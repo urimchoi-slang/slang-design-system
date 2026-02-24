@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slang Design System — Component Library</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:ital,wght@1,900&display=swap" rel="stylesheet">
+  <style>
+    /* ─── RESET ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { font-family: inherit; cursor: pointer; border: none; }
+    a { text-decoration: none; }
+
+    /* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+    :root {
+      --logo-pink:   #E879F9;
+      --logo-violet: #A78BFA;
+      --logo-blue:   #7DC1F7;
+      --canvas:      #F2F0FF;
+      --sidebar-bg:  #141220;
+      --card:        #FFFFFF;
+      --card-radius: 16px;
+      --card-shadow:
+        0 1px 2px rgba(80,40,160,0.04),
+        0 3px 10px rgba(80,40,160,0.07),
+        0 8px 24px rgba(80,40,160,0.07);
+      --card-shadow-hover:
+        0 2px 4px rgba(80,40,160,0.06),
+        0 8px 20px rgba(80,40,160,0.11),
+        0 16px 40px rgba(80,40,160,0.10);
+      --accent:       #9270E8;
+      --accent-hover: #7D5CE0;
+      --accent-light: #EDE8FF;
+      --accent-dim:   #C4AFFE;
+      --red:          #F04872;
+      --red-light:    #FFE6EF;
+      --green:        #22C77A;
+      --green-light:  #D4F7E8;
+      --amber:        #F0A830;
+      --amber-light:  #FFF2D4;
+      --orange:       #F07048;
+      --orange-light: #FFE8D8;
+      --t1:  #1E1A38;
+      --t2:  #6B6488;
+      --t3:  #9E98B8;
+      --st1: #D0CCE8;
+      --st2: #8A869C;
+      --st3: #524F62;
+      --b1:  #E2DCF8;
+      --b2:  #C8C0EC;
+      --r-sm:   5px;
+      --r-md:   8px;
+      --r-lg:   12px;
+      --r-pill: 100px;
+      --ease-std:    cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ─── BASE ───────────────────────────────────────────────────── */
+    html, body {
+      height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--t1);
+      -webkit-font-smoothing: antialiased;
+      background: #ffffff;
+    }
+
+    /* ─── APP LAYOUT ─────────────────────────────────────────────── */
+    .ds-app {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ─── LEFT NAV ───────────────────────────────────────────────── */
+    .ds-nav {
+      width: 240px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #F8F7FF;
+      border-right: 1px solid #E2DCF8;
+      display: flex;
+      flex-direction: column;
+      padding: 0 0 24px;
+    }
+    .ds-nav::-webkit-scrollbar { width: 4px; }
+    .ds-nav::-webkit-scrollbar-track { background: transparent; }
+    .ds-nav::-webkit-scrollbar-thumb { background: #E2DCF8; border-radius: 4px; }
+
+    .ds-nav-logo {
+      padding: 20px 20px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t1);
+      border-bottom: 1px solid var(--b1);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ds-nav-logo svg { flex-shrink: 0; }
+
+    .ds-nav-group {
+      padding: 6px 12px 2px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .ds-nav a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      margin: 1px 8px;
+      border-radius: var(--r-md);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--t2);
+      transition: background 120ms ease-out, color 120ms ease-out;
+    }
+    .ds-nav a:hover {
+      background: rgba(146, 112, 232, 0.08);
+      color: var(--t1);
+    }
+    .ds-nav a.active {
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .ds-nav a .nav-num {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--t3);
+      min-width: 16px;
+      text-align: right;
+    }
+    .ds-nav a.active .nav-num { color: var(--accent-dim); }
+
+    /* ─── MAIN CONTENT ───────────────────────────────────────────── */
+    .ds-main {
+      flex: 1;
+      min-width: 0;
+      padding: 40px 48px 80px;
+      max-width: 1100px;
+    }
+
+    .ds-page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+    .ds-page-subtitle {
+      font-size: 14px;
+      color: var(--t2);
+      margin-bottom: 56px;
+      line-height: 1.6;
+    }
+
+    /* ─── SECTION ────────────────────────────────────────────────── */
+    .ds-section {
+      padding-bottom: 72px;
+      border-bottom: 1px solid var(--b1);
+      margin-bottom: 72px;
+    }
+    .ds-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .ds-section-header {
+      margin-bottom: 28px;
+    }
+    .ds-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--t1);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .ds-section-desc {
+      font-size: 13.5px;
+      color: var(--t2);
+      line-height: 1.65;
+      max-width: 720px;
+    }
+
+    .ds-subsection {
+      margin-bottom: 32px;
+    }
+    .ds-subsection:last-child { margin-bottom: 0; }
+
+    .ds-subsection-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--b1);
+    }
+
+    /* ─── STATE GRID ─────────────────────────────────────────────── */
+    .states-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .state-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .state-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t3);
+      text-align: center;
+    }
+
+    .state-preview {
+      border-radius: 10px;
+      border: 1px solid var(--b1);
+      min-width: 120px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .state-preview.dark-bg {
+      background: #1C1930;
+      border-color: rgba(255,255,255,0.07);
+    }
+    .state-preview.canvas-bg {
+      background:
+        radial-gradient(ellipse 65% 50% at 5% 5%,  rgba(232,121,249,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 55% 45% at 95% 95%, rgba(125,193,247,0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 55% at 55% 0%,  rgba(167,139,250,0.07) 0%, transparent 60%),
+        #F2F0FF;
+    }
+
+    /* ─── DO / DON'T ─────────────────────────────────────────────── */
+    .do-dont-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) {
+      .do-dont-row { grid-template-columns: 1fr; }
+    }
+
+    .do-card, .dont-card {
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .do-card {
+      background: #F2FBF6;
+      border: 1px solid #C2EDD8;
+      border-left: 3px solid #22C77A;
+    }
+    .dont-card {
+      background: #FFF5F7;
+      border: 1px solid #FFCCD9;
+      border-left: 3px solid #F04872;
+    }
+
+    .do-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #22C77A;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 100px;
+      width: fit-content;
+    }
+    .dont-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #F04872;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 100px;
+      width: fit-content;
+    }
+
+    .do-note {
+      font-size: 11.5px;
+      color: #22875A;
+      font-style: italic;
+      line-height: 1.55;
+    }
+    .dont-note {
+      font-size: 11.5px;
+      color: #C0305A;
+      font-style: italic;
+      line-height: 1.55;
+    }
+
+    /* ─── SWATCH GRID ────────────────────────────────────────────── */
+    .swatch-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 80px;
+    }
+    .swatch-color {
+      width: 80px;
+      height: 48px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .swatch-name {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--t1);
+    }
+    .swatch-value {
+      font-size: 10px;
+      color: var(--t3);
+      font-family: monospace;
+    }
+
+    /* ─── TYPE SCALE ─────────────────────────────────────────────── */
+    .type-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .type-sample {
+      min-width: 220px;
+      color: var(--t1);
+    }
+    .type-meta {
+      font-size: 11px;
+      color: var(--t3);
+      font-family: monospace;
+    }
+
+    /* ─── RADIUS / SHADOW DEMOS ──────────────────────────────────── */
+    .radius-demo {
+      width: 56px;
+      height: 56px;
+      background: var(--accent-light);
+      border: 2px solid var(--accent-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .shadow-demo {
+      width: 100px;
+      height: 64px;
+      background: white;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--t2);
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────────── */
+    @keyframes ds-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    @keyframes ds-toast-in {
+      from { transform: translateY(100%) scale(0.9); opacity: 0; }
+      to   { transform: translateY(0) scale(1);     opacity: 1; }
+    }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="ds-app">
+
+  <!-- LEFT NAV -->
+  <nav class="ds-nav">
+    <div class="ds-nav-logo">
+      <svg width="72" height="24" viewBox="0 0 108 36" fill="none">
+        <defs>
+          <linearGradient id="lgNav" x1="0" y1="0" x2="108" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#E879F9"/>
+            <stop offset="45%" stop-color="#A78BFA"/>
+            <stop offset="100%" stop-color="#7DC1F7"/>
+          </linearGradient>
+        </defs>
+        <text x="2" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgNav)" letter-spacing="-0.5">Slang</text>
+      </svg>
+      <span style="font-size:11px;font-weight:600;color:#9E98B8;letter-spacing:0.04em;text-transform:uppercase;">Design System</span>
+    </div>
+
+    <div class="ds-nav-group">Foundations</div>
+    <a href="#tokens"><span class="nav-num">1</span> Design Tokens</a>
+    <a href="#logo"><span class="nav-num">2</span> Logo &amp; Brand Mark</a>
+    <a href="#sidebar"><span class="nav-num">3</span> Sidebar</a>
+    <a href="#canvas-bg"><span class="nav-num">4</span> Canvas Background</a>
+
+    <div class="ds-nav-group" style="margin-top:8px;">Chrome</div>
+    <a href="#pills"><span class="nav-num">5</span> Header Pills</a>
+    <a href="#ctrl-btns"><span class="nav-num">6</span> Control Buttons</a>
+    <a href="#tabs"><span class="nav-num">7</span> Tab Bar</a>
+    <a href="#chips"><span class="nav-num">8</span> Filter Chips</a>
+    <a href="#group"><span class="nav-num">9</span> Group Headers</a>
+
+    <div class="ds-nav-group" style="margin-top:8px;">Card Components</div>
+    <a href="#cards"><span class="nav-num">10</span> Inbox Card</a>
+    <a href="#priority"><span class="nav-num">11</span> Priority Badge</a>
+    <a href="#time-pill"><span class="nav-num">12</span> Time-ago Pill</a>
+    <a href="#channel"><span class="nav-num">13</span> Channel Badges</a>
+    <a href="#contact"><span class="nav-num">14</span> Contact Chips</a>
+    <a href="#cat-tag"><span class="nav-num">15</span> Category Tag</a>
+    <a href="#rev-pill"><span class="nav-num">16</span> Revenue Pill</a>
+    <a href="#avatar"><span class="nav-num">17</span> Guest Avatar</a>
+    <a href="#empty"><span class="nav-num">18</span> Empty State</a>
+
+    <div class="ds-nav-group" style="margin-top:8px;">Actions &amp; Overlays</div>
+    <a href="#buttons"><span class="nav-num">19</span> Buttons</a>
+    <a href="#toast"><span class="nav-num">20</span> Toast</a>
+    <a href="#flyout"><span class="nav-num">21</span> Flyout Panel</a>
+    <a href="#tooltip"><span class="nav-num">22</span> Tooltip</a>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="ds-main">
+    <h1 class="ds-page-title">Component Library</h1>
+    <p class="ds-page-subtitle">Smart Inbox · Slang Design System — every component documented with interactive states, anatomy diagrams, and Do / Don't guidance. All components are rendered using the exact same CSS tokens as the live prototype.</p>
+
+<!-- Part A: Tokens, Logo, Sidebar, Canvas -->
+<section id="tokens" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Design Tokens</h2>
+    <p class="ds-section-desc">The foundational primitives of the Smart Inbox / Slang design system — colors, typography, spacing, and motion. All values are available as CSS custom properties on <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">:root</code> and should be referenced via <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">var()</code> rather than hardcoded hex values.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">1a — Color Palette</div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Logo Gradient</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#E879F9;"></div><div class="swatch-name">Pink</div><div class="swatch-value">--logo-pink</div><div class="swatch-value">#E879F9</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#A78BFA;"></div><div class="swatch-name">Violet</div><div class="swatch-value">--logo-violet</div><div class="swatch-value">#A78BFA</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#7DC1F7;"></div><div class="swatch-name">Blue</div><div class="swatch-value">--logo-blue</div><div class="swatch-value">#7DC1F7</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:linear-gradient(90deg,#E879F9,#A78BFA 45%,#7DC1F7);border:none;"></div><div class="swatch-name">Full Gradient</div><div class="swatch-value">pink → violet → blue</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Canvas / App Background</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#F2F0FF;"></div><div class="swatch-name">Base</div><div class="swatch-value">--canvas</div><div class="swatch-value">#F2F0FF</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:rgba(232,121,249,0.5);"></div><div class="swatch-name">Glow Pink</div><div class="swatch-value">top-left 10%</div><div class="swatch-value">rgba(232,121,249,.10)</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:rgba(125,193,247,0.6);"></div><div class="swatch-name">Glow Blue</div><div class="swatch-value">btm-right 12%</div><div class="swatch-value">rgba(125,193,247,.12)</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:rgba(167,139,250,0.4);"></div><div class="swatch-name">Glow Violet</div><div class="swatch-value">top-center 7%</div><div class="swatch-value">rgba(167,139,250,.07)</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Brand Accent</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#9270E8;"></div><div class="swatch-name">Primary</div><div class="swatch-value">--accent</div><div class="swatch-value">#9270E8</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#7D5CE0;"></div><div class="swatch-name">Hover</div><div class="swatch-value">--accent-hover</div><div class="swatch-value">#7D5CE0</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#EDE8FF;"></div><div class="swatch-name">Light</div><div class="swatch-value">--accent-light</div><div class="swatch-value">#EDE8FF</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#C4AFFE;"></div><div class="swatch-name">Dim</div><div class="swatch-value">--accent-dim</div><div class="swatch-value">#C4AFFE</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Text (Canvas / Light Surface)</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#1E1A38;"></div><div class="swatch-name">Primary</div><div class="swatch-value">--t1</div><div class="swatch-value">#1E1A38</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#6B6488;"></div><div class="swatch-name">Secondary</div><div class="swatch-value">--t2</div><div class="swatch-value">#6B6488</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#9E98B8;"></div><div class="swatch-name">Muted</div><div class="swatch-value">--t3</div><div class="swatch-value">#9E98B8</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Sidebar Text (Dark Surface)</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#D0CCE8;"></div><div class="swatch-name">Hover</div><div class="swatch-value">--st1</div><div class="swatch-value">#D0CCE8</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#8A869C;"></div><div class="swatch-name">Default</div><div class="swatch-value">--st2</div><div class="swatch-value">#8A869C</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#524F62;"></div><div class="swatch-name">Dim</div><div class="swatch-value">--st3</div><div class="swatch-value">#524F62</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#CAAFFE;"></div><div class="swatch-name">Active</div><div class="swatch-value">(no var)</div><div class="swatch-value">#CAAFFE</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Semantic — Status &amp; Urgency</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#F04872;"></div><div class="swatch-name">Red</div><div class="swatch-value">--red</div><div class="swatch-value">#F04872</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FFE6EF;"></div><div class="swatch-name">Red Light</div><div class="swatch-value">--red-light</div><div class="swatch-value">#FFE6EF</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#22C77A;"></div><div class="swatch-name">Green</div><div class="swatch-value">--green</div><div class="swatch-value">#22C77A</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#D4F7E8;"></div><div class="swatch-name">Green Light</div><div class="swatch-value">--green-light</div><div class="swatch-value">#D4F7E8</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F0A830;"></div><div class="swatch-name">Amber</div><div class="swatch-value">--amber</div><div class="swatch-value">#F0A830</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FFF2D4;"></div><div class="swatch-name">Amber Light</div><div class="swatch-value">--amber-light</div><div class="swatch-value">#FFF2D4</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F07048;"></div><div class="swatch-name">Orange</div><div class="swatch-value">--orange</div><div class="swatch-value">#F07048</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#FFE8D8;"></div><div class="swatch-name">Orange Light</div><div class="swatch-value">--orange-light</div><div class="swatch-value">#FFE8D8</div></div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;">Borders</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="swatch-color" style="background:#E2DCF8;"></div><div class="swatch-name">Subtle</div><div class="swatch-value">--b1</div><div class="swatch-value">#E2DCF8</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#C8C0EC;"></div><div class="swatch-name">Default</div><div class="swatch-value">--b2</div><div class="swatch-value">#C8C0EC</div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#141220;"></div><div class="swatch-name">Sidebar BG</div><div class="swatch-value">--sidebar-bg</div><div class="swatch-value">#141220</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">1b — Typography Scale</div>
+    <p style="font-size:12px;color:#6B6488;margin-bottom:16px;line-height:1.6;">UI font: <strong style="color:#1E1A38;">Inter</strong> (400, 500, 600, 700). Logo font: <strong style="color:#1E1A38;">Nunito 900 italic</strong>. Base: 13px / 1.5 line-height. <code style="font-family:monospace;font-size:11px;background:#EDE8FF;color:#9270E8;padding:1px 4px;border-radius:3px;">-webkit-font-smoothing: antialiased</code>.</p>
+    <div style="border:1px solid #E2DCF8;border-radius:12px;overflow:hidden;">
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;">QUICK FILTERS</div><div class="type-meta">10.5px / 600 / Label — uppercase chips, badges</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:11px;font-weight:500;">Today · 6:57 PM</div><div class="type-meta">11px / 500 / Caption — timestamps, metadata</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:12px;font-weight:500;">View Details</div><div class="type-meta">12px / 500 / Small body — ghost buttons</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:12.5px;font-weight:600;">Smart Inbox</div><div class="type-meta">12.5px / 600 / Nav label — sidebar, chrome</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:13px;font-weight:400;">Base font size for all UI text</div><div class="type-meta">13px / 400 / Body — default body copy</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:14px;font-weight:600;letter-spacing:-0.02em;">Reservation Inquiry for Nine People</div><div class="type-meta">14px / 600 / Card title — letter-spacing: -0.02em</div></div>
+      <div class="type-row" style="padding:10px 16px;border-bottom:1px solid #E2DCF8;"><div class="type-sample" style="font-size:15px;font-weight:700;letter-spacing:-0.02em;">Birthday Dinner Inquiry</div><div class="type-meta">15px / 700 / Flyout title</div></div>
+      <div class="type-row" style="padding:10px 16px;"><div class="type-sample" style="font-size:16px;font-weight:700;letter-spacing:-0.03em;">Smart Inbox</div><div class="type-meta">16px / 700 / Page title — letter-spacing: -0.03em</div></div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">1c — Border Radius</div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div class="radius-demo" style="border-radius:5px;">5px</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">--r-sm<br>Tags, tooltips</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div class="radius-demo" style="border-radius:8px;">8px</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">--r-md<br>Buttons, nav</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div class="radius-demo" style="border-radius:12px;">12px</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">--r-lg<br>Panels, flyout</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div class="radius-demo" style="border-radius:100px;width:88px;height:36px;font-size:10px;">pill</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">--r-pill<br>Chips, tabs</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:56px;height:56px;background:#EDE8FF;border:2px solid #C4AFFE;border-radius:16px;display:flex;align-items:center;justify-content:center;color:#9270E8;font-size:9.5px;font-weight:700;">16px</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">--card-radius<br>Inbox cards</div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:56px;height:56px;background:#EDE8FF;border:2px solid #C4AFFE;border-radius:0 24px 24px 0;display:flex;align-items:center;justify-content:center;color:#9270E8;font-size:8.5px;font-weight:700;text-align:center;line-height:1.3;">0 24px<br>24px 0</div><div style="font-size:10.5px;color:#9E98B8;text-align:center;font-family:monospace;">sidebar<br>right edge pill</div></div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">1d — Elevation &amp; Shadows</div>
+    <div style="display:flex;flex-wrap:wrap;gap:32px;align-items:flex-end;">
+      <div style="display:flex;flex-direction:column;gap:12px;"><div class="shadow-demo" style="box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);">Default</div><div style="font-size:11px;font-weight:600;color:#6B6488;">Card Default</div><div style="font-size:10px;color:#9E98B8;font-family:monospace;max-width:180px;line-height:1.7;">--card-shadow</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;"><div class="shadow-demo" style="box-shadow:0 2px 4px rgba(80,40,160,0.06),0 8px 20px rgba(80,40,160,0.11),0 16px 40px rgba(80,40,160,0.10);transform:translateY(-2px);">Hover</div><div style="font-size:11px;font-weight:600;color:#6B6488;">Card Hover / Elevated</div><div style="font-size:10px;color:#9E98B8;font-family:monospace;max-width:180px;line-height:1.7;">--card-shadow-hover</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;"><div class="shadow-demo" style="box-shadow:-8px 0 40px rgba(20,10,60,0.14);border-radius:0;">Flyout</div><div style="font-size:11px;font-weight:600;color:#6B6488;">Flyout Panel</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;"><div class="shadow-demo" style="box-shadow:6px 0 28px rgba(0,0,0,0.18);background:#141220;border-radius:0 16px 16px 0;"><span style="color:#8A869C;">Sidebar</span></div><div style="font-size:11px;font-weight:600;color:#6B6488;">Sidebar</div></div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">1e — Easing Curves &amp; Motion</div>
+    <div style="border:1px solid #E2DCF8;border-radius:12px;overflow:hidden;">
+      <div style="display:flex;align-items:flex-start;gap:24px;padding:14px 16px;border-bottom:1px solid #E2DCF8;"><div style="min-width:120px;font-size:12px;font-weight:700;color:#1E1A38;font-family:monospace;">--ease-std</div><div><div style="font-size:12px;color:#1E1A38;font-family:monospace;margin-bottom:4px;">cubic-bezier(0.4, 0, 0.2, 1)</div><div style="font-size:11.5px;color:#6B6488;">Standard (Material) — sidebar collapse 260ms, tab slider 220ms, flyout 300ms</div></div></div>
+      <div style="display:flex;align-items:flex-start;gap:24px;padding:14px 16px;border-bottom:1px solid #E2DCF8;"><div style="min-width:120px;font-size:12px;font-weight:700;color:#1E1A38;font-family:monospace;">--ease-spring</div><div><div style="font-size:12px;color:#1E1A38;font-family:monospace;margin-bottom:4px;">cubic-bezier(0.34, 1.56, 0.64, 1)</div><div style="font-size:11.5px;color:#6B6488;">Spring bounce — toast entry 280ms, card entrance 320ms staggered 50ms</div></div></div>
+      <div style="padding:12px 16px;background:#FAFAF8;display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div style="padding-right:16px;border-right:1px solid #E2DCF8;font-size:12px;color:#6B6488;line-height:2.1;"><span style="color:#1E1A38;font-family:monospace;">55ms</span> — button press<br><span style="color:#1E1A38;font-family:monospace;">150ms</span> — card hover<br><span style="color:#1E1A38;font-family:monospace;">220ms</span> — tab slider<br><span style="color:#1E1A38;font-family:monospace;">260ms</span> — sidebar collapse</div>
+        <div style="padding-left:16px;font-size:12px;color:#6B6488;line-height:2.1;"><span style="color:#1E1A38;font-family:monospace;">280ms</span> — toast entrance<br><span style="color:#1E1A38;font-family:monospace;">300ms</span> — flyout slide<br><span style="color:#1E1A38;font-family:monospace;">320ms</span> — card entrance<br><span style="color:#1E1A38;font-family:monospace;">380ms</span> — card exit/resolve</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="logo" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Logo &amp; Brand Mark</h2>
+    <p class="ds-section-desc">The Slang wordmark uses Nunito 900 italic with an inline SVG <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">linearGradient</code> fill — never a flat color or raster image. Gradient: pink → violet → blue. When sidebar is collapsed, only the "S" glyph is shown.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Wordmark States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Full — on dark sidebar</div>
+        <div class="state-preview dark-bg" style="display:flex;align-items:center;justify-content:center;padding:28px 36px;">
+          <svg width="108" height="36" viewBox="0 0 108 36" fill="none"><defs><linearGradient id="lgA1" x1="0" y1="0" x2="108" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E879F9"/><stop offset="45%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7DC1F7"/></linearGradient></defs><text x="2" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgA1)" letter-spacing="-0.5">Slang</text></svg>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Full — on light canvas</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:28px 36px;">
+          <svg width="108" height="36" viewBox="0 0 108 36" fill="none"><defs><linearGradient id="lgA2" x1="0" y1="0" x2="108" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E879F9"/><stop offset="45%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7DC1F7"/></linearGradient></defs><text x="2" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgA2)" letter-spacing="-0.5">Slang</text></svg>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Collapsed "S" glyph</div>
+        <div class="state-preview dark-bg" style="display:flex;align-items:center;justify-content:center;padding:28px 28px;">
+          <svg width="26" height="36" viewBox="0 0 26 36" fill="none"><defs><linearGradient id="lgA3" x1="0" y1="0" x2="26" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E879F9"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient></defs><text x="1" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgA3)">S</text></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Gradient Anatomy</div>
+    <div style="padding:16px 20px;background:#FAFAF8;border:1px solid #E2DCF8;border-radius:12px;">
+      <div style="height:12px;width:360px;max-width:100%;background:linear-gradient(90deg,#E879F9 0%,#A78BFA 45%,#7DC1F7 100%);border-radius:8px;margin-bottom:10px;"></div>
+      <div style="display:flex;justify-content:space-between;max-width:360px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#E879F9;">#E879F9 · 0% (Pink)</div>
+        <div style="font-size:11px;font-weight:700;color:#A78BFA;">#A78BFA · 45% (Violet)</div>
+        <div style="font-size:11px;font-weight:700;color:#7DC1F7;">#7DC1F7 · 100% (Blue)</div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Render via inline SVG with <code style="font-family:monospace;font-size:11px;">linearGradient</code> fill — ensures true gradient at all sizes on all displays.</p><p class="do-note">The SVG linearGradient is the only correct implementation. It scales perfectly, is accessible, and requires no external assets.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use a flat color, CSS gradient on text, or rasterized PNG/JPG for the wordmark.</p><div style="margin-top:12px;background:#141220;border-radius:8px;padding:12px 16px;display:inline-block;"><span style="font-family:Nunito,'Arial Rounded MT Bold',sans-serif;font-weight:900;font-style:italic;font-size:24px;color:#9270E8;">Slang</span></div><p class="dont-note">✕ Flat single-color substitution loses the brand gradient entirely.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="sidebar" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Sidebar</h2>
+    <p class="ds-section-desc">Permanently on the <strong style="color:#1E1A38;">left</strong> — non-negotiable. Dark background (#141220), pill-shaped right edge (border-radius 0 24px 24px 0), collapses to 60px icon-only. State persisted to localStorage. Tooltips appear on the right when collapsed.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States — Expanded vs. Collapsed</div>
+    <div class="states-row" style="align-items:flex-start;">
+      <div class="state-card">
+        <div class="state-label">Expanded — 228px</div>
+        <div style="width:228px;height:500px;background:#141220;border-radius:0 20px 20px 0;box-shadow:6px 0 28px rgba(0,0,0,0.18);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,0.04);">
+          <div style="padding:18px 16px 10px;"><svg width="90" height="30" viewBox="0 0 108 36" fill="none"><defs><linearGradient id="lgSbExp" x1="0" y1="0" x2="108" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E879F9"/><stop offset="45%" stop-color="#A78BFA"/><stop offset="100%" stop-color="#7DC1F7"/></linearGradient></defs><text x="2" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgSbExp)" letter-spacing="-0.5">Slang</text></svg></div>
+          <div style="margin:0 10px 8px;padding:7px 10px;background:rgba(255,255,255,0.05);border-radius:8px;border:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;background:linear-gradient(135deg,#CC7EF5,#78C0F5);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;flex-shrink:0;">AG</div><span style="font-size:11.5px;font-weight:600;color:#D0CCE8;flex:1;white-space:nowrap;overflow:hidden;">Amelia Gene's</span><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 4L5 6.5L7.5 4" stroke="#524F62" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <nav style="flex:1;padding:0 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Insights</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;background:linear-gradient(135deg,rgba(204,126,245,0.16),rgba(120,192,245,0.14));"><svg style="width:15px;height:15px;flex-shrink:0;color:#CAAFFE;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:600;color:#CAAFFE;flex:1;">Smart Inbox</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Guests</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Branding</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Concierge</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Marketplace</span></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Hours</span></div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);margin:4px 2px;"></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;">Settings</span></div>
+          </nav>
+          <div style="border-top:1px solid rgba(255,255,255,0.06);padding:6px 8px 8px;">
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><svg style="width:15px;height:15px;flex-shrink:0;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><span style="font-size:12px;font-weight:500;color:#8A869C;flex:1;">What's New</span><div style="background:#F04872;color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:100px;">10</div></div>
+            <div style="display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:8px;"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9270E8,#EC4899);display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:800;color:white;flex-shrink:0;">UC</div><span style="font-size:12px;font-weight:500;color:#8A869C;flex:1;">Urim Choi</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Collapsed — 60px</div>
+        <div style="width:60px;height:500px;background:#141220;border-radius:0 20px 20px 0;box-shadow:6px 0 28px rgba(0,0,0,0.18);display:flex;flex-direction:column;align-items:center;overflow:hidden;border:1px solid rgba(255,255,255,0.04);">
+          <div style="padding:18px 0 10px;"><svg width="20" height="28" viewBox="0 0 26 36" fill="none"><defs><linearGradient id="lgSbCol" x1="0" y1="0" x2="26" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#E879F9"/><stop offset="100%" stop-color="#A78BFA"/></linearGradient></defs><text x="1" y="30" font-family="Nunito,'Arial Rounded MT Bold',sans-serif" font-weight="900" font-style="italic" font-size="32" fill="url(#lgSbCol)">S</text></svg></div>
+          <div style="margin:0 6px 8px;padding:8px;background:rgba(255,255,255,0.05);border-radius:8px;"><div style="width:20px;height:20px;background:linear-gradient(135deg,#CC7EF5,#78C0F5);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;">AG</div></div>
+          <nav style="flex:1;width:100%;display:flex;flex-direction:column;align-items:center;gap:1px;padding:0 6px;overflow:hidden;">
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;background:linear-gradient(135deg,rgba(204,126,245,0.16),rgba(120,192,245,0.14));"><svg style="width:15px;height:15px;color:#CAAFFE;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg></div>
+            <div style="height:1px;background:rgba(255,255,255,0.07);width:calc(100% - 12px);margin:3px 6px;"></div>
+            <div style="width:100%;padding:9px 0;display:flex;justify-content:center;border-radius:8px;position:relative;"><svg style="width:15px;height:15px;color:#524F62;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg><div style="position:absolute;top:6px;right:8px;width:7px;height:7px;background:#F04872;border-radius:50%;border:1.5px solid #141220;"></div></div>
+          </nav>
+          <div style="border-top:1px solid rgba(255,255,255,0.06);padding:8px 0 12px;display:flex;justify-content:center;"><div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9270E8,#EC4899);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:white;">UC</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Keep navigation as a left sidebar with dark background (#141220) and pill-shaped right edge (border-radius: 0 24px 24px 0). Persist collapse state to localStorage. Show tooltips when collapsed.</p><p class="do-note">The left sidebar is a non-negotiable product decision. The dark background and pill edge are core brand differentiators.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Move sidebar to the right or convert to top navigation. Use a white, light grey, or warm-toned sidebar background.</p><p class="dont-note">Right sidebar and top nav were explicitly rejected. The dark #141220 background is a deliberate brand decision — do not substitute it with any light color.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="canvas-bg" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Canvas Background</h2>
+    <p class="ds-section-desc">Cool pale lavender base (#F2F0FF) layered with three subtle radial glows echoing the logo gradient — pink top-left, blue bottom-right, violet top-center. Cards float cleanly against this tinted surface.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Full canvas (with 3 radial glows)</div>
+        <div style="width:400px;max-width:100%;height:180px;border-radius:12px;border:1px solid #E2DCF8;background:radial-gradient(ellipse 65% 50% at 5% 5%,rgba(232,121,249,0.10) 0%,transparent 70%),radial-gradient(ellipse 55% 45% at 95% 95%,rgba(125,193,247,0.12) 0%,transparent 65%),radial-gradient(ellipse 45% 55% at 55% 0%,rgba(167,139,250,0.07) 0%,transparent 60%),#F2F0FF;display:flex;align-items:center;justify-content:center;"><div style="background:white;border-radius:12px;padding:12px 16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);width:220px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:12px 12px 0 0;"></div><div style="padding-top:6px;"><div style="font-size:12px;font-weight:600;color:#1E1A38;margin-bottom:3px;">Reservation Inquiry</div><div style="font-size:10.5px;color:#9E98B8;">Today · 2:14 PM</div></div></div></div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Base only — no glows</div>
+        <div style="width:400px;max-width:100%;height:180px;border-radius:12px;border:1px solid #E2DCF8;background:#F2F0FF;display:flex;align-items:center;justify-content:center;"><div style="background:white;border-radius:12px;padding:12px 16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);width:220px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:12px 12px 0 0;"></div><div style="padding-top:6px;"><div style="font-size:12px;font-weight:600;color:#1E1A38;margin-bottom:3px;">Reservation Inquiry</div><div style="font-size:10.5px;color:#9E98B8;">Today · 2:14 PM</div></div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Full CSS Value</div>
+    <div style="padding:16px 20px;background:#1E1A38;border-radius:12px;"><pre style="margin:0;font-family:monospace;font-size:11.5px;color:#D0CCE8;line-height:1.8;white-space:pre-wrap;">background:
+  radial-gradient(ellipse 65% 50% at 5% 5%,
+    rgba(232,121,249,0.10) 0%, transparent 70%),
+  radial-gradient(ellipse 55% 45% at 95% 95%,
+    rgba(125,193,247,0.12) 0%, transparent 65%),
+  radial-gradient(ellipse 45% 55% at 55% 0%,
+    rgba(167,139,250,0.07) 0%, transparent 60%),
+  #F2F0FF;</pre></div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use #F2F0FF cool lavender base with the three radial glows (7–12% opacity). The lavender tint harmonizes with the logo gradient and gives cards clear contrast.</p><p class="do-note">The glow radii and opacity values were carefully tuned — don't increase opacity as it will compete with card content.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use warm/earthy tones (tan, cream, warm grey) or pure white (#FFFFFF). Both were explicitly rejected during design.</p><div style="margin-top:12px;display:flex;gap:8px;"><div style="width:60px;height:36px;border-radius:6px;background:#F5F0E8;border:2px solid #F04872;"></div><div style="width:60px;height:36px;border-radius:6px;background:#FFFFFF;border:2px solid #F04872;"></div></div><p class="dont-note">✕ Warm/earthy · ✕ Pure white. The lavender tint is intentional and non-negotiable.</p></div>
+    </div>
+  </div>
+</section>
+<!-- Part B: Header Pills, Control Buttons, Tab Bar, Filter Chips, Group Headers -->
+
+<section id="pills" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Header Pills</h2>
+    <p class="ds-section-desc">Small count/status pills that appear in the page header. Two variants: <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">.hpill.neutral</code> for static counts and <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">.hpill.alert</code> for live urgency status with a pulsing dot.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Neutral</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px 28px;">
+          <div style="display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.06);border-radius:100px;padding:3px 9px;">
+            <span style="font-size:11.5px;font-weight:600;color:#6B6488;">12 items</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Alert — with pulsing dot</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px 28px;">
+          <div style="display:flex;align-items:center;gap:5px;background:#FFE6EF;border-radius:100px;padding:3px 10px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#F04872;display:inline-block;animation:ds-pulse 1.6s ease-in-out infinite;flex-shrink:0;"></span>
+            <span style="font-size:11.5px;font-weight:700;color:#F04872;">4 urgent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use the alert pill with the pulsing dot animation to surface live status like "4 urgent". It draws attention without disrupting the rest of the UI.</p>
+        <p class="do-note">The pulsing dot is a key signal that this count is live and changing — use it only for real-time urgency data.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use a solid-fill background (e.g. solid red, solid purple) for header pills. Opaque backgrounds compete with card content and feel too heavy for a subtle count indicator.</p>
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+          <div style="background:#F04872;border-radius:100px;padding:3px 10px;"><span style="font-size:11.5px;font-weight:700;color:white;">4 urgent</span></div>
+          <div style="background:#9270E8;border-radius:100px;padding:3px 10px;"><span style="font-size:11.5px;font-weight:700;color:white;">12 items</span></div>
+        </div>
+        <p class="dont-note">✕ Solid fills are too aggressive — use tinted/glass backgrounds instead.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ctrl-btns" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Control Buttons</h2>
+    <p class="ds-section-desc">Header-level utility buttons (search, filter, sort, etc.) using a frosted-glass style — <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">rgba(255,255,255,0.55)</code> background with <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">backdrop-filter: blur(8px)</code>. Two variants: icon-only (34×34px square) and text + icon.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Variants &amp; States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Icon-only — Default</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <button style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.75);display:flex;align-items:center;justify-content:center;color:#6B6488;cursor:pointer;box-shadow:0 1px 3px rgba(80,40,160,0.08);">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Icon-only — Hover</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <button style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;color:#1E1A38;cursor:pointer;box-shadow:0 2px 8px rgba(80,40,160,0.10);">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Text + Icon — Default</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <button style="height:34px;padding:0 12px;border-radius:8px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.75);display:flex;align-items:center;gap:6px;color:#6B6488;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(80,40,160,0.08);">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Filter
+          </button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Text + Icon — Hover</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <button style="height:34px;padding:0 12px;border-radius:8px;background:rgba(255,255,255,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.9);display:flex;align-items:center;gap:6px;color:#1E1A38;font-size:12.5px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(80,40,160,0.10);">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Filter
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Token Reference</div>
+    <div style="padding:14px 18px;background:#FAFAF8;border:1px solid #E2DCF8;border-radius:10px;font-size:11.5px;font-family:monospace;color:#1E1A38;line-height:2;">
+      background: rgba(255,255,255,0.55)<br>
+      backdrop-filter: blur(8px)<br>
+      border: 1px solid rgba(255,255,255,0.75)<br>
+      border-radius: 8px (--r-md)<br>
+      height: 34px<br>
+      <span style="color:#6B6488;">// Hover:</span><br>
+      background: rgba(255,255,255,0.82)<br>
+      border: 1px solid rgba(255,255,255,0.90)
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use frosted glass (rgba white + backdrop-filter blur) so the canvas gradient shows through. This keeps the header lightweight and visually cohesive with the canvas.</p>
+        <p class="do-note">The glass style ensures header controls recede visually behind the card content, maintaining clear hierarchy.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use opaque white (#FFFFFF) or a solid-color background for control buttons. Solid fills break the glass-morphic consistency and feel out of place against the canvas gradient.</p>
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+          <button style="height:34px;padding:0 12px;border-radius:8px;background:#FFFFFF;border:1px solid #E2DCF8;display:flex;align-items:center;gap:6px;color:#6B6488;font-size:12.5px;font-weight:600;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Filter
+          </button>
+          <button style="height:34px;padding:0 12px;border-radius:8px;background:#9270E8;border:none;display:flex;align-items:center;gap:6px;color:white;font-size:12.5px;font-weight:600;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M1 3h11M3 6.5h7M5 10h3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Filter
+          </button>
+        </div>
+        <p class="dont-note">✕ Opaque white · ✕ Solid accent color. Both break the glass aesthetic.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tabs" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Tab Bar (Segmented Control)</h2>
+    <p class="ds-section-desc">Three-tab segmented control: <strong style="color:#1E1A38;">Active | Resolved | All</strong>. The active state uses a sliding white pill background with a spring-eased transition. Count badges are gradient-filled on the active tab only; "All" tab has no badge.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">All Three Tabs — Static States</div>
+    <div class="states-row" style="flex-wrap:wrap;gap:20px;">
+      <div class="state-card">
+        <div class="state-label">Active tab selected</div>
+        <div class="state-preview canvas-bg" style="padding:20px;">
+          <div style="display:inline-flex;background:rgba(255,255,255,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;padding:3px;gap:2px;position:relative;">
+            <div style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:white;box-shadow:0 1px 3px rgba(80,40,160,0.12);display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:700;color:#1E1A38;">Active</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:white;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:100px;padding:1px 6px;min-width:18px;">8</span>
+            </div>
+            <div style="padding:5px 14px;border-radius:100px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">Resolved</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:1px 6px;min-width:18px;">23</span>
+            </div>
+            <div style="padding:5px 14px;border-radius:100px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">All</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Resolved tab selected</div>
+        <div class="state-preview canvas-bg" style="padding:20px;">
+          <div style="display:inline-flex;background:rgba(255,255,255,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;padding:3px;gap:2px;">
+            <div style="padding:5px 14px;border-radius:100px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">Active</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:1px 6px;min-width:18px;">8</span>
+            </div>
+            <div style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:white;box-shadow:0 1px 3px rgba(80,40,160,0.12);display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:700;color:#1E1A38;">Resolved</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:white;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:100px;padding:1px 6px;min-width:18px;">23</span>
+            </div>
+            <div style="padding:5px 14px;border-radius:100px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">All</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">All tab — no badge</div>
+        <div class="state-preview canvas-bg" style="padding:20px;">
+          <div style="display:inline-flex;background:rgba(255,255,255,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;padding:3px;gap:2px;">
+            <div style="padding:5px 14px;border-radius:100px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">Active</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:1px 6px;min-width:18px;">8</span>
+            </div>
+            <div style="padding:5px 14px;border-radius:100px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">Resolved</span>
+              <span style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:1px 6px;min-width:18px;">23</span>
+            </div>
+            <div style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:white;box-shadow:0 1px 3px rgba(80,40,160,0.12);">
+              <span style="font-size:12.5px;font-weight:700;color:#1E1A38;">All</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Interactive Demo — Animated Slider</div>
+    <div style="padding:20px;background:#F2F0FF;border-radius:12px;border:1px solid #E2DCF8;display:flex;flex-direction:column;gap:16px;align-items:center;">
+      <p style="font-size:12px;color:#6B6488;margin:0;">Click a tab to see the sliding white pill animation.</p>
+      <div id="tabDemoB" style="display:inline-flex;background:rgba(255,255,255,0.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;padding:3px;gap:2px;position:relative;">
+        <div id="tabSliderB" style="position:absolute;top:3px;bottom:3px;left:3px;border-radius:100px;background:white;box-shadow:0 1px 3px rgba(80,40,160,0.12);transition:left 220ms cubic-bezier(0.4,0,0.2,1),width 220ms cubic-bezier(0.4,0,0.2,1);pointer-events:none;z-index:0;"></div>
+        <button onclick="switchTabB(0,this)" class="tabBtnB" style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;">
+          <span style="font-size:12.5px;font-weight:700;color:#1E1A38;">Active</span>
+          <span id="tabBadgeB0" style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:white;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:100px;padding:1px 6px;min-width:18px;">8</span>
+        </button>
+        <button onclick="switchTabB(1,this)" class="tabBtnB" style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;">
+          <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">Resolved</span>
+          <span id="tabBadgeB1" style="display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:1px 6px;min-width:18px;">23</span>
+        </button>
+        <button onclick="switchTabB(2,this)" class="tabBtnB" style="position:relative;z-index:1;padding:5px 14px;border-radius:100px;background:transparent;border:none;cursor:pointer;font-family:inherit;">
+          <span style="font-size:12.5px;font-weight:500;color:#9E98B8;">All</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use a sliding white pill background for the active state with a smooth 220ms ease transition. Apply the logo gradient fill to the count badge only on the active tab. Leave the "All" tab with no count badge.</p>
+        <p class="do-note">The sliding pill creates a premium, cohesive feel. The gradient badge rewards the active tab — neutral grey for inactive keeps the visual hierarchy clear.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use an underline or border-bottom as the active indicator. Don't show a count badge on the "All" tab. Don't apply the gradient badge to inactive tabs.</p>
+        <div style="margin-top:12px;background:rgba(255,255,255,0.45);border-radius:8px;padding:4px 2px;display:inline-flex;gap:0;">
+          <div style="padding:5px 14px;border-bottom:2px solid #9270E8;"><span style="font-size:12px;font-weight:700;color:#1E1A38;">Active</span></div>
+          <div style="padding:5px 14px;"><span style="font-size:12px;font-weight:400;color:#9E98B8;">Resolved</span></div>
+          <div style="padding:5px 14px;"><span style="font-size:12px;font-weight:400;color:#9E98B8;">All</span></div>
+        </div>
+        <p class="dont-note">✕ Underline indicator is an older pattern — the pill slider approach is the correct implementation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="chips" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Filter Chips</h2>
+    <p class="ds-section-desc">Quick-filter toggle chips below the tab bar. Use frosted glass for the inactive state. Active state reveals a check icon with a <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">max-width</code> expand animation. Press feedback via <code style="font-family:monospace;font-size:12px;background:#EDE8FF;color:#9270E8;padding:1px 5px;border-radius:4px;">scale(0.96)</code>.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Default (inactive)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;">
+            <span style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">High Priority</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Active (with check icon)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:#EDE8FF;backdrop-filter:blur(8px);border:1px solid #C4AFFE;border-radius:100px;cursor:pointer;">
+            <span style="overflow:hidden;max-width:14px;display:flex;align-items:center;flex-shrink:0;">
+              <svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1.5" stroke="#9270E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span style="font-size:10.5px;font-weight:700;color:#7D5CE0;text-transform:uppercase;letter-spacing:0.04em;">High Priority</span>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Pressed (:active)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;transform:scale(0.96);">
+            <span style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">High Priority</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Interactive Demo — Toggle Chips</div>
+    <div style="padding:20px;background:#F2F0FF;border-radius:12px;border:1px solid #E2DCF8;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button class="demoChipB" onclick="toggleChipB(this,'Urgent')" style="display:flex;align-items:center;gap:0;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;transition:background 150ms,border-color 150ms,transform 55ms;font-family:inherit;">
+        <span class="chip-check-wrap" style="max-width:0;overflow:hidden;transition:max-width 200ms cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;"><svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="margin-right:4px;"><path d="M1 5L4.5 8.5L11 1.5" stroke="#9270E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="chip-label" style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">Urgent</span>
+      </button>
+      <button class="demoChipB" onclick="toggleChipB(this,'High Priority')" style="display:flex;align-items:center;gap:0;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;transition:background 150ms,border-color 150ms,transform 55ms;font-family:inherit;">
+        <span class="chip-check-wrap" style="max-width:0;overflow:hidden;transition:max-width 200ms cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;"><svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="margin-right:4px;"><path d="M1 5L4.5 8.5L11 1.5" stroke="#9270E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="chip-label" style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">High Priority</span>
+      </button>
+      <button class="demoChipB" onclick="toggleChipB(this,'Unread')" style="display:flex;align-items:center;gap:0;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;transition:background 150ms,border-color 150ms,transform 55ms;font-family:inherit;">
+        <span class="chip-check-wrap" style="max-width:0;overflow:hidden;transition:max-width 200ms cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;"><svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="margin-right:4px;"><path d="M1 5L4.5 8.5L11 1.5" stroke="#9270E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="chip-label" style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">Unread</span>
+      </button>
+      <button class="demoChipB" onclick="toggleChipB(this,'Phone')" style="display:flex;align-items:center;gap:0;height:30px;padding:0 12px;background:rgba(255,255,255,0.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.7);border-radius:100px;cursor:pointer;transition:background 150ms,border-color 150ms,transform 55ms;font-family:inherit;">
+        <span class="chip-check-wrap" style="max-width:0;overflow:hidden;transition:max-width 200ms cubic-bezier(0.4,0,0.2,1);display:flex;align-items:center;"><svg width="12" height="10" viewBox="0 0 12 10" fill="none" style="margin-right:4px;"><path d="M1 5L4.5 8.5L11 1.5" stroke="#9270E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="chip-label" style="font-size:10.5px;font-weight:600;color:#6B6488;text-transform:uppercase;letter-spacing:0.04em;">Phone</span>
+      </button>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use frosted glass base for inactive state. Reveal the check icon with a <code style="font-family:monospace;font-size:11px;">max-width</code> transition (0 → 14px over 200ms). Use <code style="font-family:monospace;font-size:11px;">scale(0.96)</code> on press.</p>
+        <p class="do-note">The check reveal animation provides clear visual confirmation of activation without a jarring layout shift. The glass style keeps chips visually light until activated.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use a solid-filled background for inactive chips. Don't use a hard toggle (instant state swap) without the check icon animation.</p>
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:#9270E8;border-radius:100px;"><span style="font-size:10.5px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:0.04em;">Urgent</span></div>
+          <div style="display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;background:#1E1A38;border-radius:100px;"><span style="font-size:10.5px;font-weight:600;color:white;text-transform:uppercase;letter-spacing:0.04em;">High Priority</span></div>
+        </div>
+        <p class="dont-note">✕ Solid fills are too visually heavy for filter chips — glass style is the correct pattern.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="group" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Group Headers</h2>
+    <p class="ds-section-desc">Temporal grouping labels rendered directly on the canvas between card groups. Structure: left-aligned label text + horizontal divider line + item count pill. Always rendered ON the canvas, never inside a card.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">All Three Group Labels</div>
+    <div style="display:flex;flex-direction:column;gap:20px;max-width:520px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">Today</span>
+        <div style="flex:1;height:1px;background:#E2DCF8;"></div>
+        <span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.06);border-radius:100px;padding:2px 8px;white-space:nowrap;">8 items</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">Yesterday</span>
+        <div style="flex:1;height:1px;background:#E2DCF8;"></div>
+        <span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.06);border-radius:100px;padding:2px 8px;white-space:nowrap;">5 items</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">Earlier</span>
+        <div style="flex:1;height:1px;background:#E2DCF8;"></div>
+        <span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.06);border-radius:100px;padding:2px 8px;white-space:nowrap;">14 items</span>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">In Context — On Canvas</div>
+    <div style="padding:16px;background:radial-gradient(ellipse 65% 50% at 5% 5%,rgba(232,121,249,0.10) 0%,transparent 70%),radial-gradient(ellipse 55% 45% at 95% 95%,rgba(125,193,247,0.12) 0%,transparent 65%),#F2F0FF;border-radius:12px;border:1px solid #E2DCF8;display:flex;flex-direction:column;gap:8px;max-width:500px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;">
+        <span style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;">Today</span>
+        <div style="flex:1;height:1px;background:#E2DCF8;"></div>
+        <span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.06);border-radius:100px;padding:2px 8px;white-space:nowrap;">2 items</span>
+      </div>
+      <div style="background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;">
+        <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div>
+        <div style="padding:12px 16px;"><span style="font-size:13px;font-weight:600;color:#1E1A38;">Reservation Inquiry</span></div>
+      </div>
+      <div style="background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;">
+        <div style="height:3px;background:linear-gradient(90deg,#F04872,#F07048);"></div>
+        <div style="padding:12px 16px;"><span style="font-size:13px;font-weight:600;color:#1E1A38;">Birthday Dinner Party</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Render group headers directly on the canvas between card groups. Use uppercase 11px/700 muted text (--t3), a 1px divider line, and a neutral count pill. Keep margins consistent with card gap (8px).</p>
+        <p class="do-note">The canvas-level placement visually separates groups without containing them in a card, which preserves the floating card aesthetic.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Put group headers inside a card container or card-like wrapper. This breaks the visual hierarchy by giving the header the same visual weight as inbox items.</p>
+        <div style="margin-top:12px;max-width:340px;">
+          <div style="background:white;border-radius:10px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);padding:10px 14px;border:2px solid #F04872;">
+            <span style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.06em;">Today (inside a card)</span>
+          </div>
+        </div>
+        <p class="dont-note">✕ Group header inside a card blurs the visual hierarchy between navigation elements and content items.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+@keyframes ds-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+</style>
+
+<script>
+(function() {
+  // Tab demo
+  var tabActiveB = 0;
+  var tabsBtnB = document.querySelectorAll('.tabBtnB');
+  var tabSliderEl = document.getElementById('tabSliderB');
+
+  function positionSliderB() {
+    if (!tabSliderEl || !tabsBtnB[tabActiveB]) return;
+    var btn = tabsBtnB[tabActiveB];
+    var container = btn.closest('#tabDemoB');
+    if (!container) return;
+    var containerRect = container.getBoundingClientRect();
+    var btnRect = btn.getBoundingClientRect();
+    tabSliderEl.style.left = (btnRect.left - containerRect.left) + 'px';
+    tabSliderEl.style.width = btnRect.width + 'px';
+  }
+
+  window.switchTabB = function(idx, btn) {
+    tabActiveB = idx;
+    var labels = document.querySelectorAll('.tabBtnB span:first-child');
+    var badges = [document.getElementById('tabBadgeB0'), document.getElementById('tabBadgeB1')];
+    document.querySelectorAll('.tabBtnB').forEach(function(b, i) {
+      var lbl = b.querySelector('span:first-child');
+      if (lbl) {
+        lbl.style.fontWeight = i === idx ? '700' : '500';
+        lbl.style.color = i === idx ? '#1E1A38' : '#9E98B8';
+      }
+    });
+    if (badges[0]) {
+      badges[0].style.background = idx === 0 ? 'linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7)' : 'rgba(0,0,0,0.07)';
+      badges[0].style.color = idx === 0 ? 'white' : '#9E98B8';
+      badges[0].style.fontWeight = idx === 0 ? '800' : '700';
+    }
+    if (badges[1]) {
+      badges[1].style.background = idx === 1 ? 'linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7)' : 'rgba(0,0,0,0.07)';
+      badges[1].style.color = idx === 1 ? 'white' : '#9E98B8';
+      badges[1].style.fontWeight = idx === 1 ? '800' : '700';
+    }
+    positionSliderB();
+  };
+
+  // init slider position after layout
+  setTimeout(positionSliderB, 50);
+  window.addEventListener('resize', positionSliderB);
+
+  // Chip toggle
+  window.toggleChipB = function(btn) {
+    var isActive = btn.dataset.active === '1';
+    var checkWrap = btn.querySelector('.chip-check-wrap');
+    var label = btn.querySelector('.chip-label');
+    if (isActive) {
+      btn.dataset.active = '0';
+      btn.style.background = 'rgba(255,255,255,0.55)';
+      btn.style.borderColor = 'rgba(255,255,255,0.7)';
+      if (checkWrap) checkWrap.style.maxWidth = '0';
+      if (label) { label.style.color = '#6B6488'; label.style.fontWeight = '600'; }
+    } else {
+      btn.dataset.active = '1';
+      btn.style.background = '#EDE8FF';
+      btn.style.borderColor = '#C4AFFE';
+      if (checkWrap) checkWrap.style.maxWidth = '14px';
+      if (label) { label.style.color = '#7D5CE0'; label.style.fontWeight = '700'; }
+    }
+    btn.style.transform = 'scale(0.96)';
+    setTimeout(function() { btn.style.transform = ''; }, 120);
+  };
+})();
+</script>
+<!-- Part C: Inbox Card, Priority Badge, Time Pill, Channel, Contact, Cat, Rev, Avatar, Empty State -->
+
+<section id="cards" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Inbox Card — Full Anatomy</h2>
+    <p class="ds-section-desc">The primary content unit. Each inbox item is a floating card with a 3px gradient stripe, priority badge, time-ago pill, title, contact row, and action footer. Never flat rows — always floating cards with purple-tinted shadows.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Card Anatomy — Labeled Zones</div>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;">
+      <!-- The annotated card -->
+      <div style="position:relative;">
+        <div style="width:320px;background:white;border-radius:16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:visible;position:relative;">
+          <!-- Gradient stripe -->
+          <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);border-radius:16px 16px 0 0;"></div>
+          <div style="padding:14px 18px 12px;">
+            <!-- Row 1 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div style="display:flex;align-items:center;gap:7px;">
+                <span style="font-size:10.5px;font-weight:700;color:#7D5CE0;background:#EDE8FF;border-radius:5px;padding:2px 7px;letter-spacing:0.01em;">High</span>
+                <span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:2px 8px;">12m ago</span>
+              </div>
+              <span style="font-size:11px;font-weight:500;color:#9E98B8;">Today · 2:14 PM</span>
+            </div>
+            <!-- Title -->
+            <div style="font-size:14px;font-weight:600;color:#1E1A38;letter-spacing:-0.02em;margin-bottom:8px;line-height:1.35;">Reservation for Nine — Private Dining Room</div>
+            <!-- Row 2: contact -->
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px;flex-wrap:wrap;">
+              <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+              <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#6B6488;">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 2C2 2 3 2 4 4C5 6 6 7 8 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                (415) 555-0134
+              </span>
+              <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#6B6488;">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="3.5" stroke="currentColor" stroke-width="1.3"/></svg>
+                Jennifer Lee
+              </span>
+              <span style="font-size:10.5px;font-weight:600;color:#00A896;background:rgba(0,200,180,0.10);border-radius:100px;padding:2px 7px;">💬 SMS</span>
+            </div>
+            <!-- Footer -->
+            <div style="border-top:1px solid #E2DCF8;padding-top:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:5px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.04em;">Reservation Request</span>
+              <span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:2px 8px;">◆ $2,400</span>
+              <span style="flex:1;"></span>
+              <button style="height:28px;padding:0 10px;border-radius:7px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">View Details</button>
+              <button style="height:28px;padding:0 10px;border-radius:7px;background:linear-gradient(135deg,#CC7EF5 0%,#9270E8 55%,#78C0F5 100%);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Mark as Resolved</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Annotation legend -->
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:4px;background:linear-gradient(90deg,#E879F9,#9270E8,#7DC1F7);border-radius:2px;flex-shrink:0;margin-top:5px;"></div><div><strong style="color:#1E1A38;">Gradient stripe</strong><br><span style="color:#6B6488;">3px top border, logo gradient (or red for urgent, grey for resolved)</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:12px;background:#EDE8FF;border-radius:3px;flex-shrink:0;margin-top:2px;"></div><div><strong style="color:#1E1A38;">Priority badge</strong><br><span style="color:#6B6488;">Light tint: violet (high), red (urgent), absent (routine)</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:12px;background:#D4F7E8;border-radius:6px;flex-shrink:0;margin-top:2px;"></div><div><strong style="color:#1E1A38;">Time-ago pill</strong><br><span style="color:#6B6488;">4-tier urgency color (green/amber/orange/red)</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:12px;background:#9E98B8;border-radius:50%;flex-shrink:0;margin-top:2px;"></div><div><strong style="color:#1E1A38;">Guest avatar</strong><br><span style="color:#6B6488;">22–24px, gradient bg + initials</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:1px;background:#E2DCF8;flex-shrink:0;margin-top:7px;"></div><div><strong style="color:#1E1A38;">Footer divider</strong><br><span style="color:#6B6488;">1px --b1 border-top separates metadata from actions</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:12px;background:rgba(0,0,0,0.05);border-radius:3px;flex-shrink:0;margin-top:2px;"></div><div><strong style="color:#1E1A38;">Category tag</strong><br><span style="color:#6B6488;">Neutral bg, uppercase 10.5px — always bottom-left</span></div></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;"><div style="width:12px;height:12px;background:#D4F7E8;border-radius:6px;flex-shrink:0;margin-top:2px;"></div><div><strong style="color:#1E1A38;">Revenue pill</strong><br><span style="color:#6B6488;">◆ prefix, green — only when revenue is non-null</span></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Card States</div>
+    <div class="states-row" style="align-items:flex-start;flex-wrap:wrap;">
+      <!-- Default -->
+      <div class="state-card">
+        <div class="state-label">Default (High priority)</div>
+        <div style="width:300px;background:white;border-radius:16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;">
+          <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div>
+          <div style="padding:12px 16px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div style="display:flex;gap:6px;"><span style="font-size:10.5px;font-weight:700;color:#7D5CE0;background:#EDE8FF;border-radius:5px;padding:2px 7px;">High</span><span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:2px 8px;">45m ago</span></div>
+              <span style="font-size:11px;color:#9E98B8;">Today · 1:45 PM</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:600;color:#1E1A38;margin-bottom:8px;">Private Dining Inquiry for 12</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px;">
+              <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;">MR</div>
+              <span style="font-size:11.5px;color:#6B6488;">(512) 555-0099</span>
+              <span style="font-size:11.5px;color:#6B6488;">Marcus R.</span>
+            </div>
+            <div style="border-top:1px solid #E2DCF8;padding-top:8px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:4px;padding:2px 6px;text-transform:uppercase;letter-spacing:0.03em;">Private Dining</span>
+              <span style="flex:1;"></span>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;">Details</button>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Resolve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Urgent -->
+      <div class="state-card">
+        <div class="state-label">Urgent</div>
+        <div style="width:300px;background:white;border-radius:16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;">
+          <div style="height:3px;background:linear-gradient(90deg,#F04872,#F07048);"></div>
+          <div style="padding:12px 16px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div style="display:flex;gap:6px;"><span style="font-size:10.5px;font-weight:700;color:#F04872;background:#FFE6EF;border-radius:5px;padding:2px 7px;">Urgent</span><span style="font-size:10.5px;font-weight:700;color:#F04872;background:#FFE6EF;border-radius:100px;padding:2px 8px;">2h ago</span></div>
+              <span style="font-size:11px;color:#9E98B8;">Today · 12:08 PM</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:600;color:#1E1A38;margin-bottom:8px;">Large Group Booking — Birthday</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px;">
+              <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;">SL</div>
+              <span style="font-size:11.5px;color:#6B6488;">(628) 555-0177</span>
+              <span style="font-size:11.5px;color:#6B6488;">Sara L.</span>
+            </div>
+            <div style="border-top:1px solid #E2DCF8;padding-top:8px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:4px;padding:2px 6px;text-transform:uppercase;letter-spacing:0.03em;">Birthday Dinner</span>
+              <span style="flex:1;"></span>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;">Details</button>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Resolve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Hover -->
+      <div class="state-card">
+        <div class="state-label">Hover (lifted +2px)</div>
+        <div style="width:300px;background:white;border-radius:16px;box-shadow:0 2px 4px rgba(80,40,160,0.06),0 8px 20px rgba(80,40,160,0.11),0 16px 40px rgba(80,40,160,0.10);transform:translateY(-2px);overflow:hidden;">
+          <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div>
+          <div style="padding:12px 16px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <div style="display:flex;gap:6px;"><span style="font-size:10.5px;font-weight:700;color:#7D5CE0;background:#EDE8FF;border-radius:5px;padding:2px 7px;">High</span><span style="font-size:10.5px;font-weight:700;color:#F0A830;background:#FFF2D4;border-radius:100px;padding:2px 8px;">3h ago</span></div>
+              <span style="font-size:11px;color:#9E98B8;">Today · 11:22 AM</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:600;color:#1E1A38;margin-bottom:8px;">Anniversary Dinner Reservation</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px;">
+              <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;">TK</div>
+              <span style="font-size:11.5px;color:#6B6488;">(415) 555-0201</span>
+            </div>
+            <div style="border-top:1px solid #E2DCF8;padding-top:8px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:4px;padding:2px 6px;text-transform:uppercase;letter-spacing:0.03em;">Reservation</span>
+              <span style="flex:1;"></span>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;">Details</button>
+              <button style="height:26px;padding:0 9px;border-radius:6px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Resolve</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Resolved -->
+      <div class="state-card">
+        <div class="state-label">Resolved (0.6 opacity)</div>
+        <div style="width:300px;background:white;border-radius:16px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;opacity:0.6;">
+          <div style="height:3px;background:#9E98B8;"></div>
+          <div style="padding:12px 16px 10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:2px 8px;">Resolved</span>
+              <span style="font-size:11px;color:#9E98B8;">Yesterday · 4:30 PM</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:600;color:#1E1A38;margin-bottom:8px;text-decoration:line-through;color:#9E98B8;">Weekend Brunch for 6</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px;">
+              <div style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:white;">AP</div>
+              <span style="font-size:11.5px;color:#9E98B8;">(503) 555-0144</span>
+            </div>
+            <div style="border-top:1px solid #E2DCF8;padding-top:8px;display:flex;align-items:center;gap:6px;">
+              <span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.04);border-radius:4px;padding:2px 6px;text-transform:uppercase;letter-spacing:0.03em;">Reservation</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Render inbox items as individual floating cards with purple-tinted box-shadow. Use <code style="font-family:monospace;font-size:11px;">gap: 8px</code> between cards. Every card gets a 3px gradient top stripe.</p>
+        <p class="do-note">Cards with the logo gradient stripe create a consistent visual identity. The purple-tinted shadows harmonize with the canvas and sidebar brand colors.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use flat list rows, remove the gradient stripe, or use warm/brown-tinted shadows like <code style="font-family:monospace;font-size:11px;">rgba(0,0,0,...)</code> on cards.</p>
+        <div style="margin-top:12px;max-width:280px;background:white;border-radius:4px;border-bottom:1px solid #E2DCF8;">
+          <div style="padding:10px 14px;border-bottom:1px solid #E2DCF8;font-size:12.5px;font-weight:500;color:#1E1A38;">Reservation Inquiry for 9</div>
+          <div style="padding:10px 14px;font-size:12.5px;font-weight:500;color:#1E1A38;">Birthday Dinner Party</div>
+        </div>
+        <p class="dont-note">✕ Flat list rows lose all card identity. The floating card pattern is non-negotiable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="priority" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Priority Badge</h2>
+    <p class="ds-section-desc">Small label in the top-left of a card indicating urgency. Uses light-tint backgrounds — never solid fills. Absent on routine/All-tab items.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Variants</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">High</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px 28px;">
+          <span style="font-size:10.5px;font-weight:700;color:#7D5CE0;background:#EDE8FF;border-radius:5px;padding:3px 9px;letter-spacing:0.01em;">High</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Urgent</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px 28px;">
+          <span style="font-size:10.5px;font-weight:700;color:#F04872;background:#FFE6EF;border-radius:5px;padding:3px 9px;letter-spacing:0.01em;">Urgent</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Absent (Routine)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px 28px;">
+          <span style="font-size:11px;color:#9E98B8;font-style:italic;">No badge</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Paired with Matching Stripe</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">High + logo gradient stripe</div>
+        <div style="width:240px;background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;">
+          <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div>
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:6px;"><span style="font-size:10.5px;font-weight:700;color:#7D5CE0;background:#EDE8FF;border-radius:5px;padding:2px 7px;">High</span><span style="font-size:12px;color:#6B6488;">Matched ✓</span></div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Urgent + red stripe</div>
+        <div style="width:240px;background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;">
+          <div style="height:3px;background:linear-gradient(90deg,#F04872,#F07048);"></div>
+          <div style="padding:10px 12px;display:flex;align-items:center;gap:6px;"><span style="font-size:10.5px;font-weight:700;color:#F04872;background:#FFE6EF;border-radius:5px;padding:2px 7px;">Urgent</span><span style="font-size:12px;color:#6B6488;">Matched ✓</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Pair the priority badge with a matching stripe color. Use light-tint backgrounds — --accent-light / --accent-hover for high, --red-light / --red for urgent.</p><p class="do-note">The badge + stripe pairing creates an unmistakable visual signal for each priority level.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use a solid-fill badge or mismatched badge + stripe colors (e.g. urgent badge with logo gradient stripe).</p><div style="margin-top:10px;display:flex;gap:8px;"><span style="font-size:10.5px;font-weight:700;color:white;background:#F04872;border-radius:5px;padding:3px 9px;">Urgent</span><span style="font-size:10.5px;font-weight:700;color:white;background:#9270E8;border-radius:5px;padding:3px 9px;">High</span></div><p class="dont-note">✕ Solid fills are too heavy — light-tint backgrounds are the correct treatment.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="time-pill" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Time-ago Pill</h2>
+    <p class="ds-section-desc">A 4-tier urgency color system based on how long ago the message arrived. Color changes automatically as time passes: green → amber → orange → red.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Four Urgency Tiers</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Fresh — &lt; 1 hour</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:3px 9px;">12m ago</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Warn — 1–4 hours</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:700;color:#F0A830;background:#FFF2D4;border-radius:100px;padding:3px 9px;">2h ago</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Aging — 4–24 hours</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:700;color:#F07048;background:#FFE8D8;border-radius:100px;padding:3px 9px;">8h ago</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Old — &gt; 24 hours</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:700;color:#F04872;background:#FFE6EF;border-radius:100px;padding:3px 9px;">2d ago</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Timeline Diagram</div>
+    <div style="padding:20px;background:#FAFAF8;border:1px solid #E2DCF8;border-radius:12px;max-width:560px;">
+      <div style="display:flex;align-items:center;gap:0;margin-bottom:16px;">
+        <div style="flex:1;height:8px;background:#D4F7E8;border-radius:6px 0 0 6px;"></div>
+        <div style="flex:1.5;height:8px;background:#FFF2D4;"></div>
+        <div style="flex:4;height:8px;background:#FFE8D8;"></div>
+        <div style="flex:6;height:8px;background:#FFE6EF;border-radius:0 6px 6px 0;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#6B6488;font-family:monospace;">
+        <span style="color:#22C77A;font-weight:700;">0</span>
+        <span style="color:#F0A830;font-weight:700;">1h</span>
+        <span style="color:#F07048;font-weight:700;">4h</span>
+        <span style="color:#F04872;font-weight:700;">24h+</span>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;background:#D4F7E8;border-radius:50%;"></div><span style="font-size:11.5px;color:#22C77A;font-weight:700;">Fresh</span><span style="font-size:11px;color:#6B6488;">&lt; 1h</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;background:#FFF2D4;border-radius:50%;"></div><span style="font-size:11.5px;color:#F0A830;font-weight:700;">Warn</span><span style="font-size:11px;color:#6B6488;">1–4h</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;background:#FFE8D8;border-radius:50%;"></div><span style="font-size:11.5px;color:#F07048;font-weight:700;">Aging</span><span style="font-size:11px;color:#6B6488;">4–24h</span></div>
+        <div style="display:flex;align-items:center;gap:6px;"><div style="width:10px;height:10px;background:#FFE6EF;border-radius:50%;"></div><span style="font-size:11.5px;color:#F04872;font-weight:700;">Old</span><span style="font-size:11px;color:#6B6488;">&gt; 24h</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use the four-tier system consistently. Each tier maps to a specific pre-defined token pair (color + background). The system is designed to read at a glance without needing exact times.</p><p class="do-note">The urgency tiers are semantic tokens — red doesn't just mean "old", it signals "this needs attention now".</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Invent custom colors, mix warm/cool tones between tiers, or use more than 4 levels. Don't use grey for any urgency state — grey is reserved for resolved items.</p><div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;"><span style="font-size:10.5px;font-weight:700;color:#6B4C1A;background:#FFF0DC;border-radius:100px;padding:2px 8px;">15m ago</span><span style="font-size:10.5px;font-weight:700;color:#6B6488;background:rgba(0,0,0,0.08);border-radius:100px;padding:2px 8px;">2h ago</span></div><p class="dont-note">✕ Custom warm tone · ✕ Grey urgency (grey = resolved only). Use the four defined semantic tokens.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="channel" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Channel Badges</h2>
+    <p class="ds-section-desc">Small color-coded labels identifying the communication channel for each inbox item. Each channel has a unique, distinct color — never reuse a channel color for a different channel.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">All Channel Types</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Phone</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:600;color:#6482B4;background:rgba(100,130,180,0.12);border-radius:5px;padding:3px 8px;">📞 Phone</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Email</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:600;color:#9270E8;background:#EDE8FF;border-radius:5px;padding:3px 8px;">✉ Email</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">SMS</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:600;color:#00A896;background:rgba(0,200,180,0.10);border-radius:5px;padding:3px 8px;">💬 SMS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use each channel's designated color consistently. Place channel badges in card row 2 before contact chips. Pair with the matching emoji prefix for quick scanning.</p><p class="do-note">Channel color consistency allows users to instantly identify communication type without reading the label text.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use the same color for different channels, or use accent purple (#9270E8) for non-email channels.</p><div style="margin-top:10px;display:flex;gap:8px;"><span style="font-size:10.5px;font-weight:600;color:#9270E8;background:#EDE8FF;border-radius:5px;padding:3px 8px;">📞 Phone</span><span style="font-size:10.5px;font-weight:600;color:#9270E8;background:#EDE8FF;border-radius:5px;padding:3px 8px;">💬 SMS</span></div><p class="dont-note">✕ Both channels using email violet breaks the visual channel distinction system.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Contact Chips</h2>
+    <p class="ds-section-desc">Inline chips in card row 2 showing contact information. Guest avatar, phone number, and name appear as separate chips with icons. SMS chips get a distinct teal pill background.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Variants</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Phone number chip</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#6B6488;">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2.5 2.5C2.5 2.5 3.5 2.5 4.5 4.5C5.5 6.5 6.5 7.5 8.5 7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            (415) 555-0134
+          </span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Guest name chip</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:11.5px;color:#6B6488;">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><circle cx="5.5" cy="4" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M2 9.5c0-1.93 1.567-3.5 3.5-3.5S9 7.57 9 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Jennifer Lee
+          </span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">SMS chip (teal pill)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:#00A896;background:rgba(0,200,180,0.10);border-radius:100px;padding:2px 8px;">
+            💬 (415) 555-0134
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Show phone number and guest name as separate chips with distinct icons. SMS chips get a teal pill background to visually differentiate the channel.</p><p class="do-note">Separate chips allow quick scanning of contact details. The icon prefix eliminates ambiguity about what each piece of information represents.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Merge all contact info into a single unformatted string, or omit the icons.</p><div style="margin-top:10px;font-size:11.5px;color:#6B6488;">(415) 555-0134 · Jennifer Lee · SMS</div><p class="dont-note">✕ Plain concatenated string — loses the visual hierarchy and scannability of separate chips.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="cat-tag" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Category Tag</h2>
+    <p class="ds-section-desc">Intentionally neutral lowercase-to-uppercase labels in the card footer identifying the inquiry type. No color-coding — all categories share the same muted appearance to avoid competing with priority indicators.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Examples &amp; Multi-tag Layout</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Single tag</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:5px;padding:3px 8px;text-transform:uppercase;letter-spacing:0.04em;">Reservation Request</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Multiple tags</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:5px;padding:3px 8px;text-transform:uppercase;letter-spacing:0.04em;">Private Dining</span>
+            <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:5px;padding:3px 8px;text-transform:uppercase;letter-spacing:0.04em;">Birthday</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use a subtle <code style="font-family:monospace;font-size:11px;">rgba(0,0,0,0.05)</code> background for all category tags. Keep them intentionally neutral so they don't compete with the priority badge.</p><p class="do-note">Category tags are informational metadata, not urgency signals. Neutral styling keeps the visual hierarchy clear.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Color-code categories by type. Don't use accent colors, semantic colors, or any distinguishing hues for different category types.</p><div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;"><span style="font-size:10.5px;font-weight:600;color:white;background:#9270E8;border-radius:5px;padding:3px 8px;text-transform:uppercase;letter-spacing:0.04em;">Private Dining</span><span style="font-size:10.5px;font-weight:600;color:white;background:#F04872;border-radius:5px;padding:3px 8px;text-transform:uppercase;letter-spacing:0.04em;">Birthday</span></div><p class="dont-note">✕ Color-coded categories create false urgency signals and visual noise in the footer.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="rev-pill" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Revenue Pill</h2>
+    <p class="ds-section-desc">Optional green indicator in the card footer showing the estimated revenue value of an inquiry. Only rendered when a revenue value is present — absence is intentional and meaningful.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Present vs. Absent</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Present</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <span style="font-size:10.5px;font-weight:700;color:#22C77A;background:#D4F7E8;border-radius:100px;padding:3px 9px;">◆ $2,400</span>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Absent (no revenue value)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:20px;">
+          <div style="display:flex;align-items:center;gap:6px;border:1px dashed #E2DCF8;border-radius:6px;padding:8px 14px;">
+            <span style="font-size:11px;color:#9E98B8;font-style:italic;">No revenue pill rendered</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Only render the revenue pill when <code style="font-family:monospace;font-size:11px;">item.revenue</code> is non-null. Use the <code style="font-family:monospace;font-size:11px;">◆</code> prefix and green tint (#D4F7E8 / #22C77A). Place in the footer after category tags.</p><p class="do-note">The absence of a revenue pill is meaningful data — it tells the user this inquiry has no estimated value yet, rather than $0.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Show a "$0" pill, "No revenue" label, or any placeholder when revenue is null. Don't show grey/muted revenue pills.</p><div style="margin-top:10px;display:flex;gap:8px;"><span style="font-size:10.5px;font-weight:700;color:#9E98B8;background:rgba(0,0,0,0.07);border-radius:100px;padding:3px 9px;">◆ $0</span><span style="font-size:10.5px;font-weight:600;color:#9E98B8;background:rgba(0,0,0,0.05);border-radius:100px;padding:3px 9px;">No revenue</span></div><p class="dont-note">✕ "$0" pill or "No revenue" text is misleading — absence should be silence, not an explicit null state.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="avatar" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Guest Avatar</h2>
+    <p class="ds-section-desc">Circular avatar with gradient background and initials text. Three sizes for different contexts. Never uses photos or image URLs — gradient + initials is the only correct implementation.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Sizes &amp; Gradient Variants</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">24px — Card row 2</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#9E98B8,#6B6488);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">26px — Sidebar user</div>
+        <div class="state-preview dark-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#9270E8,#EC4899);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:white;flex-shrink:0;">UC</div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">52px — Flyout CRM</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#4F46E5,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Always use gradient background + initials. Grey gradient for unknown guests; purple-to-pink gradient for the user profile; indigo gradient for the flyout CRM large avatar.</p><p class="do-note">Gradient + initials never breaks (no missing image states), always looks intentional, and provides a unique color cue for each person.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use <code style="font-family:monospace;font-size:11px;">&lt;img&gt;</code> tags, external URLs, or show a broken image state. Don't use flat grey without gradient.</p><div style="margin-top:10px;display:flex;gap:10px;align-items:center;"><div style="width:36px;height:36px;border-radius:50%;background:#E2DCF8;border:2px solid #F04872;display:flex;align-items:center;justify-content:center;"><span style="font-size:9px;color:#9E98B8;">img</span></div><div style="width:36px;height:36px;border-radius:50%;background:#F0EEF8;border:2px solid #F04872;"></div></div><p class="dont-note">✕ Broken image · ✕ Flat grey. Gradient backgrounds are required for all avatar instances.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="empty" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Empty State</h2>
+    <p class="ds-section-desc">Displayed when the inbox is empty. Uses a colored orb with an icon — never plain text. Copy is context-specific to the current view (cleared inbox vs. filtered with no results).</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">All clear (inbox empty)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:32px 40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:#D4F7E8;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(212,247,232,0.35);">
+              <svg width="28" height="22" viewBox="0 0 28 22" fill="none"><path d="M2 11L10 19L26 3" stroke="#22C77A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#1E1A38;margin-bottom:4px;">All caught up!</div>
+              <div style="font-size:13px;color:#6B6488;">No active items in your inbox.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">No results (filtered)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:32px 40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;">
+            <div style="width:64px;height:64px;border-radius:50%;background:#EDE8FF;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(237,232,255,0.35);">
+              <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#9270E8" stroke-width="2"/><path d="M18.5 18.5L23 23" stroke="#9270E8" stroke-width="2" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:700;color:#1E1A38;margin-bottom:4px;">No matches found</div>
+              <div style="font-size:13px;color:#6B6488;">Try adjusting your filters to see more items.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card"><div class="do-badge">DO</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use a colored orb with an icon centered in the empty canvas. Copy should be context-specific — "All caught up!" for a cleared inbox, "No matches found" for a filtered view.</p><p class="do-note">The green orb with checkmark is a positive reward for resolving all items. The purple orb with search icon is neutral for filter states. Context-specific copy guides the next action.</p></div>
+      <div class="dont-card"><div class="dont-badge">DON'T</div><p style="font-size:13px;color:#1E1A38;margin:0;">Use generic placeholder copy ("No items", "Nothing here") or render the empty state as plain text without the orb visual.</p><div style="margin-top:10px;padding:16px;background:white;border-radius:10px;border:1px solid #E2DCF8;text-align:center;"><span style="font-size:13px;color:#9E98B8;">No items</span></div><p class="dont-note">✕ Plain text empty state — lacks the orb visual and doesn't match the context of why the inbox is empty.</p></div>
+    </div>
+  </div>
+</section>
+<!-- Part D: Buttons, Toast, Flyout Panel, Tooltip -->
+
+<style>
+@keyframes ds-toast-in {
+  from { transform: translateY(100%) scale(0.9); opacity: 0; }
+  to   { transform: translateY(0) scale(1);     opacity: 1; }
+}
+@keyframes ds-pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+</style>
+
+<section id="buttons" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Buttons</h2>
+    <p class="ds-section-desc">Two button variants: <strong style="color:#1E1A38;">Primary</strong> uses the logo gradient — reserved for the single highest-priority action per card. <strong style="color:#1E1A38;">Ghost</strong> uses a subtle dark tint for secondary actions. Each card gets at most one primary button.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Primary Button (.btn-primary)</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Default</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:linear-gradient(135deg,#CC7EF5 0%,#9270E8 55%,#78C0F5 100%);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;">Mark as Resolved</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Hover</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:linear-gradient(135deg,#BE6AEE,#8262DE,#66B2EE);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;box-shadow:0 4px 14px rgba(114,92,224,0.35);">Mark as Resolved</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Active / Pressed</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:linear-gradient(135deg,#CC7EF5 0%,#9270E8 55%,#78C0F5 100%);border:none;color:white;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;letter-spacing:-0.01em;transform:scale(0.96);">Mark as Resolved</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Resolving (green)</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:linear-gradient(135deg,#22C77A,#10B868);border:none;color:white;font-size:12px;font-weight:600;cursor:not-allowed;font-family:inherit;letter-spacing:-0.01em;opacity:0.9;pointer-events:none;">Resolving…</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Ghost Button (.btn-ghost)</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Default</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">View Details</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Hover</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:rgba(0,0,0,0.09);border:none;color:#1E1A38;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;">View Details</button>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Active / Pressed</div>
+        <div class="state-preview canvas-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <button style="height:34px;padding:0 14px;border-radius:8px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transform:scale(0.96);">View Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">In Context — Card Footer Pairing</div>
+    <div style="max-width:340px;background:white;border-radius:14px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07),0 8px 24px rgba(80,40,160,0.07);overflow:hidden;">
+      <div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div>
+      <div style="padding:12px 16px 10px;">
+        <div style="font-size:13.5px;font-weight:600;color:#1E1A38;margin-bottom:10px;">Birthday Dinner Inquiry</div>
+        <div style="border-top:1px solid #E2DCF8;padding-top:9px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:10.5px;font-weight:600;color:#6B6488;background:rgba(0,0,0,0.05);border-radius:4px;padding:2px 7px;text-transform:uppercase;letter-spacing:0.03em;">Birthday Dinner</span>
+          <span style="flex:1;"></span>
+          <button style="height:28px;padding:0 10px;border-radius:7px;background:rgba(0,0,0,0.05);border:none;color:#6B6488;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;">View Details</button>
+          <button style="height:28px;padding:0 10px;border-radius:7px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Mark as Resolved</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Token Reference</div>
+    <div style="border:1px solid #E2DCF8;border-radius:12px;overflow:hidden;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;background:#FAFAF8;">
+        <div style="padding:12px 16px;border-right:1px solid #E2DCF8;border-bottom:1px solid #E2DCF8;"><div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Primary — Default</div><div style="font-size:11px;font-family:monospace;color:#1E1A38;line-height:1.9;">bg: linear-gradient(135deg,<br>#CC7EF5,#9270E8 55%,#78C0F5)<br>color: white<br>height: 34px<br>border-radius: 8px (--r-md)<br>font: 12px/600</div></div>
+        <div style="padding:12px 16px;border-bottom:1px solid #E2DCF8;"><div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Ghost — Default</div><div style="font-size:11px;font-family:monospace;color:#1E1A38;line-height:1.9;">bg: rgba(0,0,0,0.05)<br>color: --t2<br>height: 34px<br>border-radius: 8px (--r-md)<br>font: 12px/500</div></div>
+        <div style="padding:12px 16px;border-right:1px solid #E2DCF8;"><div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Primary — Hover</div><div style="font-size:11px;font-family:monospace;color:#1E1A38;line-height:1.9;">bg: linear-gradient(135deg,<br>#BE6AEE,#8262DE,#66B2EE)<br>box-shadow: 0 4px 14px<br>rgba(114,92,224,0.35)</div></div>
+        <div style="padding:12px 16px;"><div style="font-size:11px;font-weight:700;color:#9E98B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Both — Active</div><div style="font-size:11px;font-family:monospace;color:#1E1A38;line-height:1.9;">transform: scale(0.96)<br>transition: 55ms ease-out</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Reserve the primary gradient button for the single most important action per card ("Mark as Resolved"). Use ghost for secondary actions ("View Details"). One primary button per card — maximum.</p>
+        <p class="do-note">The gradient button commands attention. Using it for multiple actions dilutes the primary CTA and creates visual noise. Ghost buttons recede appropriately for secondary actions.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Place two primary gradient buttons in the same card footer. Don't use the logo gradient for ghost or secondary actions.</p>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <button style="height:28px;padding:0 10px;border-radius:7px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">View Details</button>
+          <button style="height:28px;padding:0 10px;border-radius:7px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);border:none;color:white;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;">Mark as Resolved</button>
+        </div>
+        <p class="dont-note">✕ Two gradient buttons in one footer — the primary CTA loses its primacy. "View Details" should always be ghost style.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="toast" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Toast Notification</h2>
+    <p class="ds-section-desc">Transient feedback overlay positioned <strong style="color:#1E1A38;">bottom-center</strong> — never top-right. Dark background (#1C1916). Enters with a spring bounce animation. Always includes an Undo action for destructive operations like "Mark as Resolved".</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Anatomy</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Visible</div>
+        <div class="state-preview" style="background:#2A2720;display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="display:flex;align-items:center;gap:12px;background:#1C1916;border-radius:12px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:280px;max-width:340px;">
+            <div style="width:20px;height:20px;background:#22C77A;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span style="font-size:13px;font-weight:500;color:white;flex:1;">Marked as resolved</span>
+            <button style="font-size:12px;font-weight:600;color:#C4AFFE;background:transparent;border:none;cursor:pointer;padding:0;font-family:inherit;">Undo</button>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Spring entry animation</div>
+        <div class="state-preview" style="background:#2A2720;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:12px;background:#1C1916;border-radius:12px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:280px;animation:ds-toast-in 280ms cubic-bezier(0.34,1.56,0.64,1) forwards;">
+            <div style="width:20px;height:20px;background:#22C77A;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span style="font-size:13px;font-weight:500;color:white;flex:1;">3 items resolved</span>
+            <button style="font-size:12px;font-weight:600;color:#C4AFFE;background:transparent;border:none;cursor:pointer;padding:0;font-family:inherit;">Undo</button>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Stacked (max 2)</div>
+        <div class="state-preview" style="background:#2A2720;display:flex;align-items:flex-end;justify-content:center;padding:24px;overflow:hidden;min-height:110px;">
+          <div style="display:flex;flex-direction:column-reverse;gap:0;position:relative;width:280px;">
+            <div style="display:flex;align-items:center;gap:12px;background:#1C1916;border-radius:12px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:2;position:relative;">
+              <div style="width:20px;height:20px;background:#22C77A;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span style="font-size:13px;font-weight:500;color:white;flex:1;">Marked as resolved</span>
+              <button style="font-size:12px;font-weight:600;color:#C4AFFE;background:transparent;border:none;cursor:pointer;padding:0;font-family:inherit;">Undo</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;background:#282320;border-radius:12px;padding:12px 16px;transform:scale(0.95) translateY(8px);z-index:1;position:relative;pointer-events:none;">
+              <span style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.5);flex:1;">Previous notification</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Anatomy Details</div>
+    <div style="border:1px solid #E2DCF8;border-radius:12px;overflow:hidden;">
+      <div style="display:flex;align-items:flex-start;gap:16px;padding:12px 16px;border-bottom:1px solid #E2DCF8;"><div style="width:20px;height:20px;background:#22C77A;border-radius:50%;flex-shrink:0;margin-top:1px;"></div><div><div style="font-size:12.5px;font-weight:600;color:#1E1A38;margin-bottom:2px;">Check circle</div><div style="font-size:12px;color:#6B6488;">20px, background #22C77A, border-radius 50%, SVG ✓ in white. Pops in with spring easing cubic-bezier(0.34,1.56,0.64,1).</div></div></div>
+      <div style="display:flex;align-items:flex-start;gap:16px;padding:12px 16px;border-bottom:1px solid #E2DCF8;"><div style="font-size:13px;font-weight:500;color:white;background:#1C1916;padding:2px 8px;border-radius:4px;flex-shrink:0;">T</div><div><div style="font-size:12.5px;font-weight:600;color:#1E1A38;margin-bottom:2px;">Message text</div><div style="font-size:12px;color:#6B6488;">13px / 500, color: white. Flex:1 to fill space between icon and Undo button.</div></div></div>
+      <div style="display:flex;align-items:flex-start;gap:16px;padding:12px 16px;"><div style="font-size:12px;font-weight:600;color:#C4AFFE;background:#1C1916;padding:2px 8px;border-radius:4px;flex-shrink:0;">Undo</div><div><div style="font-size:12.5px;font-weight:600;color:#1E1A38;margin-bottom:2px;">Undo button</div><div style="font-size:12px;color:#6B6488;">12px / 600, color: --accent-dim (#C4AFFE). Always present for destructive operations. Auto-dismisses toast if not tapped within 4.5s.</div></div></div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Interactive Demo</div>
+    <div style="padding:20px;background:#F2F0FF;border-radius:12px;border:1px solid #E2DCF8;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <button id="demoD-toast-btn" onclick="demoDToastShow()" style="padding:8px 16px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">▶ Trigger Toast</button>
+      <div style="position:relative;min-width:300px;height:52px;display:flex;align-items:center;justify-content:center;">
+        <div id="demoD-toast" style="display:none;align-items:center;gap:12px;background:#1C1916;border-radius:12px;padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:280px;">
+          <div style="width:20px;height:20px;background:#22C77A;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span style="font-size:13px;font-weight:500;color:white;flex:1;">Marked as resolved</span>
+          <button onclick="demoDToastHide()" style="font-size:12px;font-weight:600;color:#C4AFFE;background:transparent;border:none;cursor:pointer;padding:0;font-family:inherit;">Undo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Position bottom-center. Use the spring bounce easing <code style="font-family:monospace;font-size:11px;">cubic-bezier(0.34,1.56,0.64,1)</code> for a lively but not garish entrance. Always include an Undo action for destructive operations.</p>
+        <p class="do-note">Bottom-center positioning is warm and focused — it draws attention without covering the content. The Undo button is a safety net that prevents user frustration after accidental resolves.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Position toasts at top-right (enterprise SaaS cliché). Show more than 2 simultaneously. Use a linear slide-in without spring. Omit the Undo action for destructive operations.</p>
+        <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+          <div style="background:#1C1916;border-radius:8px;padding:8px 12px;font-size:12px;color:white;border:2px solid #F04872;">✕ Top-right toast</div>
+        </div>
+        <p class="dont-note">✕ Top-right positioning is the wrong pattern for this product's design language.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flyout" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Flyout Panel</h2>
+    <p class="ds-section-desc">A 560px detail panel that slides in from the right over a blurred backdrop — never a full-screen modal. Shows CRM data, conversation history, and the TripleSeat integration. The backdrop (blur 2px, 35% opacity) keeps context visible.</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Panel States</div>
+    <div class="states-row" style="align-items:flex-start;">
+      <div class="state-card">
+        <div class="state-label">Closed (off-screen)</div>
+        <div class="state-preview canvas-bg" style="padding:20px;display:flex;align-items:center;justify-content:center;min-height:160px;position:relative;overflow:hidden;">
+          <div style="width:100%;height:120px;background:radial-gradient(ellipse 65% 50% at 5% 5%,rgba(232,121,249,0.10) 0%,transparent 70%),#F2F0FF;border-radius:8px;border:1px solid #E2DCF8;position:relative;overflow:hidden;">
+            <div style="position:absolute;right:-3px;top:0;bottom:0;width:60px;background:rgba(255,255,255,0.6);border-left:2px dashed #E2DCF8;display:flex;align-items:center;justify-content:center;">
+              <div style="writing-mode:vertical-lr;font-size:10px;font-weight:600;color:#9E98B8;text-align:center;">560px →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Open with backdrop</div>
+        <div class="state-preview" style="padding:0;display:flex;align-items:stretch;min-height:200px;overflow:hidden;border-radius:8px;position:relative;">
+          <div style="flex:1;background:radial-gradient(ellipse 65% 50% at 5% 5%,rgba(232,121,249,0.10) 0%,transparent 70%),#F2F0FF;"></div>
+          <div style="position:absolute;inset:0;background:rgba(20,18,32,0.35);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);"></div>
+          <div style="position:absolute;right:0;top:0;bottom:0;width:180px;background:white;box-shadow:-8px 0 40px rgba(20,10,60,0.14);padding:12px;z-index:1;">
+            <div style="font-size:12px;font-weight:700;color:#1E1A38;margin-bottom:8px;">Birthday Dinner</div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="width:32px;height:32px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+              <div><div style="font-size:11.5px;font-weight:600;color:#1E1A38;">Jennifer Lee</div><div style="font-size:10px;background:linear-gradient(135deg,#EDE8FF,#C4AFFE);color:#7D5CE0;border-radius:100px;padding:1px 6px;display:inline-block;font-weight:700;margin-top:1px;">VIP</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Sub-component: CRM Card</div>
+    <div style="max-width:400px;background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;border:1px solid #E2DCF8;">
+      <div style="padding:16px;background:#FAFAF8;border-bottom:1px solid #E2DCF8;display:flex;align-items:center;gap:12px;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1E1A38;margin-bottom:4px;">Jennifer Lee</div>
+          <div style="display:flex;gap:6px;">
+            <span style="font-size:10px;font-weight:700;background:linear-gradient(135deg,#EDE8FF,#C4AFFE);color:#7D5CE0;border-radius:100px;padding:2px 8px;">VIP</span>
+            <span style="font-size:10px;font-weight:600;background:rgba(0,0,0,0.06);color:#6B6488;border-radius:100px;padding:2px 8px;">Regular</span>
+            <span style="font-size:10px;font-weight:600;background:#D4F7E8;color:#22C77A;border-radius:100px;padding:2px 8px;">New Guest</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid #E2DCF8;">
+        <div style="padding:12px;text-align:center;border-right:1px solid #E2DCF8;"><div style="font-size:10.5px;font-weight:500;color:#9E98B8;margin-bottom:4px;">Visits</div><div style="font-size:16px;font-weight:700;color:#1E1A38;">14</div></div>
+        <div style="padding:12px;text-align:center;border-right:1px solid #E2DCF8;"><div style="font-size:10.5px;font-weight:500;color:#9E98B8;margin-bottom:4px;">Last Visit</div><div style="font-size:13px;font-weight:700;color:#1E1A38;">Jan 12</div></div>
+        <div style="padding:12px;text-align:center;"><div style="font-size:10.5px;font-weight:500;color:#9E98B8;margin-bottom:4px;">Spend</div><div style="font-size:13px;font-weight:700;color:#1E1A38;">$4,200</div></div>
+      </div>
+      <div style="padding:12px 16px;border-bottom:1px solid #E2DCF8;display:flex;gap:8px;align-items:center;"><span style="font-size:11.5px;color:#9E98B8;">📧</span><span style="font-size:12px;color:#6B6488;">jennifer.lee@email.com</span></div>
+      <div style="padding:12px 16px;display:flex;gap:8px;align-items:center;"><span style="font-size:11.5px;color:#9E98B8;">📱</span><span style="font-size:12px;color:#6B6488;">(415) 555-0134</span></div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Sub-component: SMS Conversation Thread</div>
+    <div style="max-width:380px;background:white;border-radius:12px;border:1px solid #E2DCF8;padding:14px;display:flex;flex-direction:column;gap:8px;">
+      <div style="align-self:flex-start;max-width:75%;background:rgba(0,0,0,0.07);border-radius:12px 12px 12px 4px;padding:8px 12px;">
+        <div style="font-size:12.5px;color:#1E1A38;line-height:1.5;">Hi, I'd like to book a private room for 8 people on Saturday evening.</div>
+        <div style="font-size:10px;color:#9E98B8;margin-top:3px;">Jennifer Lee · 2:08 PM</div>
+      </div>
+      <div style="align-self:flex-end;max-width:75%;background:#EDE8FF;border-radius:12px 12px 4px 12px;padding:8px 12px;">
+        <div style="font-size:12.5px;color:#1E1A38;line-height:1.5;">Hi Jennifer! We have availability on Saturday. I'll check on the private room details now.</div>
+        <div style="font-size:10px;color:#9E98B8;margin-top:3px;text-align:right;">You · 2:14 PM</div>
+      </div>
+      <div style="align-self:flex-start;max-width:75%;background:rgba(0,0,0,0.07);border-radius:12px 12px 12px 4px;padding:8px 12px;">
+        <div style="font-size:12.5px;color:#1E1A38;line-height:1.5;">Thank you! We're celebrating my husband's birthday. 🎉</div>
+        <div style="font-size:10px;color:#9E98B8;margin-top:3px;">Jennifer Lee · 2:16 PM</div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Sub-component: TripleSeat Integration Card</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Default</div>
+        <div class="state-preview canvas-bg" style="padding:20px;display:flex;align-items:center;justify-content:center;">
+          <div style="background:#D4F7E8;border-left:3px solid #22C77A;border-radius:8px;padding:12px 14px;max-width:240px;cursor:pointer;">
+            <div style="font-size:10px;font-weight:700;color:#22C77A;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">TripleSeat</div>
+            <div style="font-size:13px;font-weight:600;color:#1E1A38;">Birthday Dinner · $2,400 est.</div>
+            <div style="font-size:11px;color:#6B6488;margin-top:2px;">View event in TripleSeat →</div>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Hover</div>
+        <div class="state-preview canvas-bg" style="padding:20px;display:flex;align-items:center;justify-content:center;">
+          <div style="background:#C1F0DA;border-left:3px solid #22C77A;border-radius:8px;padding:12px 14px;max-width:240px;cursor:pointer;box-shadow:0 2px 8px rgba(34,199,122,0.20);">
+            <div style="font-size:10px;font-weight:700;color:#22C77A;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">TripleSeat</div>
+            <div style="font-size:13px;font-weight:600;color:#1E1A38;">Birthday Dinner · $2,400 est.</div>
+            <div style="font-size:11px;color:#6B6488;margin-top:2px;">View event in TripleSeat →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Interactive Demo</div>
+    <div style="position:relative;width:100%;height:380px;background:radial-gradient(ellipse 65% 50% at 5% 5%,rgba(232,121,249,0.10) 0%,transparent 70%),radial-gradient(ellipse 55% 45% at 95% 95%,rgba(125,193,247,0.12) 0%,transparent 65%),#F2F0FF;border-radius:12px;overflow:hidden;border:1px solid #E2DCF8;">
+      <button onclick="demoDFlyoutToggle()" style="position:absolute;top:14px;left:14px;padding:8px 14px;background:linear-gradient(135deg,#CC7EF5,#9270E8 55%,#78C0F5);color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;z-index:10;font-family:inherit;">Open Flyout</button>
+      <!-- Placeholder inbox cards -->
+      <div style="position:absolute;top:52px;left:14px;right:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;"><div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div><div style="padding:10px 14px;font-size:12.5px;font-weight:600;color:#1E1A38;">Birthday Dinner Inquiry</div></div>
+        <div style="background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;"><div style="height:3px;background:linear-gradient(90deg,#F04872,#F07048);"></div><div style="padding:10px 14px;font-size:12.5px;font-weight:600;color:#1E1A38;">Large Group Reservation</div></div>
+        <div style="background:white;border-radius:12px;box-shadow:0 1px 2px rgba(80,40,160,0.04),0 3px 10px rgba(80,40,160,0.07);overflow:hidden;"><div style="height:3px;background:linear-gradient(90deg,#E879F9,#9270E8 55%,#7DC1F7);"></div><div style="padding:10px 14px;font-size:12.5px;font-weight:600;color:#1E1A38;">Anniversary Dinner for 2</div></div>
+      </div>
+      <!-- Backdrop -->
+      <div id="demoD-backdrop" style="display:none;position:absolute;inset:0;background:rgba(20,18,32,0.35);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:20;"></div>
+      <!-- Flyout panel -->
+      <div id="demoD-flyout" style="position:absolute;top:0;right:0;bottom:0;width:260px;background:white;box-shadow:-8px 0 40px rgba(20,10,60,0.14);transform:translateX(100%);transition:transform 300ms cubic-bezier(0.4,0,0.2,1);z-index:30;overflow-y:auto;padding:14px;border-radius:0 12px 12px 0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:#1E1A38;">Birthday Dinner</div>
+          <button onclick="demoDFlyoutToggle()" style="width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.07);color:#6B6488;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1;font-family:inherit;">×</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px;background:#FAFAF8;border-radius:10px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white;flex-shrink:0;">JL</div>
+          <div><div style="font-size:12.5px;font-weight:700;color:#1E1A38;">Jennifer Lee</div><div style="font-size:9.5px;font-weight:700;background:linear-gradient(135deg,#EDE8FF,#C4AFFE);color:#7D5CE0;border-radius:100px;padding:1px 6px;display:inline-block;margin-top:2px;">VIP</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#E2DCF8;border-radius:8px;overflow:hidden;margin-bottom:12px;">
+          <div style="background:white;padding:8px 6px;text-align:center;"><div style="font-size:9.5px;color:#9E98B8;margin-bottom:2px;">Visits</div><div style="font-size:14px;font-weight:700;color:#1E1A38;">14</div></div>
+          <div style="background:white;padding:8px 6px;text-align:center;"><div style="font-size:9.5px;color:#9E98B8;margin-bottom:2px;">Last Visit</div><div style="font-size:11px;font-weight:700;color:#1E1A38;">Jan 12</div></div>
+          <div style="background:white;padding:8px 6px;text-align:center;"><div style="font-size:9.5px;color:#9E98B8;margin-bottom:2px;">Spend</div><div style="font-size:11px;font-weight:700;color:#1E1A38;">$4,200</div></div>
+        </div>
+        <div style="background:#D4F7E8;border-left:3px solid #22C77A;border-radius:8px;padding:10px 12px;"><div style="font-size:9.5px;font-weight:700;color:#22C77A;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">TripleSeat</div><div style="font-size:12px;font-weight:600;color:#1E1A38;">Birthday Dinner · $2,400 est.</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use a 560px panel width so the underlying card list remains visible. Apply a 2px blur backdrop at 35% opacity. Slide in from right with a 300ms ease transition.</p>
+        <p class="do-note">The overlay panel keeps the user grounded in the inbox context while showing detail. The blurred backdrop creates visual separation without fully hiding the background.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Use a full-screen modal that covers the entire inbox. Don't use a fully black/opaque backdrop — the context should remain visible through the blur.</p>
+        <div style="margin-top:12px;padding:12px;border-radius:8px;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;border:2px solid #F04872;"><span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.5);">✕ Fully black backdrop</span></div>
+        <p class="dont-note">✕ Opaque backdrop severs the visual connection to the card list — the overlay panel pattern requires a see-through backdrop.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tooltip" class="ds-section">
+  <div class="ds-section-header">
+    <h2 class="ds-section-title">Tooltip</h2>
+    <p class="ds-section-desc">Label tooltips that appear to the <strong style="color:#1E1A38;">right</strong> of nav icons when the sidebar is in collapsed (60px) state. Hidden by default, visible on hover. Never shown when sidebar is expanded (the nav label is already visible).</p>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">States</div>
+    <div class="states-row">
+      <div class="state-card">
+        <div class="state-label">Hidden (default)</div>
+        <div class="state-preview dark-bg" style="display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="width:60px;height:44px;background:#141220;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;">
+            <svg style="width:15px;height:15px;color:#CAAFFE;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+            <!-- No tooltip visible -->
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <div class="state-label">Visible (on hover)</div>
+        <div class="state-preview dark-bg" style="display:flex;align-items:center;justify-content:center;padding:24px 48px 24px 24px;">
+          <div style="width:60px;height:44px;background:#141220;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+            <svg style="width:15px;height:15px;color:#CAAFFE;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+            <div style="position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);background:#1E1A38;color:#D0CCE8;font-size:12px;font-weight:500;padding:6px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,0.25);">Smart Inbox</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Tooltip Style Reference</div>
+    <div style="padding:14px 18px;background:#FAFAF8;border:1px solid #E2DCF8;border-radius:10px;font-size:11.5px;font-family:monospace;color:#1E1A38;line-height:2;">
+      position: absolute<br>
+      left: calc(100% + 10px)<br>
+      top: 50%<br>
+      transform: translateY(-50%)<br>
+      background: #1E1A38 (--t1)<br>
+      color: #D0CCE8 (--st1)<br>
+      font-size: 12px / font-weight: 500<br>
+      padding: 6px 10px<br>
+      border-radius: 8px (--r-md)<br>
+      white-space: nowrap<br>
+      pointer-events: none
+    </div>
+  </div>
+  <div class="ds-subsection">
+    <div class="ds-subsection-title">Do / Don't</div>
+    <div class="do-dont-row">
+      <div class="do-card">
+        <div class="do-badge">DO</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Show tooltips only when the sidebar is in the 60px collapsed state. Position to the right of the icon. Use dark background (#1E1A38) with light text (#D0CCE8) for contrast against the dark sidebar.</p>
+        <p class="do-note">Tooltips replace the nav label that disappears during sidebar collapse — they restore usability without requiring the sidebar to expand. Right-side positioning avoids covering the sidebar content.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-badge">DON'T</div>
+        <p style="font-size:13px;color:#1E1A38;margin:0;">Show tooltips when the sidebar is expanded — the text label is already visible. Don't use light backgrounds for tooltips placed next to the dark sidebar.</p>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:12px;background:#141220;border-radius:8px;padding:12px;width:fit-content;">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;background:linear-gradient(135deg,rgba(204,126,245,0.16),rgba(120,192,245,0.14));">
+            <svg style="width:13px;height:13px;color:#CAAFFE;" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span style="font-size:12px;font-weight:600;color:#CAAFFE;">Smart Inbox</span>
+          </div>
+          <div style="background:white;color:#1E1A38;font-size:11px;padding:4px 8px;border-radius:6px;border:2px solid #F04872;white-space:nowrap;">✕ Tooltip when expanded</div>
+        </div>
+        <p class="dont-note">✕ Showing tooltip while expanded is redundant — the nav label already serves that purpose.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  // Toast demo
+  window.demoDToastShow = function() {
+    var t = document.getElementById('demoD-toast');
+    if (!t) return;
+    t.style.display = 'flex';
+    t.style.animation = 'none';
+    t.offsetHeight;
+    t.style.animation = 'ds-toast-in 280ms cubic-bezier(0.34,1.56,0.64,1) forwards';
+    clearTimeout(window._dsDemoToastTimer);
+    window._dsDemoToastTimer = setTimeout(function() {
+      if (t) t.style.display = 'none';
+    }, 4500);
+  };
+
+  window.demoDToastHide = function() {
+    var t = document.getElementById('demoD-toast');
+    if (t) t.style.display = 'none';
+    clearTimeout(window._dsDemoToastTimer);
+  };
+
+  // Flyout demo
+  var _dsFlyoutOpen = false;
+  window.demoDFlyoutToggle = function() {
+    _dsFlyoutOpen = !_dsFlyoutOpen;
+    var flyout = document.getElementById('demoD-flyout');
+    var backdrop = document.getElementById('demoD-backdrop');
+    if (!flyout || !backdrop) return;
+    flyout.style.transform = _dsFlyoutOpen ? 'translateX(0)' : 'translateX(100%)';
+    backdrop.style.display = _dsFlyoutOpen ? 'block' : 'none';
+  };
+})();
+</script>
+
+  </main>
+</div>
+
+<script>
+(function() {
+  // Active nav link highlighting on scroll
+  var sections = document.querySelectorAll('.ds-section[id]');
+  var navLinks = document.querySelectorAll('.ds-nav a[href^="#"]');
+
+  function updateActiveNav() {
+    var scrollY = window.scrollY;
+    var active = null;
+
+    sections.forEach(function(section) {
+      var top = section.offsetTop - 80;
+      if (scrollY >= top) {
+        active = section.id;
+      }
+    });
+
+    navLinks.forEach(function(link) {
+      var href = link.getAttribute('href').slice(1);
+      if (href === active) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+
+  // Smooth scroll for nav links
+  navLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var targetId = link.getAttribute('href').slice(1);
+      var target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>
