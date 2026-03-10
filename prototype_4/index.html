@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,900&family=Nunito:ital,wght@1,900&display=swap" rel="stylesheet">
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
   <style>
     /* ── DESIGN TOKENS ─────────────────────────────────────────── */
     :root {
@@ -296,14 +297,14 @@
 
     /* Sort buttons */
     .sort-btn {
-      height: 32px; padding: 0 12px;
+      padding: 7px 12px;
       border-radius: var(--r-md);
       background: rgba(255,255,255,0.65);
       border: 1px solid var(--b1);
       display: flex; align-items: center; gap: 5px;
       color: var(--t2); font-size: 12px; font-weight: 600;
+      line-height: 1; white-space: nowrap;
       transition: background 120ms, border-color 120ms, color 120ms;
-      white-space: nowrap;
     }
     .sort-btn:hover {
       background: white;
@@ -317,7 +318,7 @@
       font-weight: 700;
     }
     .icon-btn {
-      width: 32px; height: 32px;
+      padding: 8px;
       border-radius: var(--r-md);
       background: rgba(255,255,255,0.65);
       border: 1px solid var(--b1);
@@ -402,6 +403,52 @@
     .row-sep { color: var(--t3); font-size: 13px; }
     .row-phone-num { font-size: 12px; font-weight: 500; color: var(--t2); }
 
+    /* ── GUEST TYPE ICONS ───────────────────────────────────────── */
+    .guest-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      cursor: default;
+      border-radius: 50%;
+      transition: transform 120ms var(--ease-spring);
+    }
+    .guest-icon:hover { transform: scale(1.2); }
+    .guest-icon::after {
+      content: attr(data-tip);
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 50%; transform: translateX(-50%);
+      background: var(--t1); color: white;
+      font-size: 10.5px; font-weight: 600;
+      padding: 3px 8px; border-radius: var(--r-md);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 140ms;
+      z-index: 100;
+      letter-spacing: 0;
+    }
+    .guest-icon:hover::after { opacity: 1; }
+
+    /* VIP crown — warm amber/gold */
+    .guest-vip-icon {
+      width: 18px; height: 18px;
+      color: #B45309;
+      background: #FEF3C7;
+      border: 1px solid rgba(180,83,9,0.18);
+    }
+
+    /* Returning — teal */
+    .guest-returning-icon {
+      width: 18px; height: 18px;
+      color: #0FA8A0;
+      background: #E4F7F6;
+      border: 1px solid rgba(15,168,160,0.2);
+    }
+
+    /* Detail pane — slightly larger icons */
+    .detail-title .guest-icon { width: 22px; height: 22px; }
+
     .row-badge {
       font-size: 11px; font-weight: 600;
       padding: 2px 8px; border-radius: var(--r-pill);
@@ -436,7 +483,7 @@
     /* Trail */
     .row-trail {
       flex-shrink: 0;
-      display: flex; align-items: center; gap: 8px;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 5px;
     }
     .row-time-stack { text-align: right; }
     .row-timestamp {
@@ -448,11 +495,11 @@
       white-space: nowrap; text-align: right;
     }
     .row-resolve-btn {
-      height: 28px; padding: 0 12px;
+      height: 24px; padding: 0 10px;
       border-radius: var(--r-md);
       border: 1px solid var(--b2);
       background: white;
-      color: var(--t2); font-size: 11.5px; font-weight: 600;
+      color: var(--t2); font-size: 11px; font-weight: 600;
       cursor: pointer; flex-shrink: 0;
       opacity: 0;
       transition: opacity 120ms, background 120ms, border-color 120ms, color 120ms;
@@ -549,6 +596,7 @@
       font-size: 18px; font-weight: 800;
       color: var(--t1); letter-spacing: -0.03em;
       line-height: 1.2; flex: 1; margin-right: 8px;
+      display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
     }
     .detail-contact-row {
       display: flex; align-items: center; gap: 6px;
@@ -851,6 +899,113 @@
         transition-duration: 0.01ms !important;
       }
     }
+
+    /* ── FILTER MENU ────────────────────────────────────────────── */
+    .filter-btn-wrap { position: relative; }
+
+    .filter-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 292px;
+      background: white;
+      border: 1px solid var(--b1);
+      border-radius: var(--r-lg);
+      box-shadow: 0 4px 24px rgba(20,10,50,0.12), 0 1px 4px rgba(20,10,50,0.06);
+      padding: 14px;
+      z-index: 60;
+      display: none;
+      animation: filter-menu-in 160ms var(--ease-spring) both;
+    }
+    @keyframes filter-menu-in {
+      from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .filter-menu.filter-open { display: block; }
+
+    .filter-menu-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .filter-menu-title { font-size: 12.5px; font-weight: 700; color: var(--t1); }
+    .filter-clear-btn {
+      font-size: 11px; font-weight: 600; color: var(--t3);
+      cursor: pointer; padding: 3px 8px; border-radius: var(--r-md);
+      border: 1px solid transparent;
+      transition: color 100ms, background 100ms, border-color 100ms;
+    }
+    .filter-clear-btn:hover { color: var(--accent); background: var(--accent-light); border-color: var(--accent-dim); }
+
+    .filter-section { margin-bottom: 14px; }
+    .filter-section:last-of-type { margin-bottom: 0; }
+
+    .filter-section-label {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    }
+
+    .date-range-row { display: flex; align-items: center; gap: 6px; }
+    .date-input {
+      flex: 1; height: 30px; padding: 0 8px;
+      background: var(--canvas);
+      border: 1px solid var(--b1);
+      border-radius: var(--r-md);
+      font-family: inherit; font-size: 11.5px; color: var(--t1);
+      outline: none; min-width: 0;
+      transition: border-color 120ms, box-shadow 120ms, background 120ms;
+    }
+    .date-input:focus {
+      background: white;
+      border-color: var(--b2);
+      box-shadow: 0 0 0 3px rgba(124,92,255,0.08);
+    }
+    .date-range-sep { font-size: 11px; color: var(--t3); flex-shrink: 0; }
+
+    .tag-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+    .tag-chip {
+      font-size: 11px; font-weight: 500; padding: 3px 10px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--b1);
+      color: var(--t2);
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 100ms, background 100ms, color 100ms;
+    }
+    .tag-chip:hover { border-color: var(--b2); color: var(--t1); background: var(--canvas); }
+    .tag-chip.tag-chip-active {
+      background: var(--accent-light);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .filter-menu-footer { margin-top: 14px; border-top: 1px solid var(--b1); padding-top: 12px; }
+    .filter-apply-btn {
+      width: 100%; padding: 8px;
+      background: #1A1730; color: white;
+      border-radius: var(--r-md);
+      font-size: 12px; font-weight: 700;
+      font-family: inherit;
+      transition: background 100ms;
+    }
+    .filter-apply-btn:hover { background: #2C2850; }
+
+    .icon-btn.filter-active {
+      background: var(--accent-light);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+    .filter-badge {
+      position: absolute; top: -4px; right: -4px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--accent); color: white;
+      font-size: 8px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+      display: none;
+    }
+    .filter-btn-wrap.has-filters .filter-badge { display: flex; }
   </style>
 </head>
 <body>
@@ -1000,23 +1155,40 @@
             </svg>
             Oldest
           </button>
-          <button class="sort-btn" id="sortPriority" onclick="setSort('priority')">
-            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-              <path d="M1 3h9M2.5 5.5h6M4 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            Priority
-          </button>
-          <button class="icon-btn" title="Mark all as read">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <rect x="1.5" y="2.5" width="11" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M4 6l2.5 2L10 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <button class="icon-btn" title="Filter">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M1.5 3.5h11M3.5 7h7M5.5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <div class="filter-btn-wrap" id="filterBtnWrap">
+            <button class="icon-btn" id="filterBtn" title="Filter" onclick="toggleFilterMenu(event)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M1.5 3.5h11M3.5 7h7M5.5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <div class="filter-badge" id="filterBadge"></div>
+
+            <!-- Filter Menu -->
+            <div class="filter-menu" id="filterMenu">
+              <div class="filter-menu-header">
+                <span class="filter-menu-title">Filters</span>
+                <button class="filter-clear-btn" onclick="clearFilters()">Clear all</button>
+              </div>
+
+              <div class="filter-section">
+                <div class="filter-section-label">Date Range</div>
+                <div class="date-range-row">
+                  <input class="date-input" type="date" id="filterDateStart" placeholder="Start">
+                  <span class="date-range-sep">→</span>
+                  <input class="date-input" type="date" id="filterDateEnd" placeholder="End">
+                </div>
+              </div>
+
+              <div class="filter-section">
+                <div class="filter-section-label">Tags</div>
+                <div class="tag-chips" id="filterTagChips"></div>
+              </div>
+
+              <div class="filter-menu-footer">
+                <button class="filter-apply-btn" onclick="applyFilters()">Apply Filters</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1120,12 +1292,7 @@
                   <div class="gp-value" id="gpBirthday">–</div>
                 </div>
               </div>
-              <div class="gp-row-label">Dietary</div>
-              <div class="gp-tags-row" id="gpDietaryTags"></div>
-              <div class="gp-row-label">Preferences</div>
-              <div class="gp-tags-row" id="gpPrefTags"></div>
-              <div class="gp-row-label">Tags</div>
-              <div class="gp-tags-row" id="gpGuestTags"></div>
+              <div class="gp-tags-row" id="gpAllTags"></div>
             </div>
           </div>
 
@@ -1191,7 +1358,7 @@ const ALL_CALLS = [
     duration: '1:02',
     transcript: [
       { s: 'ai',    t: 'Welcome.', ts: '0:01' },
-      { s: 'ai',    t: "Thanks for calling Haleo by Jose Andres. We're here to help with reservations and any questions you may have.", ts: '0:02' },
+      { s: 'ai',    t: "Thanks for calling Velora. We're here to help with reservations and any questions you may have.", ts: '0:02' },
       { s: 'human', t: "Hi, is the restaurant week menu still available tomorrow?", ts: '0:19' },
       { s: 'ai',    t: "I'd be happy to check that for you — let me transfer you to our team right away.", ts: '0:22' },
       { s: 'human', t: "Thanks!", ts: '0:48' },
@@ -1204,7 +1371,7 @@ const ALL_CALLS = [
     summary: 'Caller informed the restaurant they would be 10-15 minutes late for their reservation. The AI agent confirmed this was within the grace period and the reservation would be held.',
     eventNote: null, duration: '0:42',
     transcript: [
-      { s: 'ai',    t: 'Welcome to Haleo by Jose Andres. How can I help you today?', ts: '0:01' },
+      { s: 'ai',    t: 'Welcome to Velora. How can I help you today?', ts: '0:01' },
       { s: 'human', t: "Hi, I have a reservation for 8 PM and I'm running about 10-15 minutes late.", ts: '0:05' },
       { s: 'ai',    t: "No problem at all! We hold reservations for up to 15 minutes. What name is the reservation under?", ts: '0:09' },
       { s: 'human', t: 'Martinez, party of 4.', ts: '0:15' },
@@ -1215,10 +1382,10 @@ const ALL_CALLS = [
     id: 3, date: 'Jan 30', time: '11:40 PM',
     title: 'Initial Reservation Inquiry Call',
     phone: '+18019183737', channel: 'Phone', status: 'Incomplete',
-    summary: "A caller contacted Jaleo DC's AI phone agent for potential reservation assistance, but the transcript cuts off mid-greeting before the caller's intent could be fully understood.",
+    summary: "A caller contacted Velora's AI phone agent for potential reservation assistance, but the transcript cuts off mid-greeting before the caller's intent could be fully understood.",
     eventNote: null, duration: '0:12',
     transcript: [
-      { s: 'ai',    t: "Thank you for calling Haleo by Jose Andres. How can I assist you today?", ts: '0:01' },
+      { s: 'ai',    t: "Thank you for calling Velora. How can I assist you today?", ts: '0:01' },
       { s: 'human', t: "Hello, I was wondering if—", ts: '0:07' },
     ]
   },
@@ -1229,7 +1396,7 @@ const ALL_CALLS = [
     summary: 'AI phone agent greeted the caller and offered reservation and event booking services. However, no further interaction or resolution is captured in this transcript.',
     eventNote: null, duration: '0:08',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! We can help with reservations, event bookings, and more. How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! We can help with reservations, event bookings, and more. How can I help?", ts: '0:01' },
       { s: 'human', t: "Uh—", ts: '0:06' },
     ]
   },
@@ -1254,7 +1421,7 @@ const ALL_CALLS = [
     eventNote: 'Transferred to events coordinator at 1:20',
     duration: '2:45',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! How can I help you?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I help you?", ts: '0:01' },
       { s: 'human', t: "Hi, I'm planning a retirement party for 18 people. Do you have space?", ts: '0:05' },
       { s: 'ai',    t: "Absolutely! For parties of 10 or more, we have a beautiful private dining room. Let me connect you with our events team.", ts: '0:10' },
       { s: 'human', t: "That would be great, thank you.", ts: '0:16' },
@@ -1284,7 +1451,7 @@ const ALL_CALLS = [
     summary: 'Caller requested information about hosting a corporate dinner for 25 guests. AI agent provided pricing, menu options, and availability for private event spaces.',
     eventNote: null, duration: '3:20',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo! How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I help?", ts: '0:01' },
       { s: 'human', t: "We're planning a corporate dinner for about 25 people. What are your private event options?", ts: '0:04' },
       { s: 'ai',    t: "For corporate events, our private dining room seats up to 30. We offer customizable prix-fixe menus starting at $85 per person.", ts: '0:09' },
     ]
@@ -1296,7 +1463,7 @@ const ALL_CALLS = [
     summary: 'Caller began planning a birthday dinner for 20 guests but was disconnected after providing the date. No contact information was captured.',
     eventNote: null, duration: '0:35',
     transcript: [
-      { s: 'ai',    t: "Thank you for calling Haleo! How can I help you today?", ts: '0:01' },
+      { s: 'ai',    t: "Thank you for calling Velora! How can I help you today?", ts: '0:01' },
       { s: 'human', t: "I want to plan a surprise birthday dinner for my mom, about 20 guests.", ts: '0:04' },
       { s: 'ai',    t: "How lovely! When were you thinking of hosting the celebration?", ts: '0:10' },
       { s: 'human', t: "March 15th — but hold on, I'm in an elevator—", ts: '0:15' },
@@ -1310,7 +1477,7 @@ const ALL_CALLS = [
     eventNote: 'Transferred to reservations at 0:45',
     duration: '1:30',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I help?", ts: '0:01' },
       { s: 'human', t: "Do you have outdoor seating? We'd love to dine outside next Saturday.", ts: '0:04' },
       { s: 'ai',    t: "We do have a lovely patio, available weather permitting. I'll transfer you to reservations to request an outdoor table.", ts: '0:08' },
     ]
@@ -1334,7 +1501,7 @@ const ALL_CALLS = [
     summary: 'Guest called to cancel their reservation for the following evening. AI confirmed the cancellation and offered to rebook for a future date.',
     eventNote: null, duration: '0:55',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo! How can I assist?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I assist?", ts: '0:01' },
       { s: 'human', t: "I need to cancel my reservation for tomorrow, party of 4 under Williams.", ts: '0:03' },
       { s: 'ai',    t: "I've found your reservation. I'll cancel that for you now. Would you like to rebook for another night?", ts: '0:08' },
     ]
@@ -1346,7 +1513,7 @@ const ALL_CALLS = [
     summary: 'Caller inquired about nut-free dining options for a severe allergy. Call was disconnected before reservation details could be confirmed.',
     eventNote: null, duration: '0:28',
     transcript: [
-      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Thank you for calling Velora! How can I help?", ts: '0:01' },
       { s: 'human', t: "I have a severe tree nut allergy. Is it safe to dine at your restaurant?", ts: '0:04' },
       { s: 'ai',    t: "We take allergies very seriously. I'd recommend alerting us when you book—", ts: '0:10' },
       { s: 'human', t: "Sorry, I can barely hear you—", ts: '0:22' },
@@ -1371,7 +1538,7 @@ const ALL_CALLS = [
     summary: 'Caller asked about the dress code for dinner service. AI confirmed the restaurant has a smart-casual dress code and provided clarifying examples.',
     eventNote: null, duration: '0:50',
     transcript: [
-      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Thank you for calling Velora! How can I help?", ts: '0:01' },
       { s: 'human', t: "What's your dress code? We're coming for dinner Saturday.", ts: '0:03' },
       { s: 'ai',    t: "We have a smart-casual dress code — think dress shirts, blouses, slacks, or tasteful dresses.", ts: '0:06' },
     ]
@@ -1383,7 +1550,7 @@ const ALL_CALLS = [
     summary: 'Caller inquired about checking their gift card balance but was unable to provide the card number before the call ended unexpectedly.',
     eventNote: null, duration: '0:22',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo! How can I assist you today?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I assist you today?", ts: '0:01' },
       { s: 'human', t: "I have a gift card and want to know my balance.", ts: '0:04' },
       { s: 'ai',    t: "Of course! Could you provide the 16-digit card number on the back?", ts: '0:07' },
       { s: 'human', t: "Hold on, let me find it — one moment—", ts: '0:13' },
@@ -1421,7 +1588,7 @@ const ALL_CALLS = [
     eventNote: 'Transfer failed at 1:05',
     duration: '1:20',
     transcript: [
-      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'ai',    t: "Thank you for calling Velora! How can I help?", ts: '0:01' },
       { s: 'human', t: "I'd like to bring a custom cake for my reservation next week. Is that allowed?", ts: '0:04' },
       { s: 'ai',    t: "Absolutely! We do allow outside cakes for special occasions with a $15 plating fee.", ts: '0:09' },
     ]
@@ -1434,7 +1601,7 @@ const ALL_CALLS = [
     eventNote: 'Transferred to reservations at 0:30',
     duration: '1:50',
     transcript: [
-      { s: 'ai',    t: "Welcome to Haleo! How can I help you?", ts: '0:01' },
+      { s: 'ai',    t: "Welcome to Velora! How can I help you?", ts: '0:01' },
       { s: 'human', t: "I need to modify my reservation — can I move it from 7 to 8 PM and add one person?", ts: '0:04' },
       { s: 'ai',    t: "Of course! What name is the reservation under?", ts: '0:12' },
     ]
@@ -1469,16 +1636,16 @@ const CALL_EXTRA = {
         sessionId: 'f1c84a29-d67b-4e03-8f1a-5b92c748e310' },
   7:  { priority: 'Low',  callerName: 'Michelle Johnson', modality: 'phone', outcome: 'lead-generated',
         tags: ['Dietary', 'Menu Inquiry'],
-        guestProfile: { member: true, visits: 8, lastVisit: 'Dec 5, 2025', birthday: 'July 22', email: 'm.johnson@email.com', crmSynced: false, dietary: ['Gluten'], preferences: ['Window seat'], guestTags: [] },
+        guestProfile: { member: true, visits: 8, lastVisit: 'Dec 5, 2025', birthday: 'July 22', email: 'm.johnson@email.com', crmSynced: true, dietary: ['Gluten Free'], preferences: ['Window seat'], guestTags: ['VIP'] },
         sessionId: 'a2d57f18-3e94-47cb-b065-c18f92a43510' },
   8:  { priority: 'Low',  callerName: 'James Thompson',   modality: 'email', outcome: 'lead-generated',
         tags: ['Corporate Event'],
         guestProfile: { member: false, visits: 6, lastVisit: 'Jan 10, 2026', birthday: 'April 18', email: 'j.thompson@corp.com', crmSynced: true, dietary: [], preferences: ['Large table'], guestTags: ['Corporate'] },
         sessionId: 'c9e23b47-a158-4d0f-9e82-7a46d183c920' },
   9:  { priority: 'High', callerName: 'Lisa Park',        modality: 'phone', outcome: 'incomplete-reservation', tags: ['Birthday'],            guestProfile: null, sessionId: 'f4b82e61-7d30-4a95-b149-c28f5e036748' },
-  10: { priority: 'Low',  callerName: 'David Wilson',     modality: 'phone', outcome: 'reservation-made',      tags: ['Outdoor Seating'],     guestProfile: null, sessionId: '78a5c932-b1e4-4d67-a03f-9b15e842c150' },
-  11: { priority: 'Low',  callerName: 'Emma Rodriguez',   modality: 'sms',   outcome: 'reservation-made',      tags: ['Dietary'],             guestProfile: null, sessionId: '3d8f49a2-c076-4b12-e95d-a24b6f183c70' },
-  12: { priority: 'Low',  callerName: 'Michael Williams', modality: 'phone', outcome: null,                    tags: ['Cancellation'],        guestProfile: null, sessionId: '9c47b2e1-5f83-4d20-a7e6-b38c91f24058' },
+  10: { priority: 'Low',  callerName: 'David Wilson',     modality: 'phone', outcome: 'reservation-made',      tags: ['Outdoor Seating'],     guestProfile: { member: false, visits: 3, lastVisit: 'Jan 22, 2026', birthday: null, email: 'd.wilson@gmail.com', crmSynced: false, dietary: [], preferences: ['Outdoor patio'], guestTags: [] }, sessionId: '78a5c932-b1e4-4d67-a03f-9b15e842c150' },
+  11: { priority: 'Low',  callerName: 'Emma Rodriguez',   modality: 'sms',   outcome: 'reservation-made',      tags: ['Dietary'],             guestProfile: { member: true, visits: 6, lastVisit: 'Jan 28, 2026', birthday: 'Sep 14', email: 'emma.r@email.com', crmSynced: true, dietary: ['Vegan'], preferences: ['Quiet table'], guestTags: ['VIP'] }, sessionId: '3d8f49a2-c076-4b12-e95d-a24b6f183c70' },
+  12: { priority: 'Low',  callerName: 'Michael Williams', modality: 'phone', outcome: null,                    tags: ['Cancellation'],        guestProfile: { member: false, visits: 2, lastVisit: 'Dec 30, 2025', birthday: null, email: 'm.williams@icloud.com', crmSynced: false, dietary: [], preferences: [], guestTags: [] }, sessionId: '9c47b2e1-5f83-4d20-a7e6-b38c91f24058' },
   13: { priority: 'High', callerName: 'Unknown Caller',   modality: 'phone', outcome: 'incomplete-lead',       tags: ['Dietary'],             guestProfile: null, sessionId: '4e19d538-a260-4f87-bc72-d5a93e186420' },
   14: { priority: 'Low',  callerName: 'Sophie Laurent',   modality: 'chat',  outcome: 'lead-generated',        tags: ['Anniversary', 'Wine'], guestProfile: null, sessionId: '7b35f921-e048-4c63-9d1a-6f28c045a193' },
   15: { priority: 'Low',  callerName: 'Jake Anderson',    modality: 'phone', outcome: null,                    tags: ['General Inquiry'],     guestProfile: null, sessionId: '2a74e810-b936-4f05-d28e-8c51f497b302' },
@@ -1502,6 +1669,12 @@ let playProgress = 0;
 let playDuration = 60;
 const PAGE_SIZE = 20;
 
+// Filter state
+let filterDateStart = '';
+let filterDateEnd = '';
+let filterSelectedTags = new Set();
+let filterMenuOpen = false;
+
 /* ── MODALITY ICONS ────────────────────────────────────────────── */
 const MODALITY_ICONS = {
   phone: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3.5 1.5h3l1.5 3.5-2 1.5a9 9 0 004 4l1.5-2 3.5 1.5v3a1 1 0 01-1 1A13 13 0 011.5 2.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>`,
@@ -1509,6 +1682,27 @@ const MODALITY_ICONS = {
   email: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 6l5.5 3.5a2 2 0 001.5 0L14 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
   chat:  `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 3a1 1 0 011-1h10a1 1 0 011 1v7a1 1 0 01-1 1H9l-3 2v-2H3a1 1 0 01-1-1V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="5.5" cy="6.5" r="1" fill="currentColor"/><circle cx="8" cy="6.5" r="1" fill="currentColor"/><circle cx="10.5" cy="6.5" r="1" fill="currentColor"/></svg>`,
 };
+
+/* ── GUEST TYPE ICONS ──────────────────────────────────────────── */
+const CROWN_SVG = `<svg width="11" height="10" viewBox="0 0 11 10" fill="none">
+  <path d="M1 8.5h9M1 8.5V5.5l2.5 1.5L5.5 2l2 5 2.5-1.5v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="5.5" cy="1.5" r="0.8" fill="currentColor"/>
+</svg>`;
+const RETURN_SVG = `<svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+  <path d="M9.5 5.5A4 4 0 113 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M3 1.5v1.5h1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+function getGuestTypeIcon(guestProfile) {
+  if (!guestProfile) return '';
+  if (guestProfile.guestTags && guestProfile.guestTags.includes('VIP')) {
+    return `<span class="guest-icon guest-vip-icon" data-tip="VIP Guest">${CROWN_SVG}</span>`;
+  }
+  if (guestProfile.visits && guestProfile.visits > 1) {
+    return `<span class="guest-icon guest-returning-icon" data-tip="Returning Guest">${RETURN_SVG}</span>`;
+  }
+  return '';
+}
 
 function formatPhone(raw) {
   const d = raw.replace(/\D/g, '');
@@ -1519,6 +1713,12 @@ function formatPhone(raw) {
 }
 
 /* ── FILTERING + SORTING ───────────────────────────────────────── */
+function parseCallDate(dateStr) {
+  const months = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+  const parts = dateStr.split(' ');
+  return new Date(2026, months[parts[0]], parseInt(parts[1]));
+}
+
 function getFilteredCalls() {
   let calls = [...ALL_CALLS];
   if (currentTab === 'resolved') {
@@ -1533,6 +1733,28 @@ function getFilteredCalls() {
       c.phone.includes(q) ||
       c.summary.toLowerCase().includes(q)
     );
+  }
+  // Date range filter
+  if (filterDateStart || filterDateEnd) {
+    calls = calls.filter(c => {
+      const d = parseCallDate(c.date);
+      if (filterDateStart) {
+        const start = new Date(filterDateStart + 'T00:00:00');
+        if (d < start) return false;
+      }
+      if (filterDateEnd) {
+        const end = new Date(filterDateEnd + 'T23:59:59');
+        if (d > end) return false;
+      }
+      return true;
+    });
+  }
+  // Tag filter — matches outcome badges shown in the list rows
+  if (filterSelectedTags.size > 0) {
+    calls = calls.filter(c => {
+      const extra = CALL_EXTRA[c.id] || {};
+      return filterSelectedTags.has(extra.outcome || '');
+    });
   }
   if (currentSort === 'priority') {
     const order = { 'Incomplete': 0, 'Human Resolved': 1, 'AI Resolved': 2 };
@@ -1608,6 +1830,7 @@ function renderCards() {
     }
 
     const phone = formatPhone(call.phone);
+    const guestIconHtml = getGuestTypeIcon(extra.guestProfile);
     const rowClasses = [
       'inbox-row', 'row-animate',
       isSelected ? 'row-selected' : '',
@@ -1622,6 +1845,7 @@ function renderCards() {
           <div class="row-meta">
             ${isIncomplete ? '<span class="row-alert-dot"></span>' : ''}
             <span class="row-name">${callerName}</span>
+            ${guestIconHtml}
             <span class="row-sep">·</span>
             <span class="row-phone-num">${phone}</span>
             ${badgeHtml}
@@ -1667,7 +1891,9 @@ function selectCard(id) {
 
   document.getElementById('detailPhone').textContent = formatPhone(callData.phone);
   document.getElementById('detailTime').textContent = callData.date + ' · ' + callData.time;
-  document.getElementById('detailCallerName').textContent = callData.callerName || '–';
+  const detailGuestIcon = getGuestTypeIcon(callData.guestProfile);
+  document.getElementById('detailCallerName').innerHTML =
+    `<span>${callData.callerName || '–'}</span>${detailGuestIcon}`;
 
   // Email row
   const emailValue = callData.guestProfile?.email || null;
@@ -1703,12 +1929,12 @@ function selectCard(id) {
     } else {
       dietaryHeaderEl.style.display = 'none';
     }
-    document.getElementById('gpDietaryTags').innerHTML = (gp.dietary || [])
-      .map(d => `<span class="gp-dietary-tag">✿ ${d}</span>`).join('');
-    document.getElementById('gpPrefTags').innerHTML = (gp.preferences || [])
-      .map(p => `<span class="gp-pref-tag">${p}</span>`).join('');
-    document.getElementById('gpGuestTags').innerHTML = (gp.guestTags || [])
-      .map(t => `<span class="gp-guest-tag">${t}</span>`).join('');
+    const allTagsHtml = [
+      ...(gp.dietary || []).map(d => `<span class="gp-dietary-tag">✿ ${d}</span>`),
+      ...(gp.preferences || []).map(p => `<span class="gp-pref-tag">${p}</span>`),
+      ...(gp.guestTags || []).filter(t => t !== 'VIP').map(t => `<span class="gp-guest-tag">${t}</span>`),
+    ].join('');
+    document.getElementById('gpAllTags').innerHTML = allTagsHtml || '<span style="color:var(--t3);font-size:11px;font-style:italic;">No tags</span>';
     gpOpen = true;
     document.getElementById('gpBody').style.display = '';
     document.getElementById('gpChevron').style.transform = '';
@@ -1739,23 +1965,30 @@ function selectCard(id) {
     transcriptSection.style.display = 'none';
   }
 
-  const durationParts = callData.duration.split(':').map(Number);
-  playDuration = durationParts[0] * 60 + durationParts[1];
-  playProgress = 0;
-  stopPlay();
-  document.getElementById('audioProgressFill').style.width = '0%';
-  document.getElementById('audioTime').textContent = `0:00 / ${callData.duration}`;
-
-  const eventNoteEl = document.getElementById('eventNote');
-  if (callData.eventNote) {
-    eventNoteEl.style.display = 'flex';
-    document.getElementById('eventNoteText').textContent = callData.eventNote;
+  const isPhoneCall = callData.modality === 'phone';
+  const audioSection = document.getElementById('audioSection');
+  if (isPhoneCall) {
+    audioSection.style.display = '';
+    const durationParts = callData.duration.split(':').map(Number);
+    playDuration = durationParts[0] * 60 + durationParts[1];
+    playProgress = 0;
+    stopPlay();
+    document.getElementById('audioProgressFill').style.width = '0%';
+    document.getElementById('audioTime').textContent = `0:00 / ${callData.duration}`;
+    const eventNoteEl = document.getElementById('eventNote');
+    if (callData.eventNote) {
+      eventNoteEl.style.display = 'flex';
+      document.getElementById('eventNoteText').textContent = callData.eventNote;
+    } else {
+      eventNoteEl.style.display = 'none';
+    }
   } else {
-    eventNoteEl.style.display = 'none';
+    audioSection.style.display = 'none';
+    stopPlay();
   }
 
   document.getElementById('detailPanel').classList.add('panel-open');
-  requestAnimationFrame(initWaveform);
+  if (isPhoneCall) requestAnimationFrame(initWaveform);
 }
 
 function closeDetail() {
@@ -1907,6 +2140,81 @@ function showToast(msg) {
   toastTimeout = setTimeout(() => toast.classList.remove('toast-show'), 2800);
 }
 
+/* ── FILTER MENU ────────────────────────────────────────────────── */
+// Tags match the outcome badges shown in inbox list rows
+const FILTER_OUTCOME_TAGS = [
+  { key: 'reservation-made',       label: 'Reservation Made' },
+  { key: 'lead-generated',         label: 'Lead Generated' },
+  { key: 'incomplete-reservation', label: 'Incomplete Reservation' },
+  { key: 'incomplete-lead',        label: 'Incomplete Lead' },
+];
+
+function renderTagChips() {
+  const container = document.getElementById('filterTagChips');
+  container.innerHTML = FILTER_OUTCOME_TAGS.map(({ key, label }) => {
+    const active = filterSelectedTags.has(key);
+    return `<span class="tag-chip${active ? ' tag-chip-active' : ''}" onclick="toggleTagChip(event,'${key}')">${label}</span>`;
+  }).join('');
+}
+
+function toggleTagChip(e, key) {
+  e.stopPropagation();
+  if (filterSelectedTags.has(key)) {
+    filterSelectedTags.delete(key);
+  } else {
+    filterSelectedTags.add(key);
+  }
+  renderTagChips();
+}
+
+function toggleFilterMenu(e) {
+  e.stopPropagation();
+  filterMenuOpen = !filterMenuOpen;
+  document.getElementById('filterMenu').classList.toggle('filter-open', filterMenuOpen);
+  if (filterMenuOpen) {
+    renderTagChips();
+    // Sync input values with current state
+    document.getElementById('filterDateStart').value = filterDateStart;
+    document.getElementById('filterDateEnd').value = filterDateEnd;
+  }
+}
+
+function closeFilterMenu() {
+  filterMenuOpen = false;
+  document.getElementById('filterMenu').classList.remove('filter-open');
+}
+
+function updateFilterBtnState() {
+  const hasFilters = filterDateStart || filterDateEnd || filterSelectedTags.size > 0;
+  document.getElementById('filterBtn').classList.toggle('filter-active', hasFilters);
+  const wrap = document.getElementById('filterBtnWrap');
+  wrap.classList.toggle('has-filters', hasFilters);
+  const badge = document.getElementById('filterBadge');
+  const count = (filterSelectedTags.size) + (filterDateStart ? 1 : 0) + (filterDateEnd ? 1 : 0);
+  badge.textContent = count > 9 ? '9+' : count;
+}
+
+function applyFilters() {
+  filterDateStart = document.getElementById('filterDateStart').value;
+  filterDateEnd = document.getElementById('filterDateEnd').value;
+  updateFilterBtnState();
+  currentPage = 1;
+  renderCards();
+  closeFilterMenu();
+}
+
+function clearFilters() {
+  filterDateStart = '';
+  filterDateEnd = '';
+  filterSelectedTags.clear();
+  document.getElementById('filterDateStart').value = '';
+  document.getElementById('filterDateEnd').value = '';
+  renderTagChips();
+  updateFilterBtnState();
+  currentPage = 1;
+  renderCards();
+}
+
 /* ── NAV ────────────────────────────────────────────────────────── */
 function navClick(el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -1916,6 +2224,14 @@ function navClick(el) {
 /* ── INIT ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   renderCards();
+  if (location.hash.includes('figmacapture')) setTimeout(() => selectCard(1), 800);
+});
+
+// Close filter menu when clicking outside
+document.addEventListener('click', (e) => {
+  if (filterMenuOpen && !e.target.closest('.filter-btn-wrap')) {
+    closeFilterMenu();
+  }
 });
 </script>
 </body>
