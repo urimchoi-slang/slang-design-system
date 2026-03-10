@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Inbox — Slang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --canvas:        #F5F3FF;
+      --sidebar-bg:    #0F0B1A;
+      --sidebar-w:     220px;
+      --sidebar-collapsed: 60px;
+      --card:          #FFFFFF;
+      --card-radius:   16px;
+      --card-shadow:   0 1px 2px rgba(80,50,140,0.05), 0 4px 14px rgba(80,50,140,0.07), 0 12px 32px rgba(80,50,140,0.05);
+
+      --pink:          #E879F9;
+      --violet:        #A78BFA;
+      --blue:          #7DC1F7;
+      --grad:          linear-gradient(135deg, #E879F9 0%, #A78BFA 50%, #7DC1F7 100%);
+
+      --accent:        #A78BFA;
+      --accent-hover:  #8B6FF0;
+      --accent-light:  #F0EEFF;
+      --accent-dim:    #C4B5FD;
+
+      --red:           #DC2626;
+      --red-light:     #FEE2E2;
+      --red-mid:       #FCA5A5;
+      --green:         #16A34A;
+      --green-light:   #DCFCE7;
+      --amber:         #D97706;
+      --amber-light:   #FEF3C7;
+      --blue-pill:     #2563EB;
+      --blue-pill-bg:  #DBEAFE;
+      --indigo:        #4338CA;
+      --indigo-bg:     #EEF2FF;
+
+      --t1:   #1A1030;
+      --t2:   #6B5B8A;
+      --t3:   #A094BA;
+      --st1:  #E8D8FF;
+      --st2:  #9080B0;
+      --st3:  #503870;
+      --b1:   #EAE4FA;
+      --b2:   #D6CCF0;
+
+      --r-sm:   5px;
+      --r-md:   8px;
+      --r-lg:   12px;
+      --r-xl:   16px;
+      --r-pill: 100px;
+      --ease-std:    cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ── GLOBAL ─────────────────────────────────────────────────── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--canvas);
+      color: var(--t1);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────────────── */
+    .app {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ────────────────────────────────────────────────── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.06);
+      transition: width 0.28s var(--ease-std), min-width 0.28s var(--ease-std);
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    .sidebar.collapsed {
+      width: var(--sidebar-collapsed);
+      min-width: var(--sidebar-collapsed);
+    }
+
+    /* Logo area */
+    .sidebar-logo {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .logo-full {
+      font-size: 22px;
+      font-weight: 800;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      opacity: 1;
+      transition: opacity 0.15s var(--ease-std);
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+      opacity: 0;
+      position: absolute;
+      left: 14px;
+      transition: opacity 0.15s var(--ease-std);
+    }
+
+    .sidebar.collapsed .logo-full { opacity: 0; pointer-events: none; }
+    .sidebar.collapsed .logo-icon { opacity: 1; }
+
+    /* Nav */
+    .nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 12px 8px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .nav::-webkit-scrollbar { display: none; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: var(--r-lg);
+      color: var(--st2);
+      cursor: pointer;
+      transition: background 0.15s var(--ease-std), color 0.15s var(--ease-std);
+      font-size: 13.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.07);
+      color: var(--st1);
+    }
+
+    .nav-item.active {
+      background: rgba(167,139,250,0.18);
+      color: var(--violet);
+    }
+
+    .nav-item.active .nav-icon {
+      color: var(--violet);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .nav-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-label {
+      opacity: 1;
+      transition: opacity 0.15s var(--ease-std);
+    }
+
+    .sidebar.collapsed .nav-label { opacity: 0; }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--pink);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: var(--r-pill);
+      flex-shrink: 0;
+      transition: opacity 0.15s var(--ease-std);
+    }
+
+    .sidebar.collapsed .nav-badge { opacity: 0; }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 12px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+
+    .sidebar.collapsed .sidebar-toggle {
+      justify-content: center;
+      padding: 0;
+    }
+
+    .toggle-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--r-md);
+      border: none;
+      background: rgba(255,255,255,0.08);
+      color: var(--st2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .toggle-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: var(--st1);
+    }
+
+    .toggle-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.28s var(--ease-std);
+    }
+
+    .sidebar.collapsed .toggle-btn svg {
+      transform: rotate(180deg);
+    }
+
+    /* User profile */
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      margin: 0 8px 8px;
+      border-radius: var(--r-lg);
+      cursor: pointer;
+      transition: background 0.15s;
+      overflow: hidden;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .sidebar-user:hover { background: rgba(255,255,255,0.07); }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      overflow: hidden;
+      transition: opacity 0.15s;
+    }
+
+    .sidebar.collapsed .user-info { opacity: 0; }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 11px;
+      color: var(--st2);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── MAIN AREA ──────────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── LIST PANEL ─────────────────────────────────────────────── */
+    .list-panel {
+      display: flex;
+      flex-direction: column;
+      background: var(--canvas);
+      border-right: 1px solid var(--b2);
+      transition: width 0.3s var(--ease-std);
+      overflow: hidden;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .list-panel.detail-open {
+      width: 44%;
+      min-width: 340px;
+    }
+
+    /* Topbar */
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      background: white;
+      border-bottom: 1px solid var(--b2);
+      flex-shrink: 0;
+    }
+
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--t1);
+      flex: 1;
+    }
+
+    .search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--b1);
+      border-radius: var(--r-lg);
+      padding: 8px 12px;
+      width: 220px;
+    }
+
+    .search-wrap svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--t3);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .search-wrap input {
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 13px;
+      color: var(--t1);
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .search-wrap input::placeholder { color: var(--t3); }
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--b1);
+      border: none;
+      border-radius: var(--r-lg);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t2);
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover { background: var(--b2); }
+
+    .filter-btn svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Section header */
+    .section-header {
+      padding: 16px 20px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+    }
+
+    /* List scroll area */
+    .list-scroll {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .list-scroll::-webkit-scrollbar { width: 4px; }
+    .list-scroll::-webkit-scrollbar-track { background: transparent; }
+    .list-scroll::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+
+    /* Row items */
+    .inbox-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.12s;
+      border-bottom: 1px solid var(--b1);
+      position: relative;
+    }
+
+    .inbox-row:hover { background: rgba(167,139,250,0.06); }
+
+    .inbox-row.active {
+      background: var(--accent-light);
+      border-bottom-color: rgba(167,139,250,0.15);
+    }
+
+    .inbox-row.active::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      border-radius: 2px 0 0 2px;
+    }
+
+    .inbox-row.unread .row-name { font-weight: 700; }
+    .inbox-row.unread .row-preview { color: var(--t2); }
+
+    .row-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .row-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 3px;
+    }
+
+    .row-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--t1);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .row-time {
+      font-size: 11px;
+      color: var(--t3);
+      flex-shrink: 0;
+      margin-left: 8px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .row-preview {
+      font-size: 12.5px;
+      color: var(--t3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 5px;
+    }
+
+    .row-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-urgent    { background: var(--red-light);    color: var(--red);      }
+    .badge-important { background: var(--amber-light);  color: var(--amber);    }
+    .badge-resolved  { background: var(--green-light);  color: var(--green);    }
+    .badge-pending   { background: var(--indigo-bg);    color: var(--indigo);   }
+    .badge-new       { background: #FDF4FF;              color: var(--pink);     }
+
+    .unread-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--pink);
+      flex-shrink: 0;
+    }
+
+    /* ── DETAIL PANE ────────────────────────────────────────────── */
+    .detail-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.3s var(--ease-std), opacity 0.25s var(--ease-std);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .detail-pane.open {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Detail header */
+    .detail-header {
+      padding: 20px 24px 0;
+      background: white;
+      border-bottom: 1px solid var(--b1);
+      flex-shrink: 0;
+    }
+
+    .detail-header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .detail-contact {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .detail-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .detail-name-block {}
+
+    .detail-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--t1);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .detail-contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .contact-info-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--t2);
+    }
+
+    .contact-info-row svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--t3);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    .detail-close {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--r-md);
+      border: none;
+      background: var(--b1);
+      color: var(--t2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .detail-close:hover {
+      background: var(--b2);
+      color: var(--t1);
+    }
+
+    .detail-close svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .detail-tabs {
+      display: flex;
+      gap: 0;
+      margin-top: 14px;
+    }
+
+    .detail-tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--t3);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .detail-tab:hover { color: var(--t2); }
+
+    .detail-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .detail-meta-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      margin-top: 4px;
+    }
+
+    /* Detail body */
+    .detail-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .detail-body::-webkit-scrollbar { width: 4px; }
+    .detail-body::-webkit-scrollbar-track { background: transparent; }
+    .detail-body::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+
+    /* ── TRANSCRIPT ─────────────────────────────────────────────── */
+    .transcript {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .transcript-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+      text-align: center;
+      position: relative;
+    }
+
+    .transcript-label::before,
+    .transcript-label::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: calc(50% - 70px);
+      height: 1px;
+      background: var(--b2);
+    }
+
+    .transcript-label::before { left: 0; }
+    .transcript-label::after  { right: 0; }
+
+    .msg-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    /* Customer/caller messages: LEFT aligned */
+    .msg-row.caller {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    /* AI/agent messages: RIGHT aligned */
+    .msg-row.agent {
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+    }
+
+    .msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-bottom: 2px;
+    }
+
+    .msg-avatar.caller-av {
+      background: var(--b2);
+      color: var(--t2);
+    }
+
+    .msg-avatar.agent-av {
+      background: var(--grad);
+      color: white;
+    }
+
+    .msg-bubble-wrap {
+      display: flex;
+      flex-direction: column;
+      max-width: 72%;
+    }
+
+    .msg-row.caller .msg-bubble-wrap { align-items: flex-start; }
+    .msg-row.agent  .msg-bubble-wrap { align-items: flex-end; }
+
+    .msg-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .caller .msg-bubble {
+      background: var(--b1);
+      color: var(--t1);
+      border-bottom-left-radius: 4px;
+    }
+
+    .agent .msg-bubble {
+      background: var(--accent);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-time {
+      font-size: 10.5px;
+      color: var(--t3);
+      margin-top: 4px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── NOTES / CRM panel ──────────────────────────────────────── */
+    .detail-info-section {
+      padding: 20px 24px;
+      border-top: 1px solid var(--b1);
+    }
+
+    .info-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--t3);
+      margin-bottom: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .info-item {}
+
+    .info-label {
+      font-size: 11px;
+      color: var(--t3);
+      margin-bottom: 2px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .info-value {
+      font-size: 13.5px;
+      color: var(--t1);
+      font-weight: 500;
+    }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────── */
+    .empty-detail {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--t3);
+      padding: 40px;
+      text-align: center;
+    }
+
+    .empty-detail svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--b2);
+      fill: none;
+      stroke-width: 1.5;
+    }
+
+    .empty-detail h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--t2);
+    }
+
+    .empty-detail p {
+      font-size: 13px;
+      color: var(--t3);
+      max-width: 260px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+      <div class="logo-full">slang</div>
+      <div class="logo-icon">S</div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-item active">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16v2.5a2 2 0 0 1-.6 1.45L13 14v6l-2-1v-5L4.6 7.95A2 2 0 0 1 4 6.5V4z"/><path d="M4 4h16"/></svg>
+        </span>
+        <span class="nav-label">Inbox</span>
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </span>
+        <span class="nav-label">Contacts</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </span>
+        <span class="nav-label">Calendar</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        <span class="nav-label">Analytics</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        </span>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">AK</div>
+      <div class="user-info">
+        <div class="user-name">Alex King</div>
+        <div class="user-email">alex@slang.ai</div>
+      </div>
+    </div>
+
+    <div class="sidebar-toggle">
+      <button class="toggle-btn" id="sidebarToggle" title="Toggle sidebar">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+    </div>
+
+  </aside>
+
+  <!-- ── MAIN AREA ────────────────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- LIST PANEL -->
+    <div class="list-panel" id="listPanel">
+
+      <!-- Topbar -->
+      <div class="topbar">
+        <h1 class="topbar-title">Smart Inbox</h1>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search conversations…">
+        </div>
+        <button class="filter-btn">
+          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filter
+        </button>
+      </div>
+
+      <!-- Scrollable list -->
+      <div class="list-scroll" id="listScroll">
+
+        <div class="section-header">Urgent &amp; Recent</div>
+
+        <!-- Rows injected by JS -->
+        <div id="inboxList"></div>
+
+      </div>
+    </div>
+
+    <!-- DETAIL PANE -->
+    <div class="detail-pane" id="detailPane">
+      <div class="detail-header" id="detailHeader"><!-- filled by JS --></div>
+      <div class="detail-body" id="detailBody"><!-- filled by JS --></div>
+    </div>
+
+  </div><!-- /.main -->
+
+</div><!-- /.app -->
+
+<script>
+/* ── DATA ──────────────────────────────────────────────────────────── */
+const conversations = [
+  {
+    id: 1,
+    name: 'Maria Santos',
+    phone: '+1 (415) 882-3201',
+    email: 'maria.santos@gmail.com',
+    initials: 'MS',
+    color: '#E879F9',
+    preview: '"Do you have gluten-free pasta options?"',
+    time: '2 min ago',
+    badge: 'urgent',
+    badgeLabel: 'Urgent',
+    unread: true,
+    tags: ['New Guest', 'Dietary'],
+    restaurant: 'Aria Bistro',
+    duration: '1m 42s',
+    transcript: [
+      { role: 'agent', text: 'Thank you for calling Aria Bistro, this is Aria. How can I help you today?', time: '3:01 PM' },
+      { role: 'caller', text: 'Hi! I was wondering if you have gluten-free pasta options on the menu?', time: '3:01 PM' },
+      { role: 'agent', text: 'Absolutely! We have a wonderful gluten-free pappardelle made with rice flour. It pairs beautifully with our truffle mushroom sauce.', time: '3:02 PM' },
+      { role: 'caller', text: 'That sounds amazing. Is it a separate preparation so there\'s no cross-contamination?', time: '3:02 PM' },
+      { role: 'agent', text: 'Yes, we use dedicated cookware for all gluten-free dishes. Your safety is our priority. Would you like to make a reservation?', time: '3:03 PM' },
+      { role: 'caller', text: 'Yes, for two people this Saturday at 7pm if possible.', time: '3:03 PM' },
+      { role: 'agent', text: 'I\'ve reserved a table for two this Saturday, March 14th at 7:00 PM. I\'ll send a confirmation to your email. Is there anything else I can help you with?', time: '3:04 PM' },
+      { role: 'caller', text: 'No that\'s perfect, thank you so much!', time: '3:04 PM' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'James Thornton',
+    phone: '+1 (628) 310-4477',
+    email: 'j.thornton@outlook.com',
+    initials: 'JT',
+    color: '#7DC1F7',
+    preview: '"I need to cancel my reservation for tonight"',
+    time: '18 min ago',
+    badge: 'important',
+    badgeLabel: 'Follow-up',
+    unread: true,
+    tags: ['Cancellation'],
+    restaurant: 'Aria Bistro',
+    duration: '2m 11s',
+    transcript: [
+      { role: 'agent', text: 'Thank you for calling Aria Bistro. How can I assist you today?', time: '2:44 PM' },
+      { role: 'caller', text: 'Hi, I need to cancel my reservation for tonight. I\'m so sorry for the short notice.', time: '2:44 PM' },
+      { role: 'agent', text: 'Of course, I\'m sorry to hear that. May I have your name and reservation time?', time: '2:44 PM' },
+      { role: 'caller', text: 'James Thornton, reservation at 8pm for four people.', time: '2:45 PM' },
+      { role: 'agent', text: 'I\'ve found your reservation. I\'ve gone ahead and cancelled it. No penalty since you\'re calling before 3pm. Would you like me to help you reschedule for another date?', time: '2:45 PM' },
+      { role: 'caller', text: 'That would be great, maybe next weekend?', time: '2:46 PM' },
+      { role: 'agent', text: 'We have availability on Saturday the 15th and Sunday the 16th. Which works better for you and your party?', time: '2:46 PM' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Priya Mehta',
+    phone: '+1 (510) 774-0093',
+    email: 'priya.mehta@gmail.com',
+    initials: 'PM',
+    color: '#A78BFA',
+    preview: '"Birthday reservation for 12 — private room available?"',
+    time: '1 hr ago',
+    badge: 'pending',
+    badgeLabel: 'Pending',
+    unread: false,
+    tags: ['Large Party', 'Events'],
+    restaurant: 'Aria Bistro',
+    duration: '3m 05s',
+    transcript: [
+      { role: 'agent', text: 'Good afternoon, Aria Bistro. How may I help you?', time: '2:01 PM' },
+      { role: 'caller', text: 'Hi, I\'m looking to book a birthday dinner for about 12 people next month. Do you have a private dining room?', time: '2:01 PM' },
+      { role: 'agent', text: 'Congratulations on the upcoming birthday! We do have a beautiful private dining room that seats up to 16. It\'s perfect for celebrations.', time: '2:02 PM' },
+      { role: 'caller', text: 'Wonderful! What\'s the minimum spend for the private room?', time: '2:02 PM' },
+      { role: 'agent', text: 'The private dining room requires a minimum food and beverage spend of $800 for weekday bookings, or $1,200 on weekends. We also offer custom menus for groups.', time: '2:03 PM' },
+      { role: 'caller', text: 'That works for us. Can I get more details emailed to me?', time: '2:04 PM' },
+      { role: 'agent', text: 'Absolutely. I\'ll send our private dining package details to your email right away. Our events coordinator will also follow up within 24 hours.', time: '2:04 PM' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Derek Vasquez',
+    phone: '+1 (312) 940-6621',
+    email: 'derek.v@company.io',
+    initials: 'DV',
+    color: '#34D399',
+    preview: '"What time do you close on Sundays?"',
+    time: '3 hr ago',
+    badge: 'resolved',
+    badgeLabel: 'Resolved',
+    unread: false,
+    tags: ['Quick Query'],
+    restaurant: 'Aria Bistro',
+    duration: '0m 48s',
+    transcript: [
+      { role: 'agent', text: 'Thanks for calling Aria Bistro! How can I help?', time: '12:15 PM' },
+      { role: 'caller', text: 'Hi, quick question — what time do you close on Sundays?', time: '12:15 PM' },
+      { role: 'agent', text: 'On Sundays we close at 9:30 PM. Last seating is at 8:45 PM.', time: '12:15 PM' },
+      { role: 'caller', text: 'Perfect, thanks!', time: '12:15 PM' },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Chloe Nakamura',
+    phone: '+1 (213) 556-8830',
+    email: 'chloe.n@mail.com',
+    initials: 'CN',
+    color: '#F59E0B',
+    preview: '"Do you accommodate nut allergies? Severe anaphylaxis"',
+    time: 'Yesterday',
+    badge: 'urgent',
+    badgeLabel: 'Urgent',
+    unread: false,
+    tags: ['Allergy', 'Health & Safety'],
+    restaurant: 'Aria Bistro',
+    duration: '2m 30s',
+    transcript: [
+      { role: 'agent', text: 'Aria Bistro, how can I help you today?', time: '6:40 PM' },
+      { role: 'caller', text: 'Hi, I have a severe nut allergy — anaphylaxis level. I want to make sure you can accommodate me safely before I book.', time: '6:40 PM' },
+      { role: 'agent', text: 'Your safety is our absolute priority. I\'m flagging your inquiry for our head chef right now. We take severe allergies very seriously and will ensure completely nut-free preparation.', time: '6:41 PM' },
+      { role: 'caller', text: 'Thank you. I\'ve had restaurants say that before and then there was cross-contamination.', time: '6:41 PM' },
+      { role: 'agent', text: 'I completely understand your concern. Our chef will call you personally before your reservation to discuss your needs and walk through our kitchen protocols.', time: '6:42 PM' },
+      { role: 'caller', text: 'That would be really reassuring. Thank you so much.', time: '6:42 PM' },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Oliver Grant',
+    phone: '+1 (917) 223-7741',
+    email: 'ogrant@fastmail.com',
+    initials: 'OG',
+    color: '#818CF8',
+    preview: '"Party of 8, anniversary dinner, any special touches?"',
+    time: 'Yesterday',
+    badge: 'new',
+    badgeLabel: 'New',
+    unread: false,
+    tags: ['Anniversary', 'Large Party'],
+    restaurant: 'Aria Bistro',
+    duration: '4m 12s',
+    transcript: [
+      { role: 'agent', text: 'Good evening, Aria Bistro. How may I assist you?', time: '7:20 PM' },
+      { role: 'caller', text: 'Hi, I\'d like to book for 8 people for my parents\' 40th anniversary. Are there any special touches you can arrange?', time: '7:21 PM' },
+      { role: 'agent', text: 'How wonderful — 40 years is such a milestone! Absolutely. We can arrange fresh flowers, a personalized anniversary cake, and a dedicated server for your table. We can also place a photo of the couple at the table setting.', time: '7:21 PM' },
+      { role: 'caller', text: 'Oh wow, the photo idea is beautiful. And the cake — can it be chocolate?', time: '7:22 PM' },
+      { role: 'agent', text: 'Of course! Our pastry chef makes an exceptional dark chocolate celebration cake. I\'ll note your preferences. What date were you thinking?', time: '7:22 PM' },
+      { role: 'caller', text: 'April 5th, a Saturday. Around 7pm?', time: '7:23 PM' },
+    ],
+  },
+];
+
+/* ── RENDER ─────────────────────────────────────────────────────────── */
+let activeId = null;
+
+function renderList(items) {
+  const list = document.getElementById('inboxList');
+  list.innerHTML = items.map(c => `
+    <div class="inbox-row ${c.unread ? 'unread' : ''} ${activeId === c.id ? 'active' : ''}"
+         data-id="${c.id}" onclick="openDetail(${c.id})">
+      <div class="row-avatar" style="background:${c.color}">${c.initials}</div>
+      <div class="row-body">
+        <div class="row-top">
+          <span class="row-name">${c.name}</span>
+          <span class="row-time">${c.time}</span>
+        </div>
+        <div class="row-preview">${c.preview}</div>
+        <div class="row-meta">
+          ${c.unread ? '<div class="unread-dot"></div>' : ''}
+          <span class="badge badge-${c.badge}">${c.badgeLabel}</span>
+          ${c.tags.map(t => `<span class="badge" style="background:var(--b1);color:var(--t2)">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openDetail(id) {
+  activeId = id;
+  const c = conversations.find(x => x.id === id);
+  if (!c) return;
+
+  // Update active row styles
+  document.querySelectorAll('.inbox-row').forEach(r => {
+    r.classList.toggle('active', parseInt(r.dataset.id) === id);
+  });
+
+  // Open list-panel narrow mode
+  document.getElementById('listPanel').classList.add('detail-open');
+
+  // Build detail header
+  document.getElementById('detailHeader').innerHTML = `
+    <div class="detail-header-top">
+      <div class="detail-contact">
+        <div class="detail-avatar" style="background:${c.color}">${c.initials}</div>
+        <div class="detail-name-block">
+          <div class="detail-name">${c.name}</div>
+          <div class="detail-contact-info">
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              ${c.phone}
+            </div>
+            <div class="contact-info-row">
+              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              ${c.email}
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="detail-close" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="detail-meta-pills">
+      <span class="badge badge-${c.badge}">${c.badgeLabel}</span>
+      ${c.tags.map(t => `<span class="badge" style="background:var(--b1);color:var(--t2)">${t}</span>`).join('')}
+      <span class="badge" style="background:var(--indigo-bg);color:var(--indigo)">${c.restaurant}</span>
+      <span class="badge" style="background:var(--b1);color:var(--t3);font-family:'DM Mono',monospace">⏱ ${c.duration}</span>
+    </div>
+    <div class="detail-tabs">
+      <div class="detail-tab active">Transcript</div>
+      <div class="detail-tab">Notes</div>
+      <div class="detail-tab">Contact Info</div>
+    </div>
+  `;
+
+  // Build transcript
+  const bubbles = c.transcript.map(m => `
+    <div class="msg-row ${m.role}">
+      <div class="msg-avatar ${m.role === 'caller' ? 'caller-av' : 'agent-av'}">
+        ${m.role === 'caller' ? c.initials : 'AI'}
+      </div>
+      <div class="msg-bubble-wrap">
+        <div class="msg-bubble">${m.text}</div>
+        <div class="msg-time">${m.time}</div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('detailBody').innerHTML = `
+    <div class="transcript">
+      <div class="transcript-label">Call Transcript · ${c.time}</div>
+      ${bubbles}
+    </div>
+    <div class="detail-info-section">
+      <div class="info-section-title">Call Details</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Restaurant</div>
+          <div class="info-value">${c.restaurant}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Duration</div>
+          <div class="info-value">${c.duration}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Status</div>
+          <div class="info-value">${c.badgeLabel}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Called</div>
+          <div class="info-value">${c.time}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Open pane with animation
+  requestAnimationFrame(() => {
+    document.getElementById('detailPane').classList.add('open');
+  });
+
+  // Tab switching
+  document.querySelectorAll('.detail-tab').forEach((tab, i) => {
+    tab.onclick = () => {
+      document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    };
+  });
+}
+
+function closeDetail() {
+  activeId = null;
+  document.getElementById('detailPane').classList.remove('open');
+  document.getElementById('listPanel').classList.remove('detail-open');
+  document.querySelectorAll('.inbox-row').forEach(r => r.classList.remove('active'));
+}
+
+/* ── SIDEBAR TOGGLE ─────────────────────────────────────────────────── */
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+});
+
+/* ── SEARCH ─────────────────────────────────────────────────────────── */
+document.getElementById('searchInput').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  const filtered = q
+    ? conversations.filter(c =>
+        c.name.toLowerCase().includes(q) ||
+        c.preview.toLowerCase().includes(q) ||
+        c.phone.includes(q)
+      )
+    : conversations;
+  renderList(filtered);
+});
+
+/* ── INIT ────────────────────────────────────────────────────────────── */
+renderList(conversations);
+</script>
+</body>
+</html>
