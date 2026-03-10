@@ -259,10 +259,14 @@
     .tab-bar {
       display: inline-flex;
       gap: 2px;
+      background: white;
+      border: 1px solid var(--b1);
+      border-radius: var(--r-pill);
+      padding: 3px;
     }
     .tab-btn {
       position: relative;
-      padding: 6px 14px; border-radius: var(--r-pill);
+      padding: 5px 13px; border-radius: var(--r-pill);
       background: transparent;
       display: flex; align-items: center; gap: 6px;
       font-size: 12.5px; font-weight: 500; color: var(--t3);
@@ -524,11 +528,11 @@
       flex-shrink: 0;
     }
     .detail-panel.panel-open {
-      width: 380px;
-      min-width: 380px;
+      width: 760px;
+      min-width: 760px;
     }
     .detail-inner {
-      width: 380px; min-width: 380px;
+      width: 760px; min-width: 760px;
       height: 100%; display: flex; flex-direction: column; overflow: hidden;
     }
 
@@ -542,9 +546,52 @@
       margin-bottom: 4px;
     }
     .detail-title {
-      font-size: 15px; font-weight: 700;
-      color: var(--t1); letter-spacing: -0.02em;
-      line-height: 1.3; flex: 1; margin-right: 8px;
+      font-size: 18px; font-weight: 800;
+      color: var(--t1); letter-spacing: -0.03em;
+      line-height: 1.2; flex: 1; margin-right: 8px;
+    }
+    .detail-contact-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 6px; flex-wrap: wrap;
+    }
+    .detail-contact-sep { color: var(--t3); font-size: 12px; }
+    .detail-contact-time { font-size: 12px; color: var(--t3); }
+    .detail-email-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 10px;
+    }
+    .detail-email-icon { color: var(--t3); flex-shrink: 0; }
+    .detail-email-value {
+      font-size: 12.5px; font-weight: 500; color: var(--t2);
+    }
+    .detail-email-empty {
+      font-size: 12px; color: var(--t3); font-style: italic;
+    }
+    .crm-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid rgba(24,168,105,0.25);
+      flex-shrink: 0;
+      position: relative; cursor: default;
+    }
+    .crm-badge::after {
+      content: 'CRM Synced';
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%; transform: translateX(-50%);
+      background: var(--t1); color: white;
+      font-size: 11px; font-weight: 600;
+      padding: 4px 8px; border-radius: var(--r-md);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 120ms;
+    }
+    .crm-badge:hover::after { opacity: 1; }
+    .detail-header-footer {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     }
     .detail-close {
       width: 26px; height: 26px;
@@ -580,7 +627,7 @@
 
     /* Caller section */
     .detail-scroll {
-      flex: 1; overflow-y: auto; padding: 0 18px 8px;
+      flex: 1; overflow-y: auto; padding: 16px 18px 8px;
     }
     .detail-scroll::-webkit-scrollbar { width: 4px; }
     .detail-scroll::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
@@ -657,16 +704,50 @@
     .call-summary-label { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 6px; }
     .call-summary-text { font-size: 13px; color: var(--t2); line-height: 1.6; }
 
+    /* Transcript */
+    .transcript-section { margin-bottom: 16px; }
+    .transcript-label {
+      font-size: 13px; font-weight: 700; color: var(--t1);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .transcript-messages { display: flex; flex-direction: column; gap: 7px; }
+    .transcript-msg { display: flex; flex-direction: column; gap: 2px; max-width: 86%; }
+    .transcript-msg.msg-ai  { align-self: flex-start; }
+    .transcript-msg.msg-human { align-self: flex-end; }
+    .msg-bubble {
+      padding: 8px 11px;
+      font-size: 12.5px; line-height: 1.5;
+    }
+    .msg-ai .msg-bubble {
+      background: var(--accent-light);
+      color: var(--t1);
+      border-radius: 4px 12px 12px 12px;
+    }
+    .msg-human .msg-bubble {
+      background: var(--t1);
+      color: white;
+      border-radius: 12px 4px 12px 12px;
+    }
+    .msg-meta {
+      font-size: 10.5px; color: var(--t3);
+      padding: 0 3px;
+    }
+    .msg-ai .msg-meta    { text-align: left; }
+    .msg-human .msg-meta { text-align: right; }
+
     /* Waveform player */
     .audio-section {
       padding: 14px 18px;
-      border-bottom: 1px solid var(--b1);
+      border-top: 1px solid var(--b1);
       flex-shrink: 0;
     }
     .waveform-player {
       display: flex; align-items: center; gap: 12px;
+      width: 100%;
       background: white; border: 1px solid var(--b1);
       border-radius: var(--r-lg); padding: 12px 14px; margin-bottom: 0;
+      box-sizing: border-box;
     }
     .play-btn {
       width: 30px; height: 30px; border-radius: 50%;
@@ -973,31 +1054,45 @@
 
         <div class="detail-header">
           <div class="detail-header-top">
-            <div class="priority-badge" id="detailPriority">Priority: High</div>
+            <div class="detail-title" id="detailCallerName">–</div>
             <button class="detail-close" onclick="closeDetail()">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
             </button>
           </div>
+          <div class="detail-contact-row">
+            <div class="detail-phone-row">
+              <span class="detail-phone" id="detailPhone">–</span>
+              <button class="copy-btn" onclick="copyPhone()" title="Copy phone">
+                <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                  <rect x="3.5" y="3.5" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M1.5 7.5V2A1 1 0 012.5 1h5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <span class="detail-contact-sep">·</span>
+            <span class="detail-contact-time" id="detailTime">–</span>
+          </div>
+          <div class="detail-email-row" id="detailEmailRow">
+            <svg class="detail-email-icon" width="13" height="13" viewBox="0 0 16 16" fill="none">
+              <rect x="1.5" y="3" width="13" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M1.5 6l5.5 3.5a2 2 0 001.5 0L14 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            <span id="detailEmailValue"></span>
+            <span class="crm-badge" id="detailCrmBadge" style="display:none;">
+              <svg width="9" height="9" viewBox="0 0 9 9" fill="none">
+                <path d="M1.5 4.5l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+          <div class="detail-header-footer">
+            <div class="priority-badge" id="detailPriority">Priority: High</div>
+            <div id="detailCallTags" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+          </div>
         </div>
 
         <div class="detail-scroll">
-
-          <div class="caller-section">
-            <div class="caller-phone-row">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:#A09CC0;flex-shrink:0;"><path d="M3.5 1.5h3l1.5 3.5-2 1.5a9 9 0 004 4l1.5-2 3.5 1.5v3a1 1 0 01-1 1A13 13 0 011.5 2.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-              <div class="caller-phone-large" id="detailPhone">–</div>
-            </div>
-            <div class="caller-time" id="detailTime">–</div>
-            <div class="caller-name-row">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:#A09CC0;flex-shrink:0;"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14.5c0-3.314 2.686-5.5 6-5.5s6 2.186 6 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-              <div class="caller-name" id="detailCallerName">–</div>
-            </div>
-            <div class="caller-tags" id="detailCallTags"></div>
-          </div>
-
-          <div class="section-divider"></div>
 
           <div class="guest-profile-card" id="guestProfileCard">
             <div class="gp-header" onclick="toggleGuestProfile()">
@@ -1024,10 +1119,6 @@
                   <div class="gp-label">Birthday</div>
                   <div class="gp-value" id="gpBirthday">–</div>
                 </div>
-                <div class="gp-info-cell">
-                  <div class="gp-label">Email</div>
-                  <div class="gp-value" id="gpEmail" style="font-size:11px;word-break:break-all;">–</div>
-                </div>
               </div>
               <div class="gp-row-label">Dietary</div>
               <div class="gp-tags-row" id="gpDietaryTags"></div>
@@ -1039,41 +1130,33 @@
           </div>
 
           <div class="call-summary-section">
-            <div class="call-summary-label">Call Summary:</div>
+            <div class="call-summary-label">Summary</div>
             <div class="call-summary-text" id="detailSummaryText">–</div>
           </div>
 
-          <div class="audio-section" id="audioSection">
-            <div class="waveform-player">
-              <button class="play-btn" id="playBtn" onclick="togglePlay()">
-                <svg id="playIcon" width="10" height="12" viewBox="0 0 10 12" fill="none">
-                  <path d="M1 1l8 5-8 5V1z" fill="currentColor"/>
-                </svg>
-              </button>
-              <div class="waveform-bars-wrap" id="audioProgress" onclick="seekAudio(event)">
-                <div class="wf-played-overlay" id="audioProgressFill"></div>
-              </div>
-              <span class="audio-time" id="audioTime">0:00 / 0:00</span>
-            </div>
-            <div class="event-note" id="eventNote" style="display:none;">
-              <div class="event-dot"></div>
-              <span id="eventNoteText"></span>
-            </div>
+          <div class="transcript-section" id="transcriptSection" style="display:none;">
+            <div class="transcript-label" id="transcriptLabel">Transcript</div>
+            <div class="transcript-messages" id="transcriptMessages"></div>
           </div>
 
-          <div class="dev-tools-section">
-            <div class="dev-tools-label">Dev Tools:</div>
-            <div class="dev-tools-card">
-              <span class="dev-tools-text" id="detailSessionId">Session ID: –</span>
-              <button class="copy-btn" onclick="copySessionId()" title="Copy">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
-                  <path d="M2 8V2a1 1 0 011-1h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-                </svg>
-              </button>
-            </div>
-          </div>
+        </div>
 
+        <div class="audio-section" id="audioSection">
+          <div class="waveform-player">
+            <button class="play-btn" id="playBtn" onclick="togglePlay()">
+              <svg id="playIcon" width="10" height="12" viewBox="0 0 10 12" fill="none">
+                <path d="M1 1l8 5-8 5V1z" fill="currentColor"/>
+              </svg>
+            </button>
+            <div class="waveform-bars-wrap" id="audioProgress" onclick="seekAudio(event)">
+              <div class="wf-played-overlay" id="audioProgressFill"></div>
+            </div>
+            <span class="audio-time" id="audioTime">0:00 / 0:00</span>
+          </div>
+          <div class="event-note" id="eventNote" style="display:none;">
+            <div class="event-dot"></div>
+            <span id="eventNoteText"></span>
+          </div>
         </div>
 
         <div class="detail-footer">
@@ -1362,35 +1445,35 @@ const ALL_CALLS = [
 const CALL_EXTRA = {
   1:  { priority: 'Low',  callerName: 'Sarah Mitchell',   modality: 'phone', outcome: 'reservation-made',
         tags: ['Menu Inquiry'],
-        guestProfile: { member: true, visits: 12, lastVisit: 'Jan 20, 2026', birthday: 'March 26', email: 'sarah.mitchell@gmail.com', dietary: ['Gluten Free'], preferences: ['Booth seating'], guestTags: ['VIP'] },
+        guestProfile: { member: true, visits: 12, lastVisit: 'Jan 20, 2026', birthday: 'March 26', email: 'sarah.mitchell@gmail.com', crmSynced: true, dietary: ['Gluten Free'], preferences: ['Booth seating'], guestTags: ['VIP'] },
         sessionId: 'a7f23c51-e8b4-4d12-9a6f-3b58e921c047' },
   2:  { priority: 'Low',  callerName: 'Carlos Martinez',  modality: 'chat', outcome: null,
         tags: ['Late Arrival'],
-        guestProfile: { member: true, visits: 5, lastVisit: 'Feb 1, 2026', birthday: null, email: 'c.martinez@outlook.com', dietary: [], preferences: ['Bar seating'], guestTags: [] },
+        guestProfile: { member: true, visits: 5, lastVisit: 'Feb 1, 2026', birthday: null, email: 'c.martinez@outlook.com', crmSynced: false, dietary: [], preferences: ['Bar seating'], guestTags: [] },
         sessionId: 'b3e47f92-c105-4a8d-b17e-6c49a853d128' },
   3:  { priority: 'High', callerName: 'Amy Theo',         modality: 'sms', outcome: 'incomplete-lead',
         tags: ['Reservation Inquiry'],
-        guestProfile: { member: true, visits: 4, lastVisit: 'Jan 15, 2026', birthday: 'April 2', email: 'amy.theo@email.com', dietary: ['Gluten'], preferences: ['Booth seating'], guestTags: ['Event Inquiry'] },
+        guestProfile: { member: true, visits: 4, lastVisit: 'Jan 15, 2026', birthday: 'April 2', email: 'amy.theo@email.com', crmSynced: true, dietary: ['Gluten'], preferences: ['Booth seating'], guestTags: ['Event Inquiry'] },
         sessionId: 'ec60d5ba-f7f1-4773-ac08-e7f6b10ba73f' },
   4:  { priority: 'High', callerName: 'Jordan Park',      modality: 'phone', outcome: 'incomplete-lead',
         tags: ['Incomplete Lead'],
-        guestProfile: { member: false, visits: 3, lastVisit: 'Dec 18, 2025', birthday: 'March 14', email: 'jordan.park@icloud.com', dietary: ['Nut Allergy'], preferences: [], guestTags: [] },
+        guestProfile: { member: false, visits: 3, lastVisit: 'Dec 18, 2025', birthday: 'March 14', email: 'jordan.park@icloud.com', crmSynced: false, dietary: ['Nut Allergy'], preferences: [], guestTags: [] },
         sessionId: 'd2b96e41-f730-4c5a-a82d-9e17c304b562' },
   5:  { priority: 'High', callerName: 'Nina Patel',       modality: 'phone', outcome: 'incomplete-reservation',
         tags: ['Reservation Inquiry'],
-        guestProfile: { member: false, visits: 1, lastVisit: 'Jan 8, 2026', birthday: 'March 12', email: null, dietary: ['Vegan'], preferences: ['Quiet table'], guestTags: ['First Visit'] },
+        guestProfile: { member: false, visits: 1, lastVisit: 'Jan 8, 2026', birthday: 'March 12', email: null, crmSynced: false, dietary: ['Vegan'], preferences: ['Quiet table'], guestTags: ['First Visit'] },
         sessionId: 'e5a18c73-4920-4f87-bc6e-d2509a471983' },
   6:  { priority: 'Low',  callerName: 'Robert Chen',      modality: 'email', outcome: 'reservation-made',
         tags: ['Private Dining', 'Events'],
-        guestProfile: { member: false, visits: 2, lastVisit: 'Nov 20, 2025', birthday: null, email: 'r.chen@company.com', dietary: [], preferences: ['Private room'], guestTags: ['Corporate'] },
+        guestProfile: { member: false, visits: 2, lastVisit: 'Nov 20, 2025', birthday: null, email: 'r.chen@company.com', crmSynced: true, dietary: [], preferences: ['Private room'], guestTags: ['Corporate'] },
         sessionId: 'f1c84a29-d67b-4e03-8f1a-5b92c748e310' },
   7:  { priority: 'Low',  callerName: 'Michelle Johnson', modality: 'phone', outcome: 'lead-generated',
         tags: ['Dietary', 'Menu Inquiry'],
-        guestProfile: { member: true, visits: 8, lastVisit: 'Dec 5, 2025', birthday: 'July 22', email: 'm.johnson@email.com', dietary: ['Gluten'], preferences: ['Window seat'], guestTags: [] },
+        guestProfile: { member: true, visits: 8, lastVisit: 'Dec 5, 2025', birthday: 'July 22', email: 'm.johnson@email.com', crmSynced: false, dietary: ['Gluten'], preferences: ['Window seat'], guestTags: [] },
         sessionId: 'a2d57f18-3e94-47cb-b065-c18f92a43510' },
   8:  { priority: 'Low',  callerName: 'James Thompson',   modality: 'email', outcome: 'lead-generated',
         tags: ['Corporate Event'],
-        guestProfile: { member: false, visits: 6, lastVisit: 'Jan 10, 2026', birthday: 'April 18', email: 'j.thompson@corp.com', dietary: [], preferences: ['Large table'], guestTags: ['Corporate'] },
+        guestProfile: { member: false, visits: 6, lastVisit: 'Jan 10, 2026', birthday: 'April 18', email: 'j.thompson@corp.com', crmSynced: true, dietary: [], preferences: ['Large table'], guestTags: ['Corporate'] },
         sessionId: 'c9e23b47-a158-4d0f-9e82-7a46d183c920' },
   9:  { priority: 'High', callerName: 'Lisa Park',        modality: 'phone', outcome: 'incomplete-reservation', tags: ['Birthday'],            guestProfile: null, sessionId: 'f4b82e61-7d30-4a95-b149-c28f5e036748' },
   10: { priority: 'Low',  callerName: 'David Wilson',     modality: 'phone', outcome: 'reservation-made',      tags: ['Outdoor Seating'],     guestProfile: null, sessionId: '78a5c932-b1e4-4d67-a03f-9b15e842c150' },
@@ -1582,9 +1665,24 @@ function selectCard(id) {
   priorityEl.textContent = 'Priority: ' + priorityLevel;
   priorityEl.className = 'priority-badge' + (priorityLevel === 'Low' ? ' priority-low' : '');
 
-  document.getElementById('detailPhone').textContent = callData.phone;
+  document.getElementById('detailPhone').textContent = formatPhone(callData.phone);
   document.getElementById('detailTime').textContent = callData.date + ' · ' + callData.time;
   document.getElementById('detailCallerName').textContent = callData.callerName || '–';
+
+  // Email row
+  const emailValue = callData.guestProfile?.email || null;
+  const crmSynced = callData.guestProfile?.crmSynced || false;
+  const emailEl = document.getElementById('detailEmailValue');
+  const crmBadgeEl = document.getElementById('detailCrmBadge');
+  if (emailValue) {
+    emailEl.textContent = emailValue;
+    emailEl.className = 'detail-email-value';
+    crmBadgeEl.style.display = crmSynced ? '' : 'none';
+  } else {
+    emailEl.textContent = 'No email on file';
+    emailEl.className = 'detail-email-empty';
+    crmBadgeEl.style.display = 'none';
+  }
   document.getElementById('detailCallTags').innerHTML = (callData.tags || [])
     .map(t => `<span class="caller-tag">${t}</span>`).join('');
 
@@ -1596,7 +1694,6 @@ function selectCard(id) {
     document.getElementById('gpVisits').textContent = gp.visits != null ? gp.visits : '–';
     document.getElementById('gpLastVisit').textContent = gp.lastVisit || '–';
     document.getElementById('gpBirthday').textContent = gp.birthday || '–';
-    document.getElementById('gpEmail').textContent = gp.email || '–';
     const memberEl = document.getElementById('gpTagMember');
     memberEl.style.display = gp.member ? '' : 'none';
     const dietaryHeaderEl = document.getElementById('gpTagDietary');
@@ -1621,6 +1718,27 @@ function selectCard(id) {
 
   document.getElementById('detailSummaryText').textContent = callData.summary || '–';
 
+  // Transcript
+  const SPEAKER_LABELS = {
+    phone: { ai: 'Slang AI', human: 'Caller' },
+    sms:   { ai: 'Slang AI', human: 'Guest' },
+    email: { ai: 'Slang AI', human: 'Guest' },
+    chat:  { ai: 'Slang AI', human: 'Visitor' },
+  };
+  const labels = SPEAKER_LABELS[callData.modality] || SPEAKER_LABELS.phone;
+  const transcriptSection = document.getElementById('transcriptSection');
+  const transcriptMessages = document.getElementById('transcriptMessages');
+  if (callData.transcript && callData.transcript.length > 0) {
+    transcriptMessages.innerHTML = callData.transcript.map(msg => `
+      <div class="transcript-msg msg-${msg.s}">
+        <div class="msg-bubble">${msg.t}</div>
+        <div class="msg-meta">${msg.s === 'ai' ? labels.ai : labels.human} · ${msg.ts}</div>
+      </div>`).join('');
+    transcriptSection.style.display = '';
+  } else {
+    transcriptSection.style.display = 'none';
+  }
+
   const durationParts = callData.duration.split(':').map(Number);
   playDuration = durationParts[0] * 60 + durationParts[1];
   playProgress = 0;
@@ -1636,8 +1754,8 @@ function selectCard(id) {
     eventNoteEl.style.display = 'none';
   }
 
-  document.getElementById('detailSessionId').textContent = 'Session ID: ' + (callData.sessionId || '–');
   document.getElementById('detailPanel').classList.add('panel-open');
+  requestAnimationFrame(initWaveform);
 }
 
 function closeDetail() {
@@ -1648,6 +1766,12 @@ function closeDetail() {
   selectedCardId = null;
   stopPlay();
   document.getElementById('detailPanel').classList.remove('panel-open');
+}
+
+function copyPhone() {
+  const phone = document.getElementById('detailPhone').textContent;
+  if (navigator.clipboard) navigator.clipboard.writeText(phone);
+  showToast('Phone number copied');
 }
 
 /* ── RESOLVE ────────────────────────────────────────────────────── */
@@ -1751,24 +1875,26 @@ function toggleGuestProfile() {
   document.getElementById('gpBody').style.display = gpOpen ? '' : 'none';
   document.getElementById('gpChevron').style.transform = gpOpen ? '' : 'rotate(180deg)';
 }
-function copySessionId() {
-  const text = document.getElementById('detailSessionId').textContent.replace('Session ID: ', '');
-  navigator.clipboard.writeText(text).catch(() => {});
-  showToast('Session ID copied');
-}
 function resolveCurrentCard() {
   if (!selectedCardId) return;
   resolveCard({ stopPropagation: () => {} }, selectedCardId);
 }
 
 /* ── WAVEFORM ───────────────────────────────────────────────────── */
+const BASE_HEIGHTS = [25,40,55,45,70,55,80,65,85,70,75,60,80,90,65,75,70,85,60,55,70,80,65,55,60,70,50,45,35,55,60,50,40,30,45,35,25,30,20,25,30,40,55,65,75,85,70,60,50,40,35,50,65,75,80,70,60,45,35,25,40,55,70,80];
+let waveformInitialised = false;
+
 function initWaveform() {
-  const heights = [25,40,55,45,70,55,80,65,85,70,75,60,80,90,65,75,70,85,60,55,70,80,65,55,60,70,50,45,35,55,60,50,40,30,45,35,25,30,20,25];
+  if (waveformInitialised) return;
   const wrap = document.getElementById('audioProgress');
-  if (!wrap) return;
+  if (!wrap || wrap.offsetWidth === 0) return;
   const overlay = document.getElementById('audioProgressFill');
+  const barW = 2.5, barGap = 2;
+  const count = Math.ceil(wrap.offsetWidth / (barW + barGap));
+  const heights = Array.from({ length: count }, (_, i) => BASE_HEIGHTS[i % BASE_HEIGHTS.length]);
   wrap.insertAdjacentHTML('afterbegin', heights.map(h => `<div class="wf-bar" style="height:${h}%"></div>`).join(''));
   wrap.appendChild(overlay);
+  waveformInitialised = true;
 }
 
 /* ── TOAST ──────────────────────────────────────────────────────── */
@@ -1790,7 +1916,6 @@ function navClick(el) {
 /* ── INIT ───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   renderCards();
-  initWaveform();
 });
 </script>
 </body>
