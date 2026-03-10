@@ -8,969 +8,741 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ── TOKENS ─────────────────────────────────────────────────── */
     :root {
-      --canvas:        #FAFAFA;
-      --sidebar-bg:    #FFFFFF;
-      --sidebar-w:     212px;
-      --card:          #FFFFFF;
-      --card-radius:   16px;
-      --card-shadow:   0 1px 2px rgba(0,0,0,0.04), 0 4px 14px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.04);
+      /* Sidebar */
+      --sidebar-bg:         #111827;
+      --sidebar-w:          210px;
+      --sidebar-border:     rgba(255,255,255,0.06);
+      --sidebar-text:       #9CA3AF;
+      --sidebar-text-hover: #D1D5DB;
+      --sidebar-active-bg:  rgba(255,255,255,0.09);
 
-      --pink:          #D97EF5;
-      --violet:        #3D5CE8;
-      --blue:          #7DC4F5;
-      --yellow:        #F5C842;
-      --grad:          linear-gradient(135deg, #D97EF5 0%, #3D5CE8 50%, #7DC4F5 100%);
+      /* Canvas */
+      --canvas:      #F0F2F8;
+      --card:        #FFFFFF;
+      --card-radius: 10px;
 
-      --accent:        #3D5CE8;
-      --accent-hover:  #2D4CD8;
-      --accent-light:  #EEF2FF;
-      --accent-dim:    #93A8F4;
+      /* Brand — blue gradient, no purple */
+      --brand-a:    #38BDF8;
+      --brand-b:    #2563EB;
+      --brand-grad: linear-gradient(135deg, #38BDF8 0%, #2563EB 100%);
 
-      --red:           #DC2626;
-      --red-light:     #FEE2E2;
-      --red-mid:       #FCA5A5;
-      --green:         #16A34A;
-      --green-light:   #DCFCE7;
-      --amber:         #D97706;
-      --amber-light:   #FEF3C7;
-      --blue-pill:     #2563EB;
-      --blue-pill-bg:  #DBEAFE;
-      --indigo:        #4338CA;
-      --indigo-bg:     #EEF2FF;
+      /* Modality avatar colors */
+      --mod-phone-bg:  #DBEAFE; --mod-phone-fg:  #1D4ED8;
+      --mod-sms-bg:    #D1FAE5; --mod-sms-fg:    #065F46;
+      --mod-email-bg:  #FEF3C7; --mod-email-fg:  #92400E;
+      --mod-chat-bg:   #ECFEFF; --mod-chat-fg:   #0891B2;
 
-      --t1:   #18181B;
-      --t2:   #52525B;
-      --t3:   #A1A1AA;
-      --st1:  #3F3F46;
-      --st2:  #71717A;
-      --st3:  #A1A1AA;
-      --b1:   #E4E4E7;
-      --b2:   #D4D4D8;
+      /* Accent */
+      --accent:       #2563EB;
+      --accent-hover: #1D4ED8;
+      --accent-light: #EFF6FF;
+      --accent-dim:   #BFDBFE;
 
-      --r-sm:   5px;
+        /* Revenue pill colors */
+      --rose:        #E11D48;
+      --rose-light:  #FFF1F2;
+      --green:       #16A34A;
+      --green-light: #F0FDF4;
+      --cyan:        #0891B2;
+      --cyan-light:  #ECFEFF;
+
+      /* Text */
+      --t1: #111827;
+      --t2: #374151;
+      --t3: #6B7280;
+      --t4: #9CA3AF;
+
+      /* Borders */
+      --b1: #F9FAFB;
+      --b2: #F3F4F6;
+      --b3: #E5E7EB;
+      --b4: #D1D5DB;
+
+      --r-sm:   4px;
       --r-md:   8px;
-      --r-lg:   12px;
-      --r-xl:   16px;
+      --r-lg:   10px;
       --r-pill: 100px;
-      --ease-std:    cubic-bezier(0.4, 0, 0.2, 1);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease:   cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* ── GLOBAL ─────────────────────────────────────────────────── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--canvas);
       color: var(--t1);
-      overflow: hidden;
-      height: 100vh;
-    }
-
-    /* ── LAYOUT ─────────────────────────────────────────────────── */
-    .app {
-      display: flex;
       height: 100vh;
       overflow: hidden;
     }
 
-    /* ── SIDEBAR ────────────────────────────────────────────────── */
+    .app { display: flex; height: 100vh; }
+
+    /* ══════════════ SIDEBAR ══════════════ */
     .sidebar {
       width: var(--sidebar-w);
       min-width: var(--sidebar-w);
       background: var(--sidebar-bg);
       display: flex;
       flex-direction: column;
-      border-right: 1px solid var(--b1);
-      transition: width 0.28s var(--ease-std), min-width 0.28s var(--ease-std);
-      overflow: hidden;
-      position: relative;
-      z-index: 10;
+      flex-shrink: 0;
     }
 
-    .sidebar.collapsed {
-      width: var(--sidebar-collapsed);
-      min-width: var(--sidebar-collapsed);
-    }
-
-    /* Logo area */
     .sidebar-logo {
-      height: 64px;
+      padding: 20px 16px 12px;
+      flex-shrink: 0;
+    }
+
+    .logo-img {
+      height: 26px;
+      width: auto;
+      display: block;
+    }
+
+    .location-selector {
+      margin: 0 8px 6px;
+      padding: 8px 10px;
+      border-radius: var(--r-lg);
       display: flex;
       align-items: center;
-      padding: 0 18px;
-      border-bottom: 1px solid var(--b1);
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      color: var(--sidebar-text-hover);
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--sidebar-border);
+    }
+
+    .location-selector:hover { background: rgba(255,255,255,0.06); }
+
+    .location-selector svg {
+      width: 15px; height: 15px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
       flex-shrink: 0;
-      overflow: hidden;
-      white-space: nowrap;
     }
 
-    .logo-full {
-      font-size: 22px;
-      font-weight: 800;
-      background: var(--grad);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.5px;
-      opacity: 1;
-      transition: opacity 0.15s var(--ease-std);
-    }
+    .location-name { flex: 1; }
+    .location-chevron { opacity: 0.45; flex-shrink: 0; }
 
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 9px;
-      background: var(--grad);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 800;
-      color: white;
-      flex-shrink: 0;
-      opacity: 0;
-      position: absolute;
-      left: 14px;
-      transition: opacity 0.15s var(--ease-std);
-    }
-
-    .sidebar.collapsed .logo-full { opacity: 0; pointer-events: none; }
-    .sidebar.collapsed .logo-icon { opacity: 1; }
-
-    /* Nav */
     .nav {
       flex: 1;
+      padding: 4px 8px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      padding: 12px 8px;
+      gap: 1px;
       overflow-y: auto;
-      overflow-x: hidden;
     }
-
     .nav::-webkit-scrollbar { display: none; }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 10px;
-      border-radius: var(--r-lg);
-      color: var(--st2);
+      padding: 9px 10px;
+      border-radius: var(--r-md);
+      color: var(--sidebar-text);
       cursor: pointer;
-      transition: background 0.15s var(--ease-std), color 0.15s var(--ease-std);
+      transition: background 0.13s, color 0.13s;
       font-size: 13.5px;
       font-weight: 500;
       white-space: nowrap;
-      overflow: hidden;
-      position: relative;
     }
-
-    .nav-item:hover {
-      background: rgba(0,0,0,0.04);
-      color: var(--st1);
-    }
-
-    .nav-item.active {
-      background: rgba(61,92,232,0.10);
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .nav-item.active .nav-icon {
-      color: var(--accent);
-    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--sidebar-text-hover); }
+    .nav-item.active { background: var(--sidebar-active-bg); color: #F9FAFB; font-weight: 600; }
 
     .nav-icon {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 18px; height: 18px;
+      display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-
     .nav-icon svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 16px; height: 16px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
     }
-
-    .nav-label {
-      opacity: 1;
-      transition: opacity 0.15s var(--ease-std);
-    }
-
-    .sidebar.collapsed .nav-label { opacity: 0; }
-
+    .nav-label { flex: 1; }
     .nav-badge {
-      margin-left: auto;
-      background: var(--pink);
+      background: #EF4444;
       color: white;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 6px;
+      font-size: 10px; font-weight: 700;
+      padding: 1px 5px;
       border-radius: var(--r-pill);
-      flex-shrink: 0;
-      transition: opacity 0.15s var(--ease-std);
+      min-width: 18px; text-align: center;
     }
 
-    .sidebar.collapsed .nav-badge { opacity: 0; }
-
-    /* Sidebar toggle button */
-    .sidebar-toggle {
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 0 12px;
-      border-top: 1px solid var(--b1);
+    .sidebar-bottom {
+      padding: 8px;
+      border-top: 1px solid var(--sidebar-border);
       flex-shrink: 0;
     }
 
-    .sidebar.collapsed .sidebar-toggle {
-      justify-content: center;
-      padding: 0;
-    }
-
-    .toggle-btn {
-      width: 28px;
-      height: 28px;
+    .whats-new-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px;
       border-radius: var(--r-md);
-      border: none;
-      background: rgba(0,0,0,0.04);
-      color: var(--st2);
+      color: var(--sidebar-text);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
+      transition: background 0.13s, color 0.13s;
+      font-size: 13.5px; font-weight: 500;
+      margin-bottom: 2px;
     }
+    .whats-new-item:hover { background: rgba(255,255,255,0.06); color: var(--sidebar-text-hover); }
 
-    .toggle-btn:hover {
-      background: rgba(0,0,0,0.06);
-      color: var(--st1);
-    }
-
-    .toggle-btn svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      transition: transform 0.28s var(--ease-std);
-    }
-
-    .sidebar.collapsed .toggle-btn svg {
-      transform: rotate(180deg);
-    }
-
-    /* User profile */
     .sidebar-user {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 10px;
-      margin: 0 8px 8px;
-      border-radius: var(--r-lg);
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px;
+      border-radius: var(--r-md);
       cursor: pointer;
-      transition: background 0.15s;
-      overflow: hidden;
-      white-space: nowrap;
-      flex-shrink: 0;
+      transition: background 0.13s;
     }
-
-    .sidebar-user:hover { background: rgba(0,0,0,0.04); }
+    .sidebar-user:hover { background: rgba(255,255,255,0.06); }
 
     .user-avatar {
-      width: 30px;
-      height: 30px;
+      width: 28px; height: 28px;
       border-radius: 50%;
-      background: var(--grad);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 12px;
-      font-weight: 700;
+      background: var(--brand-grad);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white;
       flex-shrink: 0;
     }
-
-    .user-info {
-      overflow: hidden;
-      transition: opacity 0.15s;
+    .user-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--sidebar-text-hover); }
+    .user-more {
+      width: 22px; height: 22px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--sidebar-text);
+      border-radius: var(--r-sm);
+      transition: background 0.13s;
+    }
+    .user-more:hover { background: rgba(255,255,255,0.1); color: var(--sidebar-text-hover); }
+    .user-more svg {
+      width: 14px; height: 14px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .sidebar.collapsed .user-info { opacity: 0; }
+    /* ══════════════ MAIN ══════════════ */
+    .main { flex: 1; display: flex; overflow: hidden; }
 
-    .user-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--t1);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .user-email {
-      font-size: 11px;
-      color: var(--st2);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* ── MAIN AREA ──────────────────────────────────────────────── */
-    .main {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-
-    /* ── LIST PANEL ─────────────────────────────────────────────── */
+    /* ══════════════ LIST PANEL ══════════════ */
     .list-panel {
-      display: flex;
-      flex-direction: column;
-      background: var(--canvas);
-      border-right: 1px solid var(--b2);
-      transition: width 0.3s var(--ease-std);
-      overflow: hidden;
-      flex-shrink: 0;
       width: 100%;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: width 0.3s var(--ease);
     }
-
-    .list-panel.detail-open {
-      width: 44%;
-      min-width: 340px;
-    }
+    .list-panel.detail-open { width: 46%; min-width: 380px; }
 
     /* Topbar */
     .topbar {
-      height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 20px;
-      background: white;
-      border-bottom: 1px solid var(--b2);
+      height: 62px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: var(--card);
+      border-bottom: 1px solid var(--b3);
       flex-shrink: 0;
     }
 
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+
     .topbar-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--t1);
-      flex: 1;
+      font-size: 19px; font-weight: 800;
+      color: var(--t1); letter-spacing: -0.3px;
+    }
+
+    .active-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-size: 12px; font-weight: 600;
+      padding: 3px 10px;
+      border-radius: var(--r-pill);
+    }
+    .active-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%; background: var(--accent);
     }
 
     .search-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--b1);
+      display: flex; align-items: center; gap: 8px;
+      background: var(--b2);
       border-radius: var(--r-lg);
-      padding: 8px 12px;
-      width: 220px;
+      padding: 7px 12px;
+      width: 240px;
+      border: 1px solid var(--b3);
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
-
+    .search-wrap:focus-within {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
     .search-wrap svg {
-      width: 15px;
-      height: 15px;
-      stroke: var(--t3);
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 14px; height: 14px;
+      stroke: var(--t4); fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .search-wrap input {
+      border: none; background: transparent; outline: none;
+      font-size: 13px; color: var(--t1); font-family: inherit; width: 100%;
+    }
+    .search-wrap input::placeholder { color: var(--t4); }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px; height: 46px;
+      background: var(--card);
+      border-bottom: 1px solid var(--b3);
       flex-shrink: 0;
     }
 
-    .search-wrap input {
-      border: none;
-      background: transparent;
-      outline: none;
-      font-size: 13px;
-      color: var(--t1);
-      font-family: inherit;
-      width: 100%;
-    }
+    .tabs { display: flex; align-items: center; gap: 3px; }
 
-    .search-wrap input::placeholder { color: var(--t3); }
-
-    .filter-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 14px;
-      background: var(--b1);
-      border: none;
-      border-radius: var(--r-lg);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--t2);
-      cursor: pointer;
-      transition: background 0.15s;
-      font-family: inherit;
-    }
-
-    .filter-btn:hover { background: var(--b2); }
-
-    .filter-btn svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    /* Section header */
-    .section-header {
-      padding: 16px 20px 8px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
+    .tab {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--r-md);
+      font-size: 13px; font-weight: 600;
       color: var(--t3);
+      cursor: pointer;
+      transition: background 0.13s, color 0.13s;
+    }
+    .tab:hover { background: var(--b2); color: var(--t2); }
+    .tab.active { background: var(--t1); color: white; }
+    .tab-count { font-size: 11px; font-weight: 700; opacity: 0.75; }
+
+    .sort-controls { display: flex; align-items: center; gap: 4px; }
+
+    .sort-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 10px;
+      border-radius: var(--r-md);
+      font-size: 12px; font-weight: 600;
+      color: var(--t2);
+      background: transparent;
+      border: 1px solid var(--b3);
+      cursor: pointer;
+      transition: background 0.13s, border-color 0.13s;
+      font-family: inherit;
+    }
+    .sort-btn:hover { background: var(--b2); border-color: var(--b4); }
+    .sort-btn.active {
+      background: var(--accent-light);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+    .sort-btn svg {
+      width: 11px; height: 11px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    /* List scroll area */
+    .icon-btn {
+      width: 31px; height: 31px;
+      border-radius: var(--r-md);
+      background: transparent;
+      border: 1px solid var(--b3);
+      color: var(--t3);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.13s, color 0.13s;
+    }
+    .icon-btn:hover { background: var(--b2); color: var(--t2); }
+    .icon-btn svg {
+      width: 13px; height: 13px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    /* List scroll */
     .list-scroll {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
+      background: var(--canvas);
+      padding: 14px;
     }
-
     .list-scroll::-webkit-scrollbar { width: 4px; }
     .list-scroll::-webkit-scrollbar-track { background: transparent; }
-    .list-scroll::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
+    .list-scroll::-webkit-scrollbar-thumb { background: var(--b4); border-radius: 4px; }
 
-    /* Row items */
+    .list-card {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      border: 1px solid var(--b3);
+      overflow: hidden;
+    }
+
+    /* Inbox rows */
     .inbox-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 20px;
       cursor: pointer;
       transition: background 0.12s;
-      border-bottom: 1px solid var(--b1);
+      border-bottom: 1px solid var(--b2);
       position: relative;
     }
-
-    .inbox-row:hover { background: rgba(167,139,250,0.06); }
-
-    .inbox-row.active {
-      background: var(--accent-light);
-      border-bottom-color: rgba(167,139,250,0.15);
-    }
-
-    .inbox-row.active::after {
+    .inbox-row:last-child { border-bottom: none; }
+    .inbox-row:hover { background: var(--b1); }
+    .inbox-row:hover .resolve-btn { opacity: 1; }
+    .inbox-row.active { background: var(--accent-light); }
+    .inbox-row.active::before {
       content: '';
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--accent);
-      border-radius: 2px 0 0 2px;
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--accent);
     }
-
-    .inbox-row.unread .row-name { font-weight: 700; }
-    .inbox-row.unread .row-preview { color: var(--t2); }
 
     .row-avatar {
-      width: 40px;
-      height: 40px;
+      width: 38px; height: 38px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
     }
+    .row-avatar svg {
+      width: 17px; height: 17px;
+      stroke: currentColor; fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .mod-phone { background: var(--mod-phone-bg); color: var(--mod-phone-fg); }
+    .mod-sms   { background: var(--mod-sms-bg);   color: var(--mod-sms-fg);   }
+    .mod-email { background: var(--mod-email-bg);  color: var(--mod-email-fg); }
+    .mod-chat  { background: var(--mod-chat-bg);   color: var(--mod-chat-fg);  }
 
-    .row-body {
-      flex: 1;
-      min-width: 0;
-    }
+    .row-body { flex: 1; min-width: 0; }
 
     .row-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 3px;
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 4px; flex-wrap: wrap;
     }
 
-    .row-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--t1);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .row-name { font-size: 13.5px; font-weight: 700; color: var(--t1); }
+    .row-dot {
+      width: 3px; height: 3px;
+      border-radius: 50%; background: var(--t4); flex-shrink: 0;
     }
+    .row-phone { font-size: 12.5px; color: var(--t3); }
 
-    .row-time {
-      font-size: 11px;
-      color: var(--t3);
-      flex-shrink: 0;
-      margin-left: 8px;
-      font-family: 'DM Mono', monospace;
-    }
-
-    .row-preview {
-      font-size: 12.5px;
-      color: var(--t3);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-bottom: 5px;
-    }
-
-    .row-meta {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+    .row-tag {
+      display: inline-flex; align-items: center;
       padding: 2px 8px;
       border-radius: var(--r-pill);
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .tag-res-made        { background: #F0FDF4; color: #15803D; }
+    .tag-lead            { background: #EFF6FF; color: #1D4ED8; }
+    .tag-incomplete-res  { background: #FFF7ED; color: #C2410C; }
+    .tag-incomplete-lead { background: #FFF1F2; color: #BE123C; }
+
+    .row-preview {
+      font-size: 12.5px; color: var(--t3);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
 
-    .badge-urgent    { background: var(--red-light);    color: var(--red);      }
-    .badge-important { background: var(--amber-light);  color: var(--amber);    }
-    .badge-resolved  { background: var(--green-light);  color: var(--green);    }
-    .badge-pending   { background: var(--indigo-bg);    color: var(--indigo);   }
-    .badge-new       { background: #FDF4FF;              color: var(--pink);     }
-
-    .unread-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--pink);
-      flex-shrink: 0;
+    .row-right {
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 6px;
+      flex-shrink: 0; min-width: 72px;
     }
-
-    /* ── DETAIL PANE ────────────────────────────────────────────── */
-    .detail-pane {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: white;
-      transform: translateX(100%);
-      opacity: 0;
-      transition: transform 0.3s var(--ease-std), opacity 0.25s var(--ease-std);
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .detail-pane.open {
-      transform: translateX(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    /* Detail header */
-    .detail-header {
-      padding: 20px 24px 0;
-      background: white;
-      border-bottom: 1px solid var(--b1);
-      flex-shrink: 0;
-    }
-
-    .detail-header-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .detail-contact {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .detail-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: 700;
-      color: white;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .detail-name-block {}
-
-    .detail-name {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--t1);
-      letter-spacing: -0.3px;
-      line-height: 1.2;
-      margin-bottom: 6px;
-    }
-
-    .detail-contact-info {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    .contact-info-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--t2);
-    }
-
-    .contact-info-row svg {
-      width: 13px;
-      height: 13px;
-      stroke: var(--t3);
-      fill: none;
-      stroke-width: 1.8;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-
-    .detail-close {
-      width: 32px;
-      height: 32px;
-      border-radius: var(--r-md);
-      border: none;
-      background: var(--b1);
-      color: var(--t2);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, color 0.15s;
-      flex-shrink: 0;
-    }
-
-    .detail-close:hover {
-      background: var(--b2);
-      color: var(--t1);
-    }
-
-    .detail-close svg {
-      width: 15px;
-      height: 15px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .detail-tabs {
-      display: flex;
-      gap: 0;
-      margin-top: 14px;
-    }
-
-    .detail-tab {
-      padding: 8px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--t3);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
-    }
-
-    .detail-tab:hover { color: var(--t2); }
-
-    .detail-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .detail-meta-pills {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-      margin-top: 4px;
-    }
-
-    /* Detail body */
-    .detail-body {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .detail-body::-webkit-scrollbar { width: 4px; }
-    .detail-body::-webkit-scrollbar-track { background: transparent; }
-    .detail-body::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 4px; }
-
-    /* ── TRANSCRIPT ─────────────────────────────────────────────── */
-    .transcript {
-      padding: 20px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .transcript-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--t3);
-      text-align: center;
-      position: relative;
-    }
-
-    .transcript-label::before,
-    .transcript-label::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: calc(50% - 70px);
-      height: 1px;
-      background: var(--b2);
-    }
-
-    .transcript-label::before { left: 0; }
-    .transcript-label::after  { right: 0; }
-
-    .msg-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-    }
-
-    /* Customer/caller messages: LEFT aligned */
-    .msg-row.caller {
-      flex-direction: row;
-      justify-content: flex-start;
-    }
-
-    /* AI/agent messages: RIGHT aligned */
-    .msg-row.agent {
-      flex-direction: row-reverse;
-      justify-content: flex-start;
-    }
-
-    .msg-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-bottom: 2px;
-    }
-
-    .msg-avatar.caller-av {
-      background: var(--b2);
-      color: var(--t2);
-    }
-
-    .msg-avatar.agent-av {
-      background: var(--grad);
-      color: white;
-    }
-
-    .msg-bubble-wrap {
-      display: flex;
-      flex-direction: column;
-      max-width: 72%;
-    }
-
-    .msg-row.caller .msg-bubble-wrap { align-items: flex-start; }
-    .msg-row.agent  .msg-bubble-wrap { align-items: flex-end; }
-
-    .msg-bubble {
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 13.5px;
-      line-height: 1.55;
-    }
-
-    .caller .msg-bubble {
-      background: var(--b1);
-      color: var(--t1);
-      border-bottom-left-radius: 4px;
-    }
-
-    .agent .msg-bubble {
-      background: var(--accent);
-      color: white;
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg-time {
-      font-size: 10.5px;
-      color: var(--t3);
-      margin-top: 4px;
+    .row-time, .row-duration {
+      font-size: 11px; color: var(--t4);
       font-family: 'DM Mono', monospace;
     }
 
-    /* ── NOTES / CRM panel ──────────────────────────────────────── */
-    .detail-info-section {
-      padding: 20px 24px;
-      border-top: 1px solid var(--b1);
+    .resolve-btn {
+      opacity: 0;
+      padding: 4px 10px;
+      border-radius: var(--r-md);
+      font-size: 11.5px; font-weight: 600;
+      background: var(--card); color: var(--t2);
+      border: 1px solid var(--b3);
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.13s;
+      font-family: inherit; white-space: nowrap;
+    }
+    .resolve-btn:hover { background: var(--b2); }
+
+    /* Footer pagination */
+    .list-footer {
+      height: 50px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 24px;
+      background: var(--card);
+      border-top: 1px solid var(--b3);
+      flex-shrink: 0;
+    }
+    .showing-text { font-size: 13px; color: var(--t3); }
+
+    .pagination { display: flex; align-items: center; gap: 2px; }
+    .page-btn {
+      width: 30px; height: 30px;
+      border-radius: var(--r-md);
+      background: transparent;
+      border: 1px solid var(--b3);
+      color: var(--t2); font-size: 12.5px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.13s, border-color 0.13s, color 0.13s;
+      font-family: inherit;
+    }
+    .page-btn:hover { background: var(--b2); border-color: var(--b4); }
+    .page-btn.active { background: var(--t1); border-color: var(--t1); color: white; }
+    .page-btn svg {
+      width: 12px; height: 12px;
+      stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .info-section-title {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--t3);
-      margin-bottom: 12px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .info-item {}
-
-    .info-label {
-      font-size: 11px;
-      color: var(--t3);
-      margin-bottom: 2px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .info-value {
-      font-size: 13.5px;
-      color: var(--t1);
-      font-weight: 500;
-    }
-
-    /* ── EMPTY STATE ────────────────────────────────────────────── */
-    .empty-detail {
+    /* ══════════════ DETAIL PANE ══════════════ */
+    .detail-pane {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      color: var(--t3);
-      padding: 40px;
-      text-align: center;
+      display: flex; flex-direction: column;
+      background: var(--card);
+      border-left: 1px solid var(--b3);
+      transform: translateX(100%);
+      opacity: 0;
+      transition: transform 0.28s var(--ease), opacity 0.22s var(--ease);
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .detail-pane.open { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+    .detail-scroll {
+      flex: 1; overflow-y: auto;
+      padding: 20px 22px 0;
+    }
+    .detail-scroll::-webkit-scrollbar { width: 4px; }
+    .detail-scroll::-webkit-scrollbar-track { background: transparent; }
+    .detail-scroll::-webkit-scrollbar-thumb { background: var(--b4); border-radius: 4px; }
+
+    /* Top bar */
+    .detail-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 22px;
+    }
+    .priority-badge {
+      display: inline-flex; align-items: center;
+      padding: 6px 15px; border-radius: var(--r-pill);
+      font-size: 12.5px; font-weight: 700; color: white;
+    }
+    .priority-high { background: var(--brand-grad); }
+    .priority-med  { background: linear-gradient(135deg, #38BDF8, #0EA5E9); }
+    .detail-close-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid var(--b3); background: transparent; color: var(--t3);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.13s, color 0.13s;
+    }
+    .detail-close-btn:hover { background: var(--b2); color: var(--t1); }
+    .detail-close-btn svg {
+      width: 14px; height: 14px; stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .empty-detail svg {
-      width: 48px;
-      height: 48px;
-      stroke: var(--b2);
-      fill: none;
-      stroke-width: 1.5;
+    /* Phone + meta */
+    .detail-phone-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 5px;
+    }
+    .detail-phone-row svg {
+      width: 20px; height: 20px; stroke: var(--t3); fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+    }
+    .detail-phone-num { font-size: 24px; font-weight: 800; color: var(--t1); letter-spacing: -0.5px; }
+    .detail-call-meta {
+      font-size: 13px; color: var(--t3);
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 14px; padding-left: 30px;
+    }
+    .detail-call-meta .dot { color: var(--b4); }
+
+    /* Contact */
+    .detail-contact-row {
+      display: flex; align-items: center; gap: 9px; margin-bottom: 10px;
+    }
+    .detail-contact-row svg {
+      width: 17px; height: 17px; stroke: var(--t3); fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+    }
+    .detail-contact-name { font-size: 17px; font-weight: 700; color: var(--t1); }
+
+    /* Member tags */
+    .detail-member-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+    .detail-member-tag {
+      padding: 4px 13px; border-radius: var(--r-pill);
+      font-size: 12px; font-weight: 600;
+      border: 1.5px solid var(--b3); color: var(--t2); background: white;
+    }
+    .detail-divider { height: 1px; background: var(--b3); margin-bottom: 18px; }
+
+    /* Guest profile card */
+    .guest-card {
+      border: 1.5px solid var(--accent-dim);
+      border-radius: 14px; padding: 16px;
+      background: var(--accent-light); margin-bottom: 20px;
+    }
+    .guest-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .guest-card-title { font-size: 14px; font-weight: 700; color: var(--accent); flex: 1; }
+    .guest-card-badge {
+      padding: 3px 10px; border-radius: var(--r-pill);
+      font-size: 11.5px; font-weight: 600;
+      background: white; color: var(--t2); border: 1px solid var(--b3);
+    }
+    .guest-card-toggle {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: white; border: 1px solid var(--b3);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--t3); flex-shrink: 0;
+    }
+    .guest-card-toggle svg {
+      width: 12px; height: 12px; stroke: currentColor; fill: none;
+      stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .guest-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .guest-stat {
+      background: white; border-radius: 8px; padding: 10px 12px;
+      border: 1px solid rgba(37,99,235,0.1);
+    }
+    .guest-stat-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--t4); margin-bottom: 4px;
+    }
+    .guest-stat-value { font-size: 14px; font-weight: 700; color: var(--t1); }
+    .guest-prefs-label {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--t4); margin-bottom: 7px;
+    }
+    .guest-prefs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .guest-pref-pill {
+      padding: 4px 11px; border-radius: var(--r-pill);
+      font-size: 12px; font-weight: 500;
+      background: white; color: var(--t1); border: 1px solid var(--b3);
     }
 
-    .empty-detail h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--t2);
+    /* Call summary */
+    .call-summary { margin-bottom: 18px; }
+    .call-summary-title { font-size: 15px; font-weight: 800; color: var(--t1); margin-bottom: 7px; }
+    .call-summary-text { font-size: 13.5px; line-height: 1.65; color: var(--t2); }
+
+    /* Audio player */
+    .audio-player {
+      background: white; border-radius: 12px; border: 1px solid var(--b3);
+      padding: 13px 16px; display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .play-btn {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--t1); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.13s;
+    }
+    .play-btn:hover { background: var(--t2); }
+    .play-btn svg { display: block; }
+    .waveform { flex: 1; height: 32px; display: flex; align-items: center; gap: 2px; }
+    .wf-bar { flex: 1; min-width: 2px; border-radius: 2px; }
+    .wf-bar.played   { background: var(--accent); }
+    .wf-bar.unplayed { background: var(--b3); }
+    .audio-time {
+      font-size: 11.5px; font-weight: 600; color: var(--t3);
+      font-family: 'DM Mono', monospace; flex-shrink: 0; white-space: nowrap;
     }
 
-    .empty-detail p {
-      font-size: 13px;
-      color: var(--t3);
-      max-width: 260px;
-      line-height: 1.5;
+    /* Transcript */
+    .transcript-section { margin-bottom: 20px; }
+    .transcript-label {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--t4); margin-bottom: 12px;
     }
+    .msg-row { margin-bottom: 10px; display: flex; }
+    .msg-row.agent  { justify-content: flex-start; }
+    .msg-row.caller { justify-content: flex-end; }
+    .msg-bubble {
+      padding: 11px 15px; border-radius: 18px;
+      font-size: 13.5px; line-height: 1.55; max-width: 82%;
+    }
+    .msg-row.agent  .msg-bubble { background: var(--brand-grad); color: white; border-bottom-left-radius: 4px; }
+    .msg-row.caller .msg-bubble { background: var(--b2); color: var(--t1); border-bottom-right-radius: 4px; }
+
+    /* Detail footer */
+    .detail-footer {
+      padding: 12px 20px 18px;
+      background: white; border-top: 1px solid var(--b3); flex-shrink: 0;
+    }
+    .resolve-btn-main {
+      width: 100%; padding: 14px; border-radius: 12px;
+      background: var(--brand-grad); color: white; border: none;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: opacity 0.15s; letter-spacing: -0.2px;
+    }
+    .resolve-btn-main:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
-  <aside class="sidebar" id="sidebar">
-
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="logo-full">slang</div>
-      <div class="logo-icon">S</div>
+      <img src="../assets/Slang.png" class="logo-img" alt="Slang">
+    </div>
+
+    <div class="location-selector">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="location-name">All Locations</span>
+      <svg class="location-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
 
     <nav class="nav">
+      <div class="nav-item">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+        <span class="nav-label">Insights</span>
+      </div>
       <div class="nav-item active">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24"><path d="M4 4h16v2.5a2 2 0 0 1-.6 1.45L13 14v6l-2-1v-5L4.6 7.95A2 2 0 0 1 4 6.5V4z"/><path d="M4 4h16"/></svg>
-        </span>
-        <span class="nav-label">Inbox</span>
-        <span class="nav-badge">12</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+        <span class="nav-label">Smart Inbox</span>
+        <span class="nav-badge">7</span>
       </div>
       <div class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </span>
-        <span class="nav-label">Contacts</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        <span class="nav-label">Guests</span>
       </div>
       <div class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </span>
-        <span class="nav-label">Calendar</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></span>
+        <span class="nav-label">Branding</span>
       </div>
       <div class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </span>
-        <span class="nav-label">Analytics</span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
+        <span class="nav-label">Concierge</span>
       </div>
       <div class="nav-item">
-        <span class="nav-icon">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
-        </span>
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+        <span class="nav-label">Marketplace</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+        <span class="nav-label">Hours</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
         <span class="nav-label">Settings</span>
       </div>
     </nav>
 
-    <div class="sidebar-user">
-      <div class="user-avatar">AK</div>
-      <div class="user-info">
-        <div class="user-name">Alex King</div>
-        <div class="user-email">alex@slang.ai</div>
+    <div class="sidebar-bottom">
+      <div class="whats-new-item">
+        <svg style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span style="flex:1;font-size:13.5px;font-weight:500;color:var(--sidebar-text)">What's New</span>
+        <span class="nav-badge">10</span>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-avatar">AS</div>
+        <span class="user-name">Alex Sambvani</span>
+        <div class="user-more">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/></svg>
+        </div>
       </div>
     </div>
-
-    <div class="sidebar-toggle">
-      <button class="toggle-btn" id="sidebarToggle" title="Toggle sidebar">
-        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-    </div>
-
   </aside>
 
-  <!-- ── MAIN AREA ────────────────────────────────────────────────── -->
+  <!-- MAIN -->
   <div class="main">
 
     <!-- LIST PANEL -->
@@ -978,212 +750,448 @@
 
       <!-- Topbar -->
       <div class="topbar">
-        <h1 class="topbar-title">Smart Inbox</h1>
+        <div class="topbar-left">
+          <h1 class="topbar-title">Smart Inbox</h1>
+          <div class="active-pill">
+            <div class="active-dot"></div>
+            7 Active
+          </div>
+        </div>
         <div class="search-wrap">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" id="searchInput" placeholder="Search conversations…">
+          <input type="text" id="searchInput" placeholder="Search transcripts…">
         </div>
-        <button class="filter-btn">
-          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-          Filter
-        </button>
       </div>
 
-      <!-- Scrollable list -->
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="tabs">
+          <div class="tab active" data-filter="inbox" onclick="switchTab(this)">Inbox <span class="tab-count">7</span></div>
+          <div class="tab" data-filter="resolved" onclick="switchTab(this)">Resolved <span class="tab-count">8</span></div>
+          <div class="tab" data-filter="all" onclick="switchTab(this)">All</div>
+        </div>
+        <div class="sort-controls">
+          <button class="sort-btn active">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            Newest
+          </button>
+          <button class="sort-btn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            Oldest
+          </button>
+          <button class="sort-btn">
+            <svg viewBox="0 0 24 24"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+            Priority
+          </button>
+          <button class="icon-btn">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </button>
+          <button class="icon-btn">
+            <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- List -->
       <div class="list-scroll" id="listScroll">
-
-        <div class="section-header">Urgent &amp; Recent</div>
-
-        <!-- Rows injected by JS -->
-        <div id="inboxList"></div>
-
+        <div class="list-card">
+          <div id="inboxList"></div>
+        </div>
       </div>
-    </div>
+
+      <!-- Pagination footer -->
+      <div class="list-footer">
+        <span id="showingText" class="showing-text">Showing <strong>1–7</strong> of <strong>7</strong> calls</span>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+    </div><!-- /list-panel -->
 
     <!-- DETAIL PANE -->
     <div class="detail-pane" id="detailPane">
-      <div class="detail-header" id="detailHeader"><!-- filled by JS --></div>
-      <div class="detail-body" id="detailBody"><!-- filled by JS --></div>
+      <div class="detail-scroll" id="detailBody"></div>
+      <div class="detail-footer" id="detailFooter"></div>
     </div>
 
-  </div><!-- /.main -->
+  </div><!-- /main -->
 
-</div><!-- /.app -->
+</div><!-- /app -->
 
 <script>
-/* ── DATA ──────────────────────────────────────────────────────────── */
+const MOD_ICONS = {
+  phone: `<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+  sms:   `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="13" y2="14"/></svg>`,
+  email: `<svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  chat:  `<svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+};
+
 const conversations = [
   {
     id: 1,
-    name: 'Maria Santos',
-    phone: '+1 (415) 882-3201',
-    email: 'maria.santos@gmail.com',
-    initials: 'MS',
-    color: '#E879F9',
-    preview: '"Do you have gluten-free pasta options?"',
-    time: '2 min ago',
-    badge: 'urgent',
-    badgeLabel: 'Urgent',
-    unread: true,
-    tags: ['New Guest', 'Dietary'],
-    restaurant: 'Aria Bistro',
-    duration: '1m 42s',
+    name: 'Carlos Delaney',
+    phone: '+1 (312) 554-8823',
+    email: 'carlos.d@gmail.com',
+    modality: 'phone',
+    tag: 'incomplete-res', tagLabel: 'Incomplete Reservation',
+    time: '10:42 AM', duration: '4m 09s',
+    status: 'inbox',
+    priority: 'High',
+    memberSince: 2019, isVIP: false,
+    guestProfile: { visits: 8, lastVisit: 'Feb 12, 2026', birthday: 'Sep 3', email: 'carlos.d@gmail.com', preferences: ['Corner table', 'No shellfish'] },
+    callSummary: 'Caller complained about incorrect order — wrong wine selection and a missing appetizer. Requested a callback from the manager before their next visit.',
+    preview: 'Caller complained about incorrect order — wrong wine selection and a missing appetizer. Requested a callback from the manager before their next visit.',
     transcript: [
-      { role: 'agent', text: 'Thank you for calling Aria Bistro, this is Aria. How can I help you today?', time: '3:01 PM' },
-      { role: 'caller', text: 'Hi! I was wondering if you have gluten-free pasta options on the menu?', time: '3:01 PM' },
-      { role: 'agent', text: 'Absolutely! We have a wonderful gluten-free pappardelle made with rice flour. It pairs beautifully with our truffle mushroom sauce.', time: '3:02 PM' },
-      { role: 'caller', text: 'That sounds amazing. Is it a separate preparation so there\'s no cross-contamination?', time: '3:02 PM' },
-      { role: 'agent', text: 'Yes, we use dedicated cookware for all gluten-free dishes. Your safety is our priority. Would you like to make a reservation?', time: '3:03 PM' },
-      { role: 'caller', text: 'Yes, for two people this Saturday at 7pm if possible.', time: '3:03 PM' },
-      { role: 'agent', text: 'I\'ve reserved a table for two this Saturday, March 14th at 7:00 PM. I\'ll send a confirmation to your email. Is there anything else I can help you with?', time: '3:04 PM' },
-      { role: 'caller', text: 'No that\'s perfect, thank you so much!', time: '3:04 PM' },
+      { role: 'agent', text: 'Thank you for calling. How can I help you today?', time: '10:38 AM' },
+      { role: 'caller', text: 'Hi, I want to flag an issue with my order last night. The wine I received was completely different from what I ordered.', time: '10:38 AM' },
+      { role: 'agent', text: "I'm very sorry to hear that. I've noted your complaint and flagged it for our manager. They will call you back shortly.", time: '10:39 AM' },
+      { role: 'caller', text: 'Also, my appetizer was missing entirely. It was a disappointing experience.', time: '10:40 AM' },
+      { role: 'agent', text: "I sincerely apologize for both issues. I've escalated your case as high priority and our manager will reach out before end of day.", time: '10:40 AM' },
     ],
   },
   {
     id: 2,
-    name: 'James Thornton',
-    phone: '+1 (628) 310-4477',
-    email: 'j.thornton@outlook.com',
-    initials: 'JT',
-    color: '#7DC1F7',
-    preview: '"I need to cancel my reservation for tonight"',
-    time: '18 min ago',
-    badge: 'important',
-    badgeLabel: 'Follow-up',
-    unread: true,
-    tags: ['Cancellation'],
-    restaurant: 'Aria Bistro',
-    duration: '2m 11s',
+    name: 'Margot Ellison',
+    phone: '+1 (415) 823-7741',
+    email: 'margot.e@mail.com',
+    modality: 'phone',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: '9:14 AM', duration: '3m 22s',
+    status: 'inbox',
+    priority: 'High',
+    memberSince: 2021, isVIP: true,
+    guestProfile: { visits: 14, lastVisit: 'Mar 1, 2026', birthday: 'Apr 18', email: 'm.ellison@gmail.com', preferences: ['Window seat', 'No cilantro', 'Sparkling water'] },
+    callSummary: "Caller asked to modify a reservation for Sunday, March 15th from 7 PM to 8 PM for a party of four. Also requested the corner booth and mentioned a birthday celebration.",
+    preview: "Guest requested to move Sunday reservation from 7 PM to 8 PM for party of four. Also asked for corner booth and noted it's a birthday celebration.",
     transcript: [
-      { role: 'agent', text: 'Thank you for calling Aria Bistro. How can I assist you today?', time: '2:44 PM' },
-      { role: 'caller', text: 'Hi, I need to cancel my reservation for tonight. I\'m so sorry for the short notice.', time: '2:44 PM' },
-      { role: 'agent', text: 'Of course, I\'m sorry to hear that. May I have your name and reservation time?', time: '2:44 PM' },
-      { role: 'caller', text: 'James Thornton, reservation at 8pm for four people.', time: '2:45 PM' },
-      { role: 'agent', text: 'I\'ve found your reservation. I\'ve gone ahead and cancelled it. No penalty since you\'re calling before 3pm. Would you like me to help you reschedule for another date?', time: '2:45 PM' },
-      { role: 'caller', text: 'That would be great, maybe next weekend?', time: '2:46 PM' },
-      { role: 'agent', text: 'We have availability on Saturday the 15th and Sunday the 16th. Which works better for you and your party?', time: '2:46 PM' },
+      { role: 'agent', text: 'Good morning! How can I assist you today?', time: '9:12 AM' },
+      { role: 'caller', text: 'Hi, I have a reservation this Sunday at 7 PM for four people. Can I move it to 8 PM?', time: '9:12 AM' },
+      { role: 'agent', text: "Of course! I've updated your reservation to 8 PM on Sunday for four guests.", time: '9:13 AM' },
+      { role: 'caller', text: "Perfect. Also, is a corner booth possible? It's a birthday celebration.", time: '9:13 AM' },
+      { role: 'agent', text: "Happy birthday to your guest! I've noted the request for a corner booth and flagged the birthday occasion. We'll make it special!", time: '9:14 AM' },
     ],
   },
   {
     id: 3,
-    name: 'Priya Mehta',
-    phone: '+1 (510) 774-0093',
-    email: 'priya.mehta@gmail.com',
-    initials: 'PM',
-    color: '#A78BFA',
-    preview: '"Birthday reservation for 12 — private room available?"',
-    time: '1 hr ago',
-    badge: 'pending',
-    badgeLabel: 'Pending',
-    unread: false,
-    tags: ['Large Party', 'Events'],
-    restaurant: 'Aria Bistro',
-    duration: '3m 05s',
+    name: 'Priya Nambara',
+    phone: '+1 (650) 302-1197',
+    email: 'priya.n@gmail.com',
+    modality: 'chat',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: '8:55 AM', duration: '2m 48s',
+    status: 'inbox',
+    priority: null,
+    memberSince: 2023, isVIP: false,
+    guestProfile: { visits: 3, lastVisit: 'Jan 15, 2026', birthday: null, email: 'priya.n@gmail.com', preferences: ['Gluten-free', 'No nuts'] },
+    callSummary: 'Inquiry about gluten-free menu options for a group of six. AI confirmed available dishes and noted a severe nut allergy for the reservation.',
+    preview: 'Inquiry about gluten-free menu options for a group of six. AI confirmed available dishes and noted a nut allergy for the reservation.',
     transcript: [
-      { role: 'agent', text: 'Good afternoon, Aria Bistro. How may I help you?', time: '2:01 PM' },
-      { role: 'caller', text: 'Hi, I\'m looking to book a birthday dinner for about 12 people next month. Do you have a private dining room?', time: '2:01 PM' },
-      { role: 'agent', text: 'Congratulations on the upcoming birthday! We do have a beautiful private dining room that seats up to 16. It\'s perfect for celebrations.', time: '2:02 PM' },
-      { role: 'caller', text: 'Wonderful! What\'s the minimum spend for the private room?', time: '2:02 PM' },
-      { role: 'agent', text: 'The private dining room requires a minimum food and beverage spend of $800 for weekday bookings, or $1,200 on weekends. We also offer custom menus for groups.', time: '2:03 PM' },
-      { role: 'caller', text: 'That works for us. Can I get more details emailed to me?', time: '2:04 PM' },
-      { role: 'agent', text: 'Absolutely. I\'ll send our private dining package details to your email right away. Our events coordinator will also follow up within 24 hours.', time: '2:04 PM' },
+      { role: 'agent', text: 'Hello! How can I help you today?', time: '8:52 AM' },
+      { role: 'caller', text: "Hi, we're coming in as a group of six and one person needs gluten-free options. What do you have?", time: '8:53 AM' },
+      { role: 'agent', text: 'We have several gluten-free options including our pasta, the grilled salmon, and the seasonal vegetable risotto. All are prepared with separate cookware.', time: '8:53 AM' },
+      { role: 'caller', text: 'Great. One guest also has a nut allergy. Can you note that?', time: '8:54 AM' },
+      { role: 'agent', text: "Absolutely, I've noted a severe nut allergy for your reservation. Our kitchen will be fully prepared. Is there anything else?", time: '8:54 AM' },
     ],
   },
   {
     id: 4,
-    name: 'Derek Vasquez',
-    phone: '+1 (312) 940-6621',
-    email: 'derek.v@company.io',
-    initials: 'DV',
-    color: '#34D399',
-    preview: '"What time do you close on Sundays?"',
-    time: '3 hr ago',
-    badge: 'resolved',
-    badgeLabel: 'Resolved',
-    unread: false,
-    tags: ['Quick Query'],
-    restaurant: 'Aria Bistro',
-    duration: '0m 48s',
+    name: 'Owen Park',
+    phone: '+1 (718) 941-0034',
+    email: 'owen.park@outlook.com',
+    modality: 'sms',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: '8:30 AM', duration: '1m 55s',
+    status: 'inbox',
+    priority: null,
+    memberSince: 2022, isVIP: false,
+    guestProfile: { visits: 6, lastVisit: 'Feb 28, 2026', birthday: 'Jul 22', email: 'owen.park@outlook.com', preferences: ['Booth seating'] },
+    callSummary: "Called to confirm tonight's reservation for 2 at 7:30 PM and asked about valet parking. Reservation confirmed and valet parking info provided.",
+    preview: "Called to confirm tonight's reservation for 2 at 7:30 PM and asked about valet parking availability.",
     transcript: [
-      { role: 'agent', text: 'Thanks for calling Aria Bistro! How can I help?', time: '12:15 PM' },
-      { role: 'caller', text: 'Hi, quick question — what time do you close on Sundays?', time: '12:15 PM' },
-      { role: 'agent', text: 'On Sundays we close at 9:30 PM. Last seating is at 8:45 PM.', time: '12:15 PM' },
-      { role: 'caller', text: 'Perfect, thanks!', time: '12:15 PM' },
+      { role: 'agent', text: 'Thank you for calling! How can I help?', time: '8:28 AM' },
+      { role: 'caller', text: 'Hi, just calling to confirm my reservation tonight at 7:30 for two people.', time: '8:28 AM' },
+      { role: 'agent', text: 'Confirmed! Reservation for Owen Park, party of 2 at 7:30 PM tonight.', time: '8:29 AM' },
+      { role: 'caller', text: 'Perfect. Do you have valet parking?', time: '8:29 AM' },
+      { role: 'agent', text: 'Yes, we offer complimentary valet parking starting at 5 PM. Just pull up to the front entrance.', time: '8:30 AM' },
     ],
   },
   {
     id: 5,
-    name: 'Chloe Nakamura',
-    phone: '+1 (213) 556-8830',
-    email: 'chloe.n@mail.com',
-    initials: 'CN',
-    color: '#F59E0B',
-    preview: '"Do you accommodate nut allergies? Severe anaphylaxis"',
-    time: 'Yesterday',
-    badge: 'urgent',
-    badgeLabel: 'Urgent',
-    unread: false,
-    tags: ['Allergy', 'Health & Safety'],
-    restaurant: 'Aria Bistro',
-    duration: '2m 30s',
+    name: 'Lucia Montoya',
+    phone: '+1 (503) 887-2264',
+    email: 'lucia.m@company.com',
+    modality: 'email',
+    tag: 'lead', tagLabel: 'Lead Generated',
+    time: '8:01 AM', duration: '3m 11s',
+    status: 'inbox',
+    priority: 'High',
+    memberSince: null, isVIP: false,
+    guestProfile: null,
+    callSummary: 'Inquired about private dining room availability for a corporate dinner of 20 guests next Friday. AI collected contact info and forwarded to the events team.',
+    preview: 'Asked about private dining room availability for a corporate dinner of 20 guests next Friday. AI collected contact info and forwarded to events team.',
     transcript: [
-      { role: 'agent', text: 'Aria Bistro, how can I help you today?', time: '6:40 PM' },
-      { role: 'caller', text: 'Hi, I have a severe nut allergy — anaphylaxis level. I want to make sure you can accommodate me safely before I book.', time: '6:40 PM' },
-      { role: 'agent', text: 'Your safety is our absolute priority. I\'m flagging your inquiry for our head chef right now. We take severe allergies very seriously and will ensure completely nut-free preparation.', time: '6:41 PM' },
-      { role: 'caller', text: 'Thank you. I\'ve had restaurants say that before and then there was cross-contamination.', time: '6:41 PM' },
-      { role: 'agent', text: 'I completely understand your concern. Our chef will call you personally before your reservation to discuss your needs and walk through our kitchen protocols.', time: '6:42 PM' },
-      { role: 'caller', text: 'That would be really reassuring. Thank you so much.', time: '6:42 PM' },
+      { role: 'agent', text: 'Good morning! How can I assist you?', time: '7:58 AM' },
+      { role: 'caller', text: "Hi, I'm looking to book a private dining room for a corporate event — about 20 people next Friday.", time: '7:58 AM' },
+      { role: 'agent', text: "We have a beautiful private dining room that accommodates up to 24. It's available next Friday. The minimum spend is $1,400 for that day.", time: '7:59 AM' },
+      { role: 'caller', text: 'That works. Can I get someone from the events team to call me?', time: '7:59 AM' },
+      { role: 'agent', text: "Of course! I've collected your contact information and forwarded it to our events coordinator. They will call you within the hour.", time: '8:00 AM' },
     ],
   },
   {
     id: 6,
-    name: 'Oliver Grant',
-    phone: '+1 (917) 223-7741',
-    email: 'ogrant@fastmail.com',
-    initials: 'OG',
-    color: '#818CF8',
-    preview: '"Party of 8, anniversary dinner, any special touches?"',
-    time: 'Yesterday',
-    badge: 'new',
-    badgeLabel: 'New',
-    unread: false,
-    tags: ['Anniversary', 'Large Party'],
-    restaurant: 'Aria Bistro',
-    duration: '4m 12s',
+    name: 'Theo Hartmann',
+    phone: '+1 (206) 773-9952',
+    email: 'theo.h@fastmail.com',
+    modality: 'sms',
+    tag: null, tagLabel: null,
+    time: 'Yesterday', duration: '2m 03s',
+    status: 'inbox',
+    priority: null,
+    memberSince: 2020, isVIP: false,
+    guestProfile: { visits: 11, lastVisit: 'Mar 5, 2026', birthday: 'Dec 14', email: 'theo.h@fastmail.com', preferences: ['Quiet table', 'Still water'] },
+    callSummary: 'Gift card balance inquiry — $47.50 remaining. Confirmed gift cards can be applied to online orders at checkout.',
+    preview: 'Gift card balance inquiry and question about whether cards can be used for online orders.',
     transcript: [
-      { role: 'agent', text: 'Good evening, Aria Bistro. How may I assist you?', time: '7:20 PM' },
-      { role: 'caller', text: 'Hi, I\'d like to book for 8 people for my parents\' 40th anniversary. Are there any special touches you can arrange?', time: '7:21 PM' },
-      { role: 'agent', text: 'How wonderful — 40 years is such a milestone! Absolutely. We can arrange fresh flowers, a personalized anniversary cake, and a dedicated server for your table. We can also place a photo of the couple at the table setting.', time: '7:21 PM' },
-      { role: 'caller', text: 'Oh wow, the photo idea is beautiful. And the cake — can it be chocolate?', time: '7:22 PM' },
-      { role: 'agent', text: 'Of course! Our pastry chef makes an exceptional dark chocolate celebration cake. I\'ll note your preferences. What date were you thinking?', time: '7:22 PM' },
-      { role: 'caller', text: 'April 5th, a Saturday. Around 7pm?', time: '7:23 PM' },
+      { role: 'agent', text: 'Hello! How can I help you today?', time: 'Yesterday 6:30 PM' },
+      { role: 'caller', text: "Hi, I have a gift card and I'm wondering what the current balance is.", time: 'Yesterday 6:30 PM' },
+      { role: 'agent', text: 'I can look that up for you. Could you provide the card number on the back?', time: 'Yesterday 6:31 PM' },
+      { role: 'caller', text: "Sure, it's 4892-3310-8847. Also, can I use this online?", time: 'Yesterday 6:31 PM' },
+      { role: 'agent', text: 'Your current balance is $47.50. And yes, gift cards can be applied to online orders at checkout by entering the card number.', time: 'Yesterday 6:32 PM' },
+    ],
+  },
+  // ── Inbox #7 ──
+  {
+    id: 7,
+    name: 'Sofia Chen',
+    phone: '+1 (628) 441-0029',
+    email: 'sofia.chen@gmail.com',
+    modality: 'phone',
+    tag: 'incomplete-lead', tagLabel: 'Incomplete Lead',
+    time: 'Yesterday',  duration: '1m 44s',
+    status: 'inbox',
+    priority: 'High',
+    memberSince: null, isVIP: false,
+    guestProfile: null,
+    callSummary: "Caller inquired about hosting a baby shower brunch for 15 guests. Asked about private space and custom menu options but said she'd call back to confirm — no booking made.",
+    preview: "Inquired about hosting a baby shower brunch for 15 guests. Asked about private space and menu but did not make a reservation.",
+    transcript: [
+      { role: 'agent', text: 'Good afternoon! How can I help you today?', time: 'Yesterday 2:10 PM' },
+      { role: 'caller', text: "Hi, I'm planning a baby shower brunch for about 15 people. Do you have a private space for that?", time: 'Yesterday 2:10 PM' },
+      { role: 'agent', text: "We do! Our private dining room accommodates up to 20 for brunch events. We also offer custom brunch menus. Would you like to check availability?", time: 'Yesterday 2:11 PM' },
+      { role: 'caller', text: "That sounds great. I need to check dates with the guest of honor first and I'll call back.", time: 'Yesterday 2:11 PM' },
+      { role: 'agent', text: "Of course! I'll note your interest and our events team will be ready. Looking forward to hearing from you.", time: 'Yesterday 2:12 PM' },
+    ],
+  },
+  // ── Resolved conversations ──
+  {
+    id: 8,
+    name: 'James Wu',
+    phone: '+1 (415) 302-6610',
+    email: 'james.wu@icloud.com',
+    modality: 'phone',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: 'Mar 8, 8:40 PM', duration: '3m 15s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2018, isVIP: true,
+    guestProfile: { visits: 22, lastVisit: 'Mar 8, 2026', birthday: 'Feb 14', email: 'james.wu@icloud.com', preferences: ['Candlelit table', 'Champagne on arrival', 'No peanuts'] },
+    callSummary: 'Booked anniversary dinner for 2 on Friday March 20th at 7:30 PM. Requested roses on the table and a champagne toast. Reservation confirmed.',
+    preview: 'Booked anniversary dinner for 2 on Friday March 20th at 7:30 PM. Requested roses on the table and champagne.',
+    transcript: [
+      { role: 'agent', text: 'Good evening! How can I help you tonight?', time: '8:38 PM' },
+      { role: 'caller', text: "Hi, I'd like to book a table for two for my anniversary. Friday the 20th at 7:30 PM if possible.", time: '8:38 PM' },
+      { role: 'agent', text: "Congratulations on your anniversary! Friday March 20th at 7:30 PM for two is available. I've reserved it for you.", time: '8:39 PM' },
+      { role: 'caller', text: "Perfect. Could you arrange roses on the table and maybe a champagne toast?", time: '8:39 PM' },
+      { role: 'agent', text: "Absolutely! I've noted fresh roses and a complimentary champagne toast. We'll make it a special evening. Is there anything else?", time: '8:40 PM' },
+      { role: 'caller', text: "That's everything, thank you so much!", time: '8:40 PM' },
+    ],
+  },
+  {
+    id: 9,
+    name: 'Elena Rodriguez',
+    phone: '+1 (510) 887-3302',
+    email: 'elena.r@outlook.com',
+    modality: 'phone',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: 'Mar 8, 6:22 PM', duration: '2m 09s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2022, isVIP: false,
+    guestProfile: { visits: 5, lastVisit: 'Feb 14, 2026', birthday: 'Nov 2', email: 'elena.r@outlook.com', preferences: ['Corner booth', 'Dairy-free options'] },
+    callSummary: 'Booked table for 6 for a birthday party on Saturday at 6 PM. Corner booth requested and confirmed. Balloon decoration noted.',
+    preview: 'Booked table for 6 for birthday party Saturday at 6 PM. Corner booth requested and confirmed.',
+    transcript: [
+      { role: 'agent', text: 'Hello! How can I assist you this evening?', time: '6:20 PM' },
+      { role: 'caller', text: "I'd like to book for 6 people this Saturday at 6 PM. It's a birthday dinner.", time: '6:20 PM' },
+      { role: 'agent', text: "Happy upcoming birthday! Saturday the 14th at 6 PM for six — confirmed. Would you like a corner booth?", time: '6:21 PM' },
+      { role: 'caller', text: "Yes please! And is it okay if we bring balloons?", time: '6:21 PM' },
+      { role: 'agent', text: "Of course, balloons are welcome! I've noted the corner booth and will let the team know. See you Saturday!", time: '6:22 PM' },
+    ],
+  },
+  {
+    id: 10,
+    name: 'Michael Torres',
+    phone: '+1 (213) 554-0077',
+    email: 'm.torres@acmecorp.com',
+    modality: 'email',
+    tag: 'lead', tagLabel: 'Lead Generated',
+    time: 'Mar 8, 3:05 PM', duration: '4m 30s',
+    status: 'resolved',
+    priority: 'High',
+    memberSince: null, isVIP: false,
+    guestProfile: null,
+    callSummary: 'Corporate catering inquiry for a 50-person product launch event on March 28th. Budget is $4,500. Forwarded to events team with full contact details.',
+    preview: 'Corporate catering inquiry for 50-person event March 28th, $4,500 budget. Forwarded to events team.',
+    transcript: [
+      { role: 'agent', text: 'Thank you for reaching out! How can I help you?', time: '3:02 PM' },
+      { role: 'caller', text: "Hi, we're planning a product launch for about 50 people on March 28th and looking for catering. What can you offer?", time: '3:02 PM' },
+      { role: 'agent', text: "We'd love to cater your event! We offer full-service catering for up to 200 guests. Can you share your budget range?", time: '3:03 PM' },
+      { role: 'caller', text: "We're thinking around $4,500 total. We'd need passed appetizers, a buffet, and dessert.", time: '3:04 PM' },
+      { role: 'agent', text: "That works perfectly for your group size. I've collected your details and am forwarding this to our events manager. Expect a call within 2 hours.", time: '3:05 PM' },
+    ],
+  },
+  {
+    id: 11,
+    name: 'Rachel Kim',
+    phone: '+1 (408) 220-1193',
+    email: 'rachel.kim@gmail.com',
+    modality: 'chat',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: 'Mar 8, 1:48 PM', duration: '1m 55s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2024, isVIP: false,
+    guestProfile: { visits: 2, lastVisit: 'Jan 20, 2026', birthday: 'Jun 5', email: 'rachel.kim@gmail.com', preferences: ['Vegan options', 'No alcohol'] },
+    callSummary: 'Booked birthday dinner for 4 on Sunday at 7 PM. Dietary restrictions (vegan, no alcohol) noted for two guests.',
+    preview: 'Booked birthday dinner for 4 this Sunday at 7 PM. Vegan options and no-alcohol drinks noted.',
+    transcript: [
+      { role: 'agent', text: 'Hi there! What can I help you with today?', time: '1:46 PM' },
+      { role: 'caller', text: "I'd like to book for 4 people this Sunday at 7 PM for a birthday dinner.", time: '1:46 PM' },
+      { role: 'agent', text: "Sunday March 15th at 7 PM for four — booked! Any dietary restrictions I should note?", time: '1:47 PM' },
+      { role: 'caller', text: "Two of us are vegan and we'd prefer non-alcoholic drink options for one guest.", time: '1:47 PM' },
+      { role: 'agent', text: "All noted! We have excellent vegan options and a full mocktail menu. Happy birthday in advance!", time: '1:48 PM' },
+    ],
+  },
+  {
+    id: 12,
+    name: 'David Okonkwo',
+    phone: '+1 (646) 778-4412',
+    email: 'd.okonkwo@mail.com',
+    modality: 'sms',
+    tag: null, tagLabel: null,
+    time: 'Mar 8, 12:33 PM', duration: '0m 52s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2021, isVIP: false,
+    guestProfile: { visits: 9, lastVisit: 'Mar 1, 2026', birthday: 'Aug 30', email: 'd.okonkwo@mail.com', preferences: ['Late seating', 'Window table'] },
+    callSummary: 'Quick inquiry about Sunday brunch operating hours. Provided hours (10 AM – 3 PM) and confirmed walk-ins are welcome before noon.',
+    preview: 'Asked about Sunday brunch hours. Confirmed 10 AM–3 PM, walk-ins welcome before noon.',
+    transcript: [
+      { role: 'agent', text: 'Hi! How can I help?', time: '12:32 PM' },
+      { role: 'caller', text: "What are your Sunday brunch hours?", time: '12:32 PM' },
+      { role: 'agent', text: "Sunday brunch runs 10 AM to 3 PM. Walk-ins are welcome before noon, after that we recommend a reservation.", time: '12:33 PM' },
+      { role: 'caller', text: "Great, thanks!", time: '12:33 PM' },
+    ],
+  },
+  {
+    id: 13,
+    name: 'Sarah Chen',
+    phone: '+1 (312) 990-8847',
+    email: 'sarah.chen@yahoo.com',
+    modality: 'phone',
+    tag: 'incomplete-lead', tagLabel: 'Incomplete Lead',
+    time: 'Mar 7, 7:15 PM', duration: '2m 44s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2023, isVIP: false,
+    guestProfile: { visits: 4, lastVisit: 'Dec 20, 2025', birthday: 'Mar 22', email: 'sarah.chen@yahoo.com', preferences: ['Quiet section'] },
+    callSummary: "Inquired about private dining availability for the next two Saturdays. Both dates were unavailable. No booking made — guest said she'd look at other options.",
+    preview: 'Inquired about private dining for next two Saturdays. Both dates unavailable. No booking made.',
+    transcript: [
+      { role: 'agent', text: 'Good evening! How can I help you?', time: '7:13 PM' },
+      { role: 'caller', text: "Hi, I'm looking for a private dining room this Saturday or the following one. Is either available?", time: '7:13 PM' },
+      { role: 'agent', text: "Unfortunately both Saturday the 14th and 21st are fully booked for private dining. I'm so sorry!", time: '7:14 PM' },
+      { role: 'caller', text: "Oh that's too bad. I'll need to look at other options then.", time: '7:14 PM' },
+      { role: 'agent', text: "I completely understand. If you're flexible on weekdays, we have availability. I can also add you to a cancellation waitlist.", time: '7:15 PM' },
+    ],
+  },
+  {
+    id: 14,
+    name: 'Alex Martinez',
+    phone: '+1 (323) 441-6609',
+    email: 'alex.m@icloud.com',
+    modality: 'sms',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: 'Mar 7, 5:58 PM', duration: '1m 20s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2020, isVIP: false,
+    guestProfile: { visits: 14, lastVisit: 'Mar 2, 2026', birthday: 'Oct 10', email: 'alex.m@icloud.com', preferences: ['Bar seating', 'Happy hour menu'] },
+    callSummary: 'Confirmed reservation for 3 guests tonight at 8 PM. Guest asked about happy hour menu — confirmed it ends at 7 PM but offered a complimentary appetizer.',
+    preview: 'Confirmed reservation for 3 tonight at 8 PM. Asked about happy hour — offered complimentary appetizer.',
+    transcript: [
+      { role: 'agent', text: 'Hi! How can I assist?', time: '5:56 PM' },
+      { role: 'caller', text: "Just confirming my reservation for 3 tonight at 8 PM under Martinez.", time: '5:57 PM' },
+      { role: 'agent', text: "Confirmed! Alex Martinez, party of 3 at 8 PM tonight. Does happy hour still apply?", time: '5:57 PM' },
+      { role: 'caller', text: "That's right — does happy hour still apply at 8?", time: '5:57 PM' },
+      { role: 'agent', text: "Happy hour ends at 7 PM, but I'd love to offer you a complimentary appetizer tonight. See you at 8!", time: '5:58 PM' },
+    ],
+  },
+  {
+    id: 15,
+    name: 'Nina Patel',
+    phone: '+1 (917) 663-2281',
+    email: 'nina.p@gmail.com',
+    modality: 'phone',
+    tag: 'res-made', tagLabel: 'Reservation Made',
+    time: 'Mar 7, 4:30 PM', duration: '1m 38s',
+    status: 'resolved',
+    priority: null,
+    memberSince: 2019, isVIP: false,
+    guestProfile: { visits: 17, lastVisit: 'Feb 22, 2026', birthday: 'Jan 15', email: 'nina.p@gmail.com', preferences: ['Outside patio', 'Sparkling water', 'No cheese'] },
+    callSummary: 'Modified existing reservation from 6 PM to 7 PM for party of 5 this Thursday. Patio seating preference noted. Confirmation sent.',
+    preview: 'Modified reservation from 6 PM to 7 PM for party of 5, Thursday. Patio preference noted.',
+    transcript: [
+      { role: 'agent', text: 'Good afternoon! How can I help?', time: '4:28 PM' },
+      { role: 'caller', text: "Hi, I have a reservation Thursday for 5 at 6 PM. Can I push it to 7 PM?", time: '4:28 PM' },
+      { role: 'agent', text: "Of course! I've updated your reservation to 7 PM on Thursday for five guests.", time: '4:29 PM' },
+      { role: 'caller', text: "Perfect. We'd also love to sit on the patio if the weather holds.", time: '4:29 PM' },
+      { role: 'agent', text: "Noted! I'll flag patio seating and keep an eye on the forecast. We'll do our best. See you Thursday!", time: '4:30 PM' },
     ],
   },
 ];
 
-/* ── RENDER ─────────────────────────────────────────────────────────── */
 let activeId = null;
 
 function renderList(items) {
-  const list = document.getElementById('inboxList');
-  list.innerHTML = items.map(c => `
-    <div class="inbox-row ${c.unread ? 'unread' : ''} ${activeId === c.id ? 'active' : ''}"
-         data-id="${c.id}" onclick="openDetail(${c.id})">
-      <div class="row-avatar" style="background:${c.color}">${c.initials}</div>
+  document.getElementById('inboxList').innerHTML = items.map(c => `
+    <div class="inbox-row ${activeId === c.id ? 'active' : ''}" data-id="${c.id}" onclick="openDetail(${c.id})">
+      <div class="row-avatar mod-${c.modality}">${MOD_ICONS[c.modality]}</div>
       <div class="row-body">
         <div class="row-top">
           <span class="row-name">${c.name}</span>
-          <span class="row-time">${c.time}</span>
+          <span class="row-dot"></span>
+          <span class="row-phone">${c.phone}</span>
+          ${c.tag ? `<span class="row-tag tag-${c.tag}">${c.tagLabel}</span>` : ''}
         </div>
         <div class="row-preview">${c.preview}</div>
-        <div class="row-meta">
-          ${c.unread ? '<div class="unread-dot"></div>' : ''}
-          <span class="badge badge-${c.badge}">${c.badgeLabel}</span>
-          ${c.tags.map(t => `<span class="badge" style="background:var(--b1);color:var(--t2)">${t}</span>`).join('')}
-        </div>
+      </div>
+      <div class="row-right">
+        <span class="row-time">${c.time}</span>
+        <span class="row-duration">${c.duration}</span>
+        <button class="resolve-btn" onclick="event.stopPropagation()">Resolve</button>
       </div>
     </div>
   `).join('');
+}
+
+function buildWaveform(totalBars, playedFraction) {
+  const played = Math.floor(totalBars * playedFraction);
+  return Array.from({ length: totalBars }, (_, i) => {
+    const x = i / totalBars;
+    const shape = Math.sin(Math.PI * x) * 0.55 + 0.45;
+    const h = Math.floor((shape * 0.6 + Math.random() * 0.4) * 22 + 6);
+    return `<div class="wf-bar ${i < played ? 'played' : 'unplayed'}" style="height:${h}px"></div>`;
+  }).join('');
 }
 
 function openDetail(id) {
@@ -1191,132 +1199,185 @@ function openDetail(id) {
   const c = conversations.find(x => x.id === id);
   if (!c) return;
 
-  // Update active row styles
   document.querySelectorAll('.inbox-row').forEach(r => {
     r.classList.toggle('active', parseInt(r.dataset.id) === id);
   });
-
-  // Open list-panel narrow mode
   document.getElementById('listPanel').classList.add('detail-open');
 
-  // Build detail header
-  document.getElementById('detailHeader').innerHTML = `
-    <div class="detail-header-top">
-      <div class="detail-contact">
-        <div class="detail-avatar" style="background:${c.color}">${c.initials}</div>
-        <div class="detail-name-block">
-          <div class="detail-name">${c.name}</div>
-          <div class="detail-contact-info">
-            <div class="contact-info-row">
-              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              ${c.phone}
-            </div>
-            <div class="contact-info-row">
-              <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              ${c.email}
-            </div>
+  // Priority badge
+  const priorityHTML = c.priority
+    ? `<div class="priority-badge priority-${c.priority.toLowerCase()}">Priority: ${c.priority}</div>`
+    : '<div></div>';
+
+  // Member tags
+  const memberTagsHTML = [
+    c.memberSince ? `<span class="detail-member-tag">Member since ${c.memberSince}</span>` : '',
+    c.isVIP ? `<span class="detail-member-tag">VIP</span>` : '',
+  ].filter(Boolean).join('');
+
+  // Guest profile card
+  let guestCardHTML = '';
+  if (c.guestProfile) {
+    const gp = c.guestProfile;
+    const prefsHTML = gp.preferences.map(p => `<span class="guest-pref-pill">${p}</span>`).join('');
+    const birthdayCell = gp.birthday ? `
+      <div class="guest-stat">
+        <div class="guest-stat-label">Birthday</div>
+        <div class="guest-stat-value">${gp.birthday}</div>
+      </div>` : '';
+    guestCardHTML = `
+      <div class="guest-card">
+        <div class="guest-card-header">
+          <div class="guest-card-title">Guest Profile</div>
+          ${c.memberSince ? '<div class="guest-card-badge">Member</div>' : ''}
+          <div class="guest-card-toggle">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
         </div>
-      </div>
-      <button class="detail-close" onclick="closeDetail()">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="detail-meta-pills">
-      <span class="badge badge-${c.badge}">${c.badgeLabel}</span>
-      ${c.tags.map(t => `<span class="badge" style="background:var(--b1);color:var(--t2)">${t}</span>`).join('')}
-      <span class="badge" style="background:var(--indigo-bg);color:var(--indigo)">${c.restaurant}</span>
-      <span class="badge" style="background:var(--b1);color:var(--t3);font-family:'DM Mono',monospace">⏱ ${c.duration}</span>
-    </div>
-    <div class="detail-tabs">
-      <div class="detail-tab active">Transcript</div>
-      <div class="detail-tab">Notes</div>
-      <div class="detail-tab">Contact Info</div>
-    </div>
-  `;
+        <div class="guest-stats-grid">
+          <div class="guest-stat">
+            <div class="guest-stat-label">Visits</div>
+            <div class="guest-stat-value">${gp.visits}</div>
+          </div>
+          <div class="guest-stat">
+            <div class="guest-stat-label">Last Visit</div>
+            <div class="guest-stat-value">${gp.lastVisit}</div>
+          </div>
+          ${birthdayCell}
+          <div class="guest-stat">
+            <div class="guest-stat-label">Email</div>
+            <div class="guest-stat-value" style="font-size:12px;word-break:break-all">${gp.email}</div>
+          </div>
+        </div>
+        ${prefsHTML ? `<div class="guest-prefs-label">Preferences</div><div class="guest-prefs">${prefsHTML}</div>` : ''}
+      </div>`;
+  }
 
-  // Build transcript
-  const bubbles = c.transcript.map(m => `
+  // Waveform (approx 38% played)
+  const waveHTML = buildWaveform(46, 0.38);
+
+  // Transcript bubbles
+  const bubblesHTML = c.transcript.map(m => `
     <div class="msg-row ${m.role}">
-      <div class="msg-avatar ${m.role === 'caller' ? 'caller-av' : 'agent-av'}">
-        ${m.role === 'caller' ? c.initials : 'AI'}
-      </div>
-      <div class="msg-bubble-wrap">
-        <div class="msg-bubble">${m.text}</div>
-        <div class="msg-time">${m.time}</div>
-      </div>
+      <div class="msg-bubble">${m.text}</div>
     </div>
   `).join('');
 
   document.getElementById('detailBody').innerHTML = `
-    <div class="transcript">
-      <div class="transcript-label">Call Transcript · ${c.time}</div>
-      ${bubbles}
+    <div class="detail-topbar">
+      ${priorityHTML}
+      <button class="detail-close-btn" onclick="closeDetail()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div class="detail-info-section">
-      <div class="info-section-title">Call Details</div>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="info-label">Restaurant</div>
-          <div class="info-value">${c.restaurant}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Duration</div>
-          <div class="info-value">${c.duration}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Status</div>
-          <div class="info-value">${c.badgeLabel}</div>
-        </div>
-        <div class="info-item">
-          <div class="info-label">Called</div>
-          <div class="info-value">${c.time}</div>
-        </div>
-      </div>
+
+    <div class="detail-phone-row">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <div class="detail-phone-num">${c.phone}</div>
+    </div>
+    <div class="detail-call-meta">
+      Today <span class="dot">·</span> ${c.time} <span class="dot">·</span> ${c.duration}
+    </div>
+
+    <div class="detail-contact-row">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="detail-contact-name">${c.name}</div>
+    </div>
+    ${memberTagsHTML ? `<div class="detail-member-tags">${memberTagsHTML}</div>` : '<div style="margin-bottom:16px"></div>'}
+
+    <div class="detail-divider"></div>
+
+    ${guestCardHTML}
+
+    <div class="call-summary">
+      <div class="call-summary-title">Call Summary</div>
+      <div class="call-summary-text">${c.callSummary}</div>
+    </div>
+
+    <div class="audio-player">
+      <button class="play-btn">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="white" stroke="none" style="margin-left:2px">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </button>
+      <div class="waveform">${waveHTML}</div>
+      <div class="audio-time">1:18 / ${c.duration}</div>
+    </div>
+
+    <div class="transcript-section">
+      <div class="transcript-label">Transcript</div>
+      ${bubblesHTML}
     </div>
   `;
 
-  // Open pane with animation
+  document.getElementById('detailFooter').innerHTML = `
+    <button class="resolve-btn-main" onclick="closeDetail()">Mark as Resolved</button>
+  `;
+
   requestAnimationFrame(() => {
     document.getElementById('detailPane').classList.add('open');
-  });
-
-  // Tab switching
-  document.querySelectorAll('.detail-tab').forEach((tab, i) => {
-    tab.onclick = () => {
-      document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    };
   });
 }
 
 function closeDetail() {
   activeId = null;
   document.getElementById('detailPane').classList.remove('open');
+  document.getElementById('detailFooter').innerHTML = '';
   document.getElementById('listPanel').classList.remove('detail-open');
   document.querySelectorAll('.inbox-row').forEach(r => r.classList.remove('active'));
 }
 
-/* ── SIDEBAR TOGGLE ─────────────────────────────────────────────────── */
-document.getElementById('sidebarToggle').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('collapsed');
-});
+let currentFilter = 'inbox';
 
-/* ── SEARCH ─────────────────────────────────────────────────────────── */
-document.getElementById('searchInput').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
-  const filtered = q
-    ? conversations.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        c.preview.toLowerCase().includes(q) ||
-        c.phone.includes(q)
-      )
-    : conversations;
+function getFiltered(query) {
+  let items = currentFilter === 'all'
+    ? conversations
+    : conversations.filter(c => c.status === currentFilter);
+  if (query) {
+    const q = query.toLowerCase();
+    items = items.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.preview.toLowerCase().includes(q) ||
+      c.phone.includes(q)
+    );
+  }
+  return items;
+}
+
+function updateFooter(total) {
+  const per = 20;
+  const pages = Math.max(1, Math.ceil(total / per));
+  const end = Math.min(per, total);
+  const start = total === 0 ? 0 : 1;
+  document.getElementById('showingText').innerHTML =
+    `Showing <strong>${start}–${end}</strong> of <strong>${total}</strong> call${total !== 1 ? 's' : ''}`;
+  let html = `<button class="page-btn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>`;
+  for (let i = 1; i <= Math.min(pages, 5); i++) {
+    html += `<button class="page-btn ${i === 1 ? 'active' : ''}">${i}</button>`;
+  }
+  html += `<button class="page-btn"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>`;
+  document.getElementById('pagination').innerHTML = html;
+}
+
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = el.dataset.filter;
+  closeDetail();
+  const filtered = getFiltered(document.getElementById('searchInput').value);
   renderList(filtered);
+  updateFooter(filtered.length);
+}
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  const filtered = getFiltered(e.target.value);
+  renderList(filtered);
+  updateFooter(filtered.length);
 });
 
-/* ── INIT ────────────────────────────────────────────────────────────── */
-renderList(conversations);
+const initialItems = getFiltered('');
+renderList(initialItems);
+updateFooter(initialItems.length);
 </script>
 </body>
 </html>
