@@ -293,7 +293,7 @@
     .toolbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 24px; height: 46px;
-      background: var(--card);
+      background: var(--canvas);
       border-bottom: 1px solid var(--b3);
       flex-shrink: 0;
     }
@@ -307,10 +307,14 @@
       font-size: 13px; font-weight: 600;
       color: var(--t3);
       cursor: pointer;
-      transition: background 0.13s, color 0.13s;
+      background: white;
+      border: 1px solid var(--b4);
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      transition: background 0.13s, color 0.13s, border-color 0.13s;
     }
-    .tab:hover { background: var(--b2); color: var(--t2); }
-    .tab.active { background: var(--t1); color: white; }
+    .tab:hover { background: var(--b1); color: var(--t2); border-color: var(--t4); }
+    .tab.active { background: var(--t1); color: white; border-color: var(--t1); box-shadow: none; }
     .tab-count { font-size: 11px; font-weight: 700; opacity: 0.75; }
 
     .sort-controls { display: flex; align-items: center; gap: 4px; }
@@ -538,38 +542,48 @@
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    /* Phone + meta */
-    .detail-phone-row {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 5px;
+    /* Name as main title */
+    .detail-name-title {
+      font-size: 22px; font-weight: 800; color: var(--t1);
+      letter-spacing: -0.4px; margin-bottom: 8px; line-height: 1.2;
     }
-    .detail-phone-row svg {
-      width: 20px; height: 20px; stroke: var(--t3); fill: none;
-      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
-    }
-    .detail-phone-num { font-size: 24px; font-weight: 800; color: var(--t1); letter-spacing: -0.5px; }
-    .detail-call-meta {
-      font-size: 13px; color: var(--t3);
-      display: flex; align-items: center; gap: 5px;
-      margin-bottom: 14px; padding-left: 30px;
-    }
-    .detail-call-meta .dot { color: var(--b4); }
-
-    /* Contact */
-    .detail-contact-row {
-      display: flex; align-items: center; gap: 9px; margin-bottom: 10px;
-    }
-    .detail-contact-row svg {
-      width: 17px; height: 17px; stroke: var(--t3); fill: none;
-      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
-    }
-    .detail-contact-name { font-size: 17px; font-weight: 700; color: var(--t1); }
 
     /* Member tags */
-    .detail-member-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+    .detail-member-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
     .detail-member-tag {
       padding: 4px 13px; border-radius: var(--r-pill);
       font-size: 12px; font-weight: 600;
       border: 1.5px solid var(--b3); color: var(--t2); background: white;
+    }
+
+    /* Contact info block */
+    .detail-contact-block {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .contact-info-row {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--t2);
+    }
+    .contact-info-row svg {
+      width: 15px; height: 15px; stroke: currentColor; fill: none;
+      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+      flex-shrink: 0; color: var(--t3);
+    }
+    .contact-info-row.contact-info-empty {
+      color: var(--t4);
+    }
+    .contact-info-row.contact-info-empty svg {
+      color: var(--b4);
+    }
+    .contact-empty-label {
+      font-size: 13px; color: var(--t4); font-style: italic;
+    }
+    .contact-meta-dot { color: var(--b4); margin: 0 2px; }
+    .contact-call-row {
+      border-top: 1px solid var(--b3);
+      padding-top: 10px;
+      margin-top: 4px;
     }
     .detail-divider { height: 1px; background: var(--b3); margin-bottom: 18px; }
 
@@ -826,6 +840,7 @@ const MOD_ICONS = {
 };
 
 const conversations = [
+  // ── Inbox: missed revenue, lead opportunities, failed transfers ──
   {
     id: 1,
     name: 'Carlos Delaney',
@@ -838,58 +853,57 @@ const conversations = [
     priority: 'High',
     memberSince: 2019, isVIP: false,
     guestProfile: { visits: 8, lastVisit: 'Feb 12, 2026', birthday: 'Sep 3', email: 'carlos.d@gmail.com', preferences: ['Corner table', 'No shellfish'] },
-    callSummary: 'Caller complained about incorrect order — wrong wine selection and a missing appetizer. Requested a callback from the manager before their next visit.',
-    preview: 'Caller complained about incorrect order — wrong wine selection and a missing appetizer. Requested a callback from the manager before their next visit.',
+    callSummary: "Called to book a graduation dinner for 10 on May 17th. AI couldn't confirm a table for a party this large and attempted a transfer to the reservations team — call dropped during hold. No reservation on file.",
+    preview: "Tried to book graduation dinner for 10 on May 17th — transfer to reservations failed, call dropped. No booking made.",
     transcript: [
-      { role: 'agent', text: 'Thank you for calling. How can I help you today?', time: '10:38 AM' },
-      { role: 'caller', text: 'Hi, I want to flag an issue with my order last night. The wine I received was completely different from what I ordered.', time: '10:38 AM' },
-      { role: 'agent', text: "I'm very sorry to hear that. I've noted your complaint and flagged it for our manager. They will call you back shortly.", time: '10:39 AM' },
-      { role: 'caller', text: 'Also, my appetizer was missing entirely. It was a disappointing experience.', time: '10:40 AM' },
-      { role: 'agent', text: "I sincerely apologize for both issues. I've escalated your case as high priority and our manager will reach out before end of day.", time: '10:40 AM' },
+      { role: 'agent', text: 'Thank you for calling! How can I help you today?', time: '10:38 AM' },
+      { role: 'caller', text: "Hi, I need to book a table for 10 on May 17th. It's a graduation dinner for my son.", time: '10:38 AM' },
+      { role: 'agent', text: "Congratulations! Let me check availability for a party of 10 on May 17th.", time: '10:39 AM' },
+      { role: 'agent', text: "I'm having trouble confirming tables for parties over 8. Let me transfer you to our reservations team now.", time: '10:40 AM' },
+      { role: 'caller', text: "OK, I'll hold—", time: '10:40 AM' },
     ],
   },
   {
     id: 2,
     name: 'Margot Ellison',
     phone: '+1 (415) 823-7741',
-    email: 'margot.e@mail.com',
+    email: null,
     modality: 'phone',
-    tag: 'res-made', tagLabel: 'Reservation Made',
+    tag: 'incomplete-res', tagLabel: 'Incomplete Reservation',
     time: '9:14 AM', duration: '3m 22s',
     status: 'inbox',
     priority: 'High',
     memberSince: 2021, isVIP: true,
     guestProfile: { visits: 14, lastVisit: 'Mar 1, 2026', birthday: 'Apr 18', email: 'm.ellison@gmail.com', preferences: ['Window seat', 'No cilantro', 'Sparkling water'] },
-    callSummary: "Caller asked to modify a reservation for Sunday, March 15th from 7 PM to 8 PM for a party of four. Also requested the corner booth and mentioned a birthday celebration.",
-    preview: "Guest requested to move Sunday reservation from 7 PM to 8 PM for party of four. Also asked for corner booth and noted it's a birthday celebration.",
+    callSummary: "VIP guest called to book a bachelorette dinner for 8 on April 5th. Provided date and time but the call dropped while AI was checking private area availability. No reservation confirmed.",
+    preview: "VIP guest started booking bachelorette dinner for 8 on April 5th — call dropped before confirmation. No booking made.",
     transcript: [
-      { role: 'agent', text: 'Good morning! How can I assist you today?', time: '9:12 AM' },
-      { role: 'caller', text: 'Hi, I have a reservation this Sunday at 7 PM for four people. Can I move it to 8 PM?', time: '9:12 AM' },
-      { role: 'agent', text: "Of course! I've updated your reservation to 8 PM on Sunday for four guests.", time: '9:13 AM' },
-      { role: 'caller', text: "Perfect. Also, is a corner booth possible? It's a birthday celebration.", time: '9:13 AM' },
-      { role: 'agent', text: "Happy birthday to your guest! I've noted the request for a corner booth and flagged the birthday occasion. We'll make it special!", time: '9:14 AM' },
+      { role: 'agent', text: 'Good morning! How can I assist you?', time: '9:12 AM' },
+      { role: 'caller', text: "Hi, I'd like to book a table for 8 for a bachelorette dinner. April 5th, around 7:30 PM.", time: '9:12 AM' },
+      { role: 'agent', text: "How exciting! Let me check availability for 8 guests on April 5th at 7:30 PM.", time: '9:13 AM' },
+      { role: 'caller', text: "And we'd love a private area if that's possible.", time: '9:13 AM' },
+      { role: 'agent', text: "I'm checking our private area availability now—", time: '9:14 AM' },
     ],
   },
   {
     id: 3,
     name: 'Priya Nambara',
     phone: '+1 (650) 302-1197',
-    email: 'priya.n@gmail.com',
+    email: null,
     modality: 'chat',
-    tag: 'res-made', tagLabel: 'Reservation Made',
+    tag: 'incomplete-lead', tagLabel: 'Incomplete Lead',
     time: '8:55 AM', duration: '2m 48s',
     status: 'inbox',
     priority: null,
-    memberSince: 2023, isVIP: false,
-    guestProfile: { visits: 3, lastVisit: 'Jan 15, 2026', birthday: null, email: 'priya.n@gmail.com', preferences: ['Gluten-free', 'No nuts'] },
-    callSummary: 'Inquiry about gluten-free menu options for a group of six. AI confirmed available dishes and noted a severe nut allergy for the reservation.',
-    preview: 'Inquiry about gluten-free menu options for a group of six. AI confirmed available dishes and noted a nut allergy for the reservation.',
+    memberSince: null, isVIP: false,
+    guestProfile: null,
+    callSummary: "Inquired about setting up a recurring monthly corporate lunch account for a team of 12–15 from Apex Group. Session ended before contact details were captured — no follow-up info on file.",
+    preview: "Asked about recurring monthly corporate lunch for 12–15 people (Apex Group). Session ended before contact info was captured.",
     transcript: [
       { role: 'agent', text: 'Hello! How can I help you today?', time: '8:52 AM' },
-      { role: 'caller', text: "Hi, we're coming in as a group of six and one person needs gluten-free options. What do you have?", time: '8:53 AM' },
-      { role: 'agent', text: 'We have several gluten-free options including our pasta, the grilled salmon, and the seasonal vegetable risotto. All are prepared with separate cookware.', time: '8:53 AM' },
-      { role: 'caller', text: 'Great. One guest also has a nut allergy. Can you note that?', time: '8:54 AM' },
-      { role: 'agent', text: "Absolutely, I've noted a severe nut allergy for your reservation. Our kitchen will be fully prepared. Is there anything else?", time: '8:54 AM' },
+      { role: 'caller', text: "Hi, we're at Apex Group and we want to set up a recurring team lunch — 12 to 15 people, once a month.", time: '8:52 AM' },
+      { role: 'agent', text: "That sounds wonderful! We'd love to host Apex Group. Can I get your name and a good phone number to follow up?", time: '8:53 AM' },
+      { role: 'caller', text: "Sure, it's Priya. My number is—", time: '8:53 AM' },
     ],
   },
   {
@@ -898,20 +912,19 @@ const conversations = [
     phone: '+1 (718) 941-0034',
     email: 'owen.park@outlook.com',
     modality: 'sms',
-    tag: 'res-made', tagLabel: 'Reservation Made',
+    tag: 'incomplete-res', tagLabel: 'Incomplete Reservation',
     time: '8:30 AM', duration: '1m 55s',
     status: 'inbox',
     priority: null,
     memberSince: 2022, isVIP: false,
     guestProfile: { visits: 6, lastVisit: 'Feb 28, 2026', birthday: 'Jul 22', email: 'owen.park@outlook.com', preferences: ['Booth seating'] },
-    callSummary: "Called to confirm tonight's reservation for 2 at 7:30 PM and asked about valet parking. Reservation confirmed and valet parking info provided.",
-    preview: "Called to confirm tonight's reservation for 2 at 7:30 PM and asked about valet parking availability.",
+    callSummary: "Texted to book Mother's Day brunch for 6 on the outdoor patio. AI informed him patio was fully booked and offered indoor seating — guest went silent. No reservation confirmed.",
+    preview: "Texted to book Mother's Day brunch for 6. AI offered indoor after outdoor unavailable — guest went silent. No booking.",
     transcript: [
-      { role: 'agent', text: 'Thank you for calling! How can I help?', time: '8:28 AM' },
-      { role: 'caller', text: 'Hi, just calling to confirm my reservation tonight at 7:30 for two people.', time: '8:28 AM' },
-      { role: 'agent', text: 'Confirmed! Reservation for Owen Park, party of 2 at 7:30 PM tonight.', time: '8:29 AM' },
-      { role: 'caller', text: 'Perfect. Do you have valet parking?', time: '8:29 AM' },
-      { role: 'agent', text: 'Yes, we offer complimentary valet parking starting at 5 PM. Just pull up to the front entrance.', time: '8:30 AM' },
+      { role: 'caller', text: "Hi, I want to book Mother's Day brunch for 6. Can we get the outdoor patio?", time: '8:27 AM' },
+      { role: 'agent', text: "Happy early Mother's Day! Unfortunately the patio is fully reserved on May 11th. We have lovely indoor seating available — would that work?", time: '8:28 AM' },
+      { role: 'caller', text: "Hmm let me check with everyone and get back to you.", time: '8:29 AM' },
+      { role: 'agent', text: "Of course! Text back anytime and I'll hold a table. We'd love to host your celebration!", time: '8:29 AM' },
     ],
   },
   {
@@ -926,14 +939,14 @@ const conversations = [
     priority: 'High',
     memberSince: null, isVIP: false,
     guestProfile: null,
-    callSummary: 'Inquired about private dining room availability for a corporate dinner of 20 guests next Friday. AI collected contact info and forwarded to the events team.',
-    preview: 'Asked about private dining room availability for a corporate dinner of 20 guests next Friday. AI collected contact info and forwarded to events team.',
+    callSummary: 'Inquired about private dining room availability for a corporate dinner of 20 guests next Friday. AI collected contact info and forwarded to the events team — awaiting human follow-up.',
+    preview: 'Asked about private dining for a corporate dinner of 20 next Friday. Contact info captured, forwarded to events team.',
     transcript: [
       { role: 'agent', text: 'Good morning! How can I assist you?', time: '7:58 AM' },
       { role: 'caller', text: "Hi, I'm looking to book a private dining room for a corporate event — about 20 people next Friday.", time: '7:58 AM' },
       { role: 'agent', text: "We have a beautiful private dining room that accommodates up to 24. It's available next Friday. The minimum spend is $1,400 for that day.", time: '7:59 AM' },
-      { role: 'caller', text: 'That works. Can I get someone from the events team to call me?', time: '7:59 AM' },
-      { role: 'agent', text: "Of course! I've collected your contact information and forwarded it to our events coordinator. They will call you within the hour.", time: '8:00 AM' },
+      { role: 'caller', text: 'That works. Can I get someone from the events team to call me back?', time: '7:59 AM' },
+      { role: 'agent', text: "Of course! I've collected your contact information and forwarded it to our events coordinator. They'll call you within the hour.", time: '8:00 AM' },
     ],
   },
   {
@@ -941,24 +954,23 @@ const conversations = [
     name: 'Theo Hartmann',
     phone: '+1 (206) 773-9952',
     email: 'theo.h@fastmail.com',
-    modality: 'sms',
-    tag: null, tagLabel: null,
-    time: 'Yesterday', duration: '2m 03s',
+    modality: 'phone',
+    tag: 'lead', tagLabel: 'Lead Generated',
+    time: 'Yesterday', duration: '3m 47s',
     status: 'inbox',
-    priority: null,
+    priority: 'High',
     memberSince: 2020, isVIP: false,
     guestProfile: { visits: 11, lastVisit: 'Mar 5, 2026', birthday: 'Dec 14', email: 'theo.h@fastmail.com', preferences: ['Quiet table', 'Still water'] },
-    callSummary: 'Gift card balance inquiry — $47.50 remaining. Confirmed gift cards can be applied to online orders at checkout.',
-    preview: 'Gift card balance inquiry and question about whether cards can be used for online orders.',
+    callSummary: "Inquired about hosting quarterly executive client dinners for 10–12 people — potentially four times a year. Contact details captured and forwarded to the events team. High revenue opportunity.",
+    preview: "Interested in hosting quarterly executive dinners for 10–12 people, 4x/year. Contact info captured, events team notified.",
     transcript: [
-      { role: 'agent', text: 'Hello! How can I help you today?', time: 'Yesterday 6:30 PM' },
-      { role: 'caller', text: "Hi, I have a gift card and I'm wondering what the current balance is.", time: 'Yesterday 6:30 PM' },
-      { role: 'agent', text: 'I can look that up for you. Could you provide the card number on the back?', time: 'Yesterday 6:31 PM' },
-      { role: 'caller', text: "Sure, it's 4892-3310-8847. Also, can I use this online?", time: 'Yesterday 6:31 PM' },
-      { role: 'agent', text: 'Your current balance is $47.50. And yes, gift cards can be applied to online orders at checkout by entering the card number.', time: 'Yesterday 6:32 PM' },
+      { role: 'agent', text: 'Good afternoon! How can I help you?', time: 'Yesterday 4:15 PM' },
+      { role: 'caller', text: "Hi, I'm looking to set up a series of private dinners for client entertainment. Probably 10–12 executives, four times a year.", time: 'Yesterday 4:15 PM' },
+      { role: 'agent', text: "That sounds like a wonderful arrangement! We'd love to host your executive dinners. Can I collect your contact details and pass them to our events manager?", time: 'Yesterday 4:16 PM' },
+      { role: 'caller', text: "Yes, it's Theo Hartmann, theo.h@fastmail.com.", time: 'Yesterday 4:16 PM' },
+      { role: 'agent', text: "Perfect, Theo. I've passed your details to our events team — they'll reach out within 24 hours to discuss menu options and pricing.", time: 'Yesterday 4:17 PM' },
     ],
   },
-  // ── Inbox #7 ──
   {
     id: 7,
     name: 'Sofia Chen',
@@ -966,19 +978,19 @@ const conversations = [
     email: 'sofia.chen@gmail.com',
     modality: 'phone',
     tag: 'incomplete-lead', tagLabel: 'Incomplete Lead',
-    time: 'Yesterday',  duration: '1m 44s',
+    time: 'Yesterday', duration: '1m 44s',
     status: 'inbox',
     priority: 'High',
     memberSince: null, isVIP: false,
     guestProfile: null,
-    callSummary: "Caller inquired about hosting a baby shower brunch for 15 guests. Asked about private space and custom menu options but said she'd call back to confirm — no booking made.",
-    preview: "Inquired about hosting a baby shower brunch for 15 guests. Asked about private space and menu but did not make a reservation.",
+    callSummary: "Caller inquired about hosting a baby shower brunch for 15 guests. Asked about private space and custom menu options but said she'd call back to confirm — no contact info or booking captured.",
+    preview: "Inquired about baby shower brunch for 15. Asked about private space and menu but did not book or leave contact info.",
     transcript: [
       { role: 'agent', text: 'Good afternoon! How can I help you today?', time: 'Yesterday 2:10 PM' },
       { role: 'caller', text: "Hi, I'm planning a baby shower brunch for about 15 people. Do you have a private space for that?", time: 'Yesterday 2:10 PM' },
-      { role: 'agent', text: "We do! Our private dining room accommodates up to 20 for brunch events. We also offer custom brunch menus. Would you like to check availability?", time: 'Yesterday 2:11 PM' },
+      { role: 'agent', text: "We do! Our private dining room accommodates up to 20 for brunch events and we offer custom brunch menus. Would you like to check availability?", time: 'Yesterday 2:11 PM' },
       { role: 'caller', text: "That sounds great. I need to check dates with the guest of honor first and I'll call back.", time: 'Yesterday 2:11 PM' },
-      { role: 'agent', text: "Of course! I'll note your interest and our events team will be ready. Looking forward to hearing from you.", time: 'Yesterday 2:12 PM' },
+      { role: 'agent', text: "Of course! I'll note your interest and our events team will be ready. Looking forward to hearing from you!", time: 'Yesterday 2:12 PM' },
     ],
   },
   // ── Resolved conversations ──
@@ -1271,19 +1283,29 @@ function openDetail(id) {
       </button>
     </div>
 
-    <div class="detail-phone-row">
-      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-      <div class="detail-phone-num">${c.phone}</div>
-    </div>
-    <div class="detail-call-meta">
-      Today <span class="dot">·</span> ${c.time} <span class="dot">·</span> ${c.duration}
-    </div>
+    <div class="detail-name-title">${c.name}</div>
+    ${memberTagsHTML ? `<div class="detail-member-tags">${memberTagsHTML}</div>` : ''}
 
-    <div class="detail-contact-row">
-      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <div class="detail-contact-name">${c.name}</div>
+    <div class="detail-contact-block">
+      <div class="contact-info-row ${c.phone ? '' : 'contact-info-empty'}">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 11a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 0h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.86 6.86l1.36-1.16a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        ${c.phone ? `<span>${c.phone}</span>` : `<span class="contact-empty-label">Phone not on file</span>`}
+      </div>
+      <div class="contact-info-row ${c.email ? '' : 'contact-info-empty'}">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        ${c.email ? `<span>${c.email}</span>` : `<span class="contact-empty-label">Email not on file</span>`}
+      </div>
+      <div class="contact-info-row contact-call-row">
+        ${MOD_ICONS[c.modality]}
+        <span>${{ phone: 'Phone call', sms: 'SMS', email: 'Email', chat: 'Chat' }[c.modality]}</span>
+        <span class="contact-meta-dot">·</span>
+        <span style="color:var(--t3)">Today</span>
+        <span class="contact-meta-dot">·</span>
+        <span style="color:var(--t3)">${c.time}</span>
+        <span class="contact-meta-dot">·</span>
+        <span style="color:var(--t3)">${c.duration}</span>
+      </div>
     </div>
-    ${memberTagsHTML ? `<div class="detail-member-tags">${memberTagsHTML}</div>` : '<div style="margin-bottom:16px"></div>'}
 
     <div class="detail-divider"></div>
 
