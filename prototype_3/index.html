@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Inbox — Slang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ── DESIGN TOKENS ─────────────────────────────────────────── */
+    :root {
+      --logo-pink:   #FF5C35;
+      --logo-violet: #7C3AED;
+      --logo-blue:   #0EA5E9;
+      --canvas:      #F6F4F1;
+      --sidebar-bg:  #1A1528;
+      --card:        #FFFFFF;
+      --card-radius: 12px;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
+      --card-shadow-hover: 0 2px 6px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.10);
+      --accent:       #FF5C35;
+      --accent-hover: #E54B25;
+      --accent-light: #FFF1EE;
+      --accent-dim:   #FFBDAD;
+      --red:          #EF4444;
+      --red-light:    #FEE2E2;
+      --green:        #10B981;
+      --green-light:  #D1FAE5;
+      --amber:        #F59E0B;
+      --amber-light:  #FEF3C7;
+      --orange:       #F97316;
+      --orange-light: #FFEDD5;
+      --t1:  #0F0A1E;
+      --t2:  #5C5675;
+      --t3:  #9E9AB0;
+      --st1: #E8E4F4;
+      --st2: #9B96B8;
+      --st3: #5C5675;
+      --b1:  #EDE9E6;
+      --b2:  #D9D4CF;
+      --r-sm:   5px;
+      --r-md:   8px;
+      --r-lg:   12px;
+      --r-pill: 100px;
+      --ease-std:    cubic-bezier(0.4, 0, 0.2, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ── RESET ──────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    a { text-decoration: none; color: inherit; }
+    html, body {
+      height: 100%; width: 100%;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px; line-height: 1.5; color: var(--t1);
+      background: var(--canvas);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    /* ── APP SHELL ──────────────────────────────────────────────── */
+    .app { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+
+    /* ── SIDEBAR ────────────────────────────────────────────────── */
+    .sidebar {
+      width: 200px; flex-shrink: 0;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-radius: 0 20px 20px 0;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      border-right: none;
+      position: relative; z-index: 20;
+    }
+
+    .sidebar-logo {
+      padding: 18px 16px 12px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-location {
+      margin: 0 10px 10px;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-md);
+      display: flex; align-items: center; gap: 8px;
+      cursor: pointer;
+    }
+    .sidebar-location-icon {
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .sidebar-location span {
+      font-size: 11.5px; font-weight: 600; color: var(--st1); flex: 1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sidebar-location svg { color: var(--st3); flex-shrink: 0; }
+
+    .sidebar-nav {
+      flex: 1; padding: 0 8px;
+      display: flex; flex-direction: column;
+      gap: 1px; overflow-y: auto;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 3px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 8px; border-radius: var(--r-md);
+      font-size: 12px; font-weight: 500; color: var(--st2);
+      cursor: pointer;
+      transition: background 120ms ease-out, color 120ms ease-out;
+      position: relative;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.06); color: var(--st1); }
+    .nav-item.active {
+      background: rgba(255,255,255,0.12);
+      color: white;
+      font-weight: 700;
+    }
+    .nav-item svg { flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: white;
+      font-size: 9px; font-weight: 800;
+      padding: 1px 5px;
+      border-radius: var(--r-pill);
+      min-width: 16px; text-align: center;
+    }
+    .nav-item.active .nav-badge { background: var(--accent); }
+
+    .nav-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 4px 2px; }
+
+    .sidebar-footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 6px 8px 10px;
+      flex-shrink: 0;
+    }
+    .sidebar-user {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 8px; border-radius: var(--r-md);
+      cursor: pointer;
+    }
+    .sidebar-user:hover { background: rgba(255,255,255,0.05); }
+    .user-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8.5px; font-weight: 800; color: white; flex-shrink: 0;
+    }
+    .sidebar-user span { font-size: 12px; font-weight: 500; color: var(--st2); flex: 1; }
+    .sidebar-user-more {
+      color: var(--st3);
+      font-size: 14px; font-weight: 700;
+      line-height: 1; letter-spacing: 1px;
+      padding: 2px 4px;
+    }
+
+    /* ── MAIN AREA ──────────────────────────────────────────────── */
+    .main {
+      flex: 1; min-width: 0;
+      height: 100vh;
+      background: var(--canvas);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── INBOX PANEL ────────────────────────────────────────────── */
+    .inbox-panel {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
+      transition: flex 300ms var(--ease-std);
+    }
+
+    .inbox-header {
+      padding: 20px 24px 0;
+      flex-shrink: 0;
+    }
+
+    .inbox-title-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .inbox-title {
+      font-size: 22px; font-weight: 800;
+      color: var(--t1); letter-spacing: -0.04em;
+    }
+    .header-pill-active {
+      display: flex; align-items: center; gap: 5px;
+      background: rgba(0,0,0,0.06);
+      border-radius: var(--r-pill);
+      padding: 3px 9px;
+    }
+    .header-pill-active .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      animation: pulse-dot 1.6s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .header-pill-active span {
+      font-size: 11.5px; font-weight: 700; color: var(--accent);
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      display: inline-flex;
+      background: white;
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-pill);
+      padding: 3px; gap: 2px;
+      position: relative;
+    }
+    .tab-slider {
+      position: absolute;
+      top: 3px; bottom: 3px; left: 3px;
+      border-radius: var(--r-pill);
+      background: var(--t1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      transition: left 220ms var(--ease-std), width 220ms var(--ease-std);
+      pointer-events: none; z-index: 0;
+    }
+    .tab-btn {
+      position: relative; z-index: 1;
+      padding: 5px 14px; border-radius: var(--r-pill);
+      background: transparent;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 600; color: var(--t3);
+      white-space: nowrap;
+      transition: color 120ms ease-out;
+    }
+    .tab-btn.tab-active { font-weight: 700; color: white; }
+    .tab-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; color: var(--t3);
+      background: rgba(0,0,0,0.07);
+      border-radius: var(--r-pill); padding: 1px 6px; min-width: 18px;
+    }
+    .tab-btn.tab-active .tab-count {
+      background: var(--accent);
+      color: white; font-weight: 800;
+    }
+    /* Search + sort row */
+    .search-sort-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 14px;
+    }
+    .search-box {
+      width: 100%;
+      height: 34px; padding: 0 12px 0 34px;
+      background: white;
+      border: 1.5px solid var(--b1);
+      border-radius: var(--r-md);
+      font-family: inherit; font-size: 12.5px; color: var(--t1);
+      outline: none;
+      box-shadow: none;
+      transition: border-color 120ms, box-shadow 120ms;
+      position: relative;
+    }
+    .search-box::placeholder { color: var(--t3); }
+    .search-box:focus {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 3px rgba(255,92,53,0.08);
+    }
+    .search-wrap {
+      position: relative; margin-left: auto; width: 220px;
+    }
+    .search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      color: var(--t3); pointer-events: none;
+    }
+    .sort-btn {
+      height: 34px; padding: 0 12px;
+      border-radius: var(--r-md);
+      background: white;
+      border: 1.5px solid var(--b1);
+      display: flex; align-items: center; gap: 6px;
+      color: var(--t2); font-size: 12.5px; font-weight: 600;
+      box-shadow: none;
+      transition: background 120ms, border-color 120ms, color 120ms;
+      white-space: nowrap;
+    }
+    .sort-btn:hover {
+      border-color: var(--b2);
+      color: var(--t1);
+    }
+    .sort-btn.sort-active {
+      background: var(--accent-light);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+    .icon-btn {
+      width: 34px; height: 34px;
+      border-radius: var(--r-md);
+      background: white;
+      border: 1.5px solid var(--b1);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t2);
+      box-shadow: none;
+      transition: background 120ms, border-color 120ms, color 120ms;
+      flex-shrink: 0;
+    }
+    .icon-btn:hover {
+      border-color: var(--b2);
+      color: var(--t1);
+    }
+    .sort-spacer { flex: 1; }
+
+    /* ── CARD LIST ──────────────────────────────────────────────── */
+    .card-list {
+      flex: 1; overflow-y: auto;
+      padding: 0 24px 16px;
+    }
+    .card-list::-webkit-scrollbar { width: 5px; }
+    .card-list::-webkit-scrollbar-track { background: transparent; }
+    .card-list::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+    .inbox-card {
+      background: white;
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 150ms var(--ease-std), transform 150ms var(--ease-std), border 120ms;
+      border: 1.5px solid transparent;
+      position: relative;
+    }
+    .inbox-card:hover {
+      box-shadow: var(--card-shadow-hover);
+      transform: translateY(-1px);
+    }
+    .inbox-card.card-selected {
+      border-color: var(--accent-dim);
+      box-shadow: 0 0 0 3px rgba(255,92,53,0.10), var(--card-shadow-hover);
+    }
+    .inbox-card.card-incomplete {
+      border-left: 3px solid var(--orange);
+    }
+    .inbox-card.card-incomplete.card-selected {
+      border-left: 3px solid var(--orange);
+      border-top: 1.5px solid var(--accent-dim);
+      border-right: 1.5px solid var(--accent-dim);
+      border-bottom: 1.5px solid var(--accent-dim);
+    }
+
+    .card-stripe {
+      height: 3px;
+      background: linear-gradient(90deg, #FF5C35, #F59E0B);
+    }
+    .card-stripe.stripe-resolved {
+      background: linear-gradient(90deg, #D1D5DB, #E5E7EB);
+    }
+    .card-stripe.stripe-incomplete {
+      background: linear-gradient(90deg, #EF4444, #F97316);
+    }
+    .card-stripe.stripe-ai {
+      background: linear-gradient(90deg, #10B981, #0EA5E9);
+    }
+
+    .card-body { padding: 14px 18px 12px; }
+
+    .card-top-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 7px; gap: 8px;
+    }
+    .card-timestamp {
+      font-size: 11px; font-weight: 500; color: var(--t3);
+      white-space: nowrap;
+    }
+    .card-resolve-btn {
+      height: 26px; padding: 0 12px;
+      border-radius: var(--r-pill);
+      border: 1.5px solid var(--b1);
+      background: white;
+      color: var(--t2); font-size: 11.5px; font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 120ms, border-color 120ms, color 120ms;
+    }
+    .card-resolve-btn:hover {
+      background: var(--green-light);
+      border-color: #6EE7B7;
+      color: #065F46;
+    }
+    .card-resolve-btn:active {
+      transform: scale(0.97);
+    }
+
+    .card-title {
+      font-size: 14px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.02em;
+      margin-bottom: 8px; line-height: 1.3;
+    }
+
+    .card-meta-row {
+      display: flex; align-items: center; gap: 7px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+
+    /* Channel + status badges */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10.5px; font-weight: 700;
+      padding: 2px 8px; border-radius: var(--r-pill);
+      white-space: nowrap;
+    }
+    .badge-phone {
+      background: var(--green); color: white;
+    }
+    .badge-human-resolved {
+      background: #E8F2F8; color: #2A6A82;
+    }
+    .badge-ai-resolved {
+      background: var(--green-light); color: #1A7A5A;
+    }
+    .badge-incomplete {
+      background: var(--orange-light); color: #B84828;
+    }
+    .badge-phone-num {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11.5px; color: var(--t2); font-weight: 500;
+    }
+
+    .card-summary {
+      font-size: 12.5px; color: var(--t2); line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── PAGINATION ─────────────────────────────────────────────── */
+    .pagination-row {
+      flex-shrink: 0;
+      padding: 12px 24px 16px;
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1px solid var(--b1);
+    }
+    .pagination-info {
+      font-size: 12px; color: var(--t2);
+      flex: 1;
+    }
+    .pagination-info strong { color: var(--t1); }
+    .page-btn {
+      width: 30px; height: 30px;
+      border-radius: var(--r-md);
+      border: 1.5px solid var(--b1);
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--t2);
+      cursor: pointer;
+      transition: background 100ms, border-color 100ms, color 100ms;
+    }
+    .page-btn:hover { background: var(--accent-light); border-color: var(--accent-dim); color: var(--accent); }
+    .page-btn.page-active {
+      background: var(--t1);
+      border-color: var(--t1);
+      color: white;
+    }
+    .page-prev, .page-next {
+      width: 30px; height: 30px;
+      border-radius: var(--r-md);
+      border: 1.5px solid var(--b1);
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t3); cursor: pointer;
+      transition: background 100ms, border-color 100ms, color 100ms;
+    }
+    .page-prev:hover, .page-next:hover { background: var(--b1); color: var(--t1); }
+
+    /* ── DETAIL PANEL ───────────────────────────────────────────── */
+    .detail-panel {
+      width: 0;
+      min-width: 0;
+      overflow: hidden;
+      height: 100vh;
+      display: flex; flex-direction: column;
+      background: white;
+      border-left: 1.5px solid var(--b1);
+      box-shadow: -4px 0 20px rgba(0,0,0,0.06);
+      transition: width 300ms var(--ease-std), min-width 300ms var(--ease-std);
+      flex-shrink: 0;
+    }
+    .detail-panel.panel-open {
+      width: 380px;
+      min-width: 380px;
+    }
+
+    .detail-inner {
+      width: 380px;
+      min-width: 380px;
+      height: 100%;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--b1);
+      flex-shrink: 0;
+    }
+    .detail-header-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .detail-title {
+      font-size: 15px; font-weight: 700;
+      color: var(--t1); letter-spacing: -0.02em;
+      line-height: 1.3; flex: 1; margin-right: 8px;
+    }
+    .detail-close {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t3); font-size: 16px; flex-shrink: 0;
+      transition: background 100ms, color 100ms;
+    }
+    .detail-close:hover { background: var(--b1); color: var(--t1); }
+
+    .detail-phone-row {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .detail-phone {
+      font-size: 12.5px; font-weight: 600; color: var(--accent);
+    }
+    .copy-btn {
+      width: 22px; height: 22px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t3);
+      transition: background 100ms, color 100ms;
+    }
+    .copy-btn:hover { background: var(--b1); color: var(--t2); }
+
+    /* Audio player */
+    .audio-section {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--b1);
+      flex-shrink: 0;
+    }
+    .audio-player {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .play-btn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--t1);
+      display: flex; align-items: center; justify-content: center;
+      color: white; flex-shrink: 0;
+      transition: background 100ms, transform 100ms;
+    }
+    .play-btn:hover { background: var(--t2); transform: scale(1.05); }
+    .audio-progress {
+      flex: 1; height: 3px; background: var(--b1);
+      border-radius: 3px; position: relative; cursor: pointer;
+    }
+    .audio-progress-fill {
+      height: 100%; background: var(--t2);
+      border-radius: 3px; width: 0%;
+      transition: width 200ms linear;
+    }
+    .audio-time { font-size: 11.5px; color: var(--t3); white-space: nowrap; }
+    .audio-volume { color: var(--t3); cursor: pointer; }
+    .audio-more { color: var(--t3); cursor: pointer; }
+
+    /* ── DETAIL PANEL NEW DESIGN ───────────────────────────────── */
+    .detail-scroll {
+      flex: 1; overflow-y: auto; padding: 0 18px 8px;
+    }
+    .detail-scroll::-webkit-scrollbar { width: 4px; }
+    .detail-scroll::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+    .priority-badge {
+      display: inline-flex; align-items: center;
+      background: var(--accent); color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 4px 12px; border-radius: var(--r-pill);
+    }
+    .priority-badge.priority-low { background: var(--green); }
+
+    .caller-section { padding: 16px 0 0; }
+    .caller-phone-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+    .caller-phone-large { font-size: 22px; font-weight: 700; color: var(--t1); letter-spacing: -0.03em; }
+    .caller-time { font-size: 12px; color: var(--t3); padding-left: 22px; margin-bottom: 12px; }
+    .caller-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .caller-name { font-size: 15px; font-weight: 700; color: var(--t1); }
+    .caller-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0; }
+    .caller-tag {
+      font-size: 11.5px; padding: 3px 10px;
+      border: 1px solid var(--b2); border-radius: var(--r-pill);
+      color: var(--t2);
+    }
+    .section-divider { height: 1px; background: var(--b1); margin: 14px 0; }
+
+    .guest-profile-card {
+      border: 1.5px solid var(--b2); border-radius: var(--r-lg);
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .gp-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 14px; cursor: pointer; gap: 6px;
+    }
+    .gp-header-left { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; flex-wrap: wrap; }
+    .gp-title { font-size: 14px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .gp-tag-member {
+      font-size: 10.5px; padding: 2px 9px;
+      background: rgba(0,0,0,0.06); color: var(--t2);
+      border-radius: var(--r-pill);
+    }
+    .gp-tag-dietary {
+      font-size: 10.5px; padding: 2px 9px;
+      background: var(--green-light); color: var(--green);
+      border-radius: var(--r-pill); border: 1px solid var(--green); font-weight: 600;
+    }
+    .gp-chevron { color: var(--t3); flex-shrink: 0; transition: transform 200ms var(--ease-std); }
+    .gp-body {
+      background: #F9F8F7; padding: 12px 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .gp-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .gp-info-cell { background: white; border: 1px solid var(--b1); border-radius: 8px; padding: 9px 11px; }
+    .gp-label {
+      font-size: 9px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px;
+    }
+    .gp-value { font-size: 13px; font-weight: 700; color: var(--t1); line-height: 1.3; }
+    .gp-row-label {
+      font-size: 9px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .gp-tags-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .gp-dietary-tag {
+      font-size: 11px; padding: 3px 10px;
+      background: var(--green-light); color: var(--green);
+      border-radius: var(--r-pill); border: 1px solid var(--green); font-weight: 600;
+    }
+    .gp-pref-tag {
+      font-size: 11px; padding: 3px 10px;
+      border: 1px solid var(--b2); border-radius: 6px; color: var(--t1);
+    }
+    .gp-guest-tag {
+      font-size: 11px; padding: 3px 10px;
+      background: var(--accent-light); color: var(--accent);
+      border-radius: 6px; border: 1px solid var(--accent-dim);
+    }
+
+    .call-summary-section { margin-bottom: 16px; }
+    .call-summary-label { font-size: 13px; font-weight: 700; color: var(--t1); margin-bottom: 6px; }
+    .call-summary-text { font-size: 13px; color: var(--t2); line-height: 1.6; }
+
+    .waveform-player {
+      display: flex; align-items: center; gap: 12px;
+      background: #F9F8F7; border: 1.5px solid var(--b1);
+      border-radius: var(--r-lg); padding: 12px 14px; margin-bottom: 0;
+    }
+    .waveform-bars-wrap {
+      flex: 1; height: 32px; position: relative; cursor: pointer;
+      display: flex; align-items: center; gap: 2px; overflow: hidden;
+    }
+    .wf-bar { width: 2.5px; border-radius: 2px; background: var(--b2); flex-shrink: 0; }
+    .wf-played-overlay {
+      position: absolute; left: 0; top: 2px; bottom: 2px; width: 0%;
+      background: linear-gradient(to right, rgba(255,92,53,0.15), rgba(255,92,53,0.04));
+      border-right: 1.5px solid var(--accent);
+      pointer-events: none;
+      transition: width 200ms linear;
+    }
+
+    .dev-tools-section { margin-bottom: 20px; }
+    .dev-tools-label { font-size: 13px; font-weight: 600; color: var(--t1); margin-bottom: 6px; }
+    .dev-tools-card {
+      background: #F9F8F7; border: 1.5px solid var(--b1);
+      border-radius: 8px; padding: 9px 12px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .dev-tools-text {
+      font-size: 11.5px; font-family: monospace; color: var(--t2);
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .detail-footer {
+      padding: 12px 18px 16px; flex-shrink: 0; border-top: 1px solid var(--b1);
+    }
+    .resolve-btn {
+      width: 100%; padding: 13px;
+      background: var(--accent); color: white;
+      font-size: 14px; font-weight: 700; border-radius: 8px;
+      transition: background 100ms;
+    }
+    .resolve-btn:hover { background: var(--accent-hover); }
+
+    .event-note {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 500;
+    }
+    .event-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--amber);
+      flex-shrink: 0;
+    }
+    .event-note span { color: var(--amber); }
+
+    /* Transcript */
+    .transcript-section {
+      flex: 1; overflow-y: auto;
+      padding: 14px 18px 20px;
+    }
+    .transcript-section::-webkit-scrollbar { width: 4px; }
+    .transcript-section::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 3px; }
+
+    .transcript-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .transcript-label {
+      font-size: 10px; font-weight: 700; color: var(--t3);
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .transcript-copy {
+      width: 24px; height: 24px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--t3);
+      transition: background 100ms;
+    }
+    .transcript-copy:hover { background: var(--b1); color: var(--t2); }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .message-row.msg-ai { justify-content: flex-end; }
+    .message-row.msg-human { justify-content: flex-start; }
+
+    .message-bubble {
+      max-width: 78%;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 12.5px; line-height: 1.5;
+    }
+    .msg-ai .message-bubble {
+      background: var(--t1);
+      color: white;
+      border-radius: 12px 12px 2px 12px;
+    }
+    .msg-human .message-bubble {
+      background: var(--b1);
+      color: var(--t1);
+      border-radius: 12px 12px 12px 2px;
+    }
+    .message-time {
+      font-size: 10px; font-weight: 500;
+      margin-top: 3px; text-align: right;
+    }
+    .msg-ai .message-time { color: rgba(255,255,255,0.65); }
+    .msg-human .message-time { color: var(--t3); text-align: left; }
+    .message-content { display: flex; flex-direction: column; }
+
+    /* ── EMPTY STATE ────────────────────────────────────────────── */
+    .empty-state {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; padding: 40px 24px;
+      text-align: center;
+    }
+    .empty-icon {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent);
+    }
+    .empty-title {
+      font-size: 15px; font-weight: 700; color: var(--t1);
+      letter-spacing: -0.02em;
+    }
+    .empty-sub { font-size: 13px; color: var(--t2); max-width: 260px; }
+
+    /* ── ANIMATIONS ─────────────────────────────────────────────── */
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(8px) scale(0.99); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card-animate { animation: card-in 320ms var(--ease-spring) both; }
+
+    @keyframes resolve-out {
+      from { opacity: 1; transform: scale(1); max-height: 200px; margin-bottom: 8px; }
+      to   { opacity: 0; transform: scale(0.97); max-height: 0; margin-bottom: 0; padding: 0; }
+    }
+    .card-resolving { animation: resolve-out 380ms var(--ease-std) forwards; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px) scale(0.9);
+      background: var(--t1); color: white;
+      padding: 10px 18px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      transition: transform 280ms var(--ease-spring), opacity 280ms;
+      opacity: 0; pointer-events: none; z-index: 100;
+      white-space: nowrap;
+    }
+    .toast.toast-show {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+    }
+    .toast-check {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--green); display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    /* ── LIST COMPONENT ────────────────────────────────────────────── */
+    .sl-list {
+      background: var(--card);
+      border-radius: var(--card-radius);
+      border: 1.5px solid var(--b1);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .sl-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--b1);
+      cursor: pointer;
+      position: relative;
+      transition: background 120ms var(--ease-std);
+    }
+    .sl-list-item:last-child { border-bottom: none; }
+    .sl-list-item:hover { background: #FAFAF8; }
+
+    .sl-list-item.sl-incomplete::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--orange);
+    }
+    .sl-list-item.sl-selected { background: var(--accent-light); }
+    .sl-list-item.sl-selected::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 5px; bottom: 5px;
+      width: 3px;
+      background: var(--accent);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .sl-list-lead {
+      flex-shrink: 0;
+      width: 32px; height: 32px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 0.02em;
+      color: white;
+    }
+
+    .sl-list-body { flex: 1; min-width: 0; }
+    .sl-list-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--t1); letter-spacing: -0.01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      line-height: 1.35; margin-bottom: 2px;
+    }
+    .sl-list-item.sl-selected .sl-list-title { color: var(--accent); font-weight: 700; }
+    .sl-list-meta {
+      font-size: 11px; font-weight: 500;
+      color: var(--t3);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .sl-list-trail {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sl-list-resolve {
+      height: 24px; padding: 0 10px;
+      border-radius: var(--r-pill);
+      border: 1.5px solid var(--b1);
+      background: white;
+      color: var(--t2); font-size: 11px; font-weight: 600;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 100ms, background 120ms, border-color 120ms, color 120ms;
+    }
+    .sl-list-item:hover .sl-list-resolve { opacity: 1; }
+    .sl-list-resolve:hover {
+      background: var(--green-light);
+      border-color: #6EE7B7;
+      color: #065F46;
+    }
+
+    @keyframes sl-item-in {
+      from { opacity: 0; transform: translateX(-6px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .sl-item-animate { animation: sl-item-in 280ms var(--ease-spring) both; }
+
+    @keyframes sl-item-out {
+      from { opacity: 1; max-height: 60px; }
+      to   { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+    }
+    .sl-item-resolving {
+      animation: sl-item-out 320ms var(--ease-std) forwards;
+      overflow: hidden; pointer-events: none;
+    }
+
+    /* ── RICH INBOX ROW ─────────────────────────────────────────── */
+    .sl-list-item.sl-rich {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 7px;
+      padding: 14px 18px;
+    }
+    .sl-rich-top {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 12px;
+    }
+    .sl-rich-top-left { display: flex; align-items: center; gap: 10px; }
+    .sl-rich-ts { font-size: 12px; font-weight: 500; color: var(--t3); }
+    .sl-rich-top-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .sl-rich-title {
+      font-size: 14px; font-weight: 700;
+      color: var(--t1); letter-spacing: -0.02em; line-height: 1.3;
+    }
+    .sl-list-item.sl-rich.sl-selected .sl-rich-title { color: var(--accent); }
+    .sl-rich-bottom {
+      display: flex; align-items: center;
+      justify-content: space-between; width: 100%; gap: 12px;
+    }
+    .sl-rich-bottom-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .sl-rich-phone, .sl-rich-name {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12.5px; color: var(--t2);
+    }
+    .sl-rich-name { font-weight: 700; color: var(--t1); }
+    .sl-rich-chips { display: flex; align-items: center; gap: 5px; }
+    .sl-rich-chip {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--b2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10.5px; font-weight: 700; color: var(--t2);
+      cursor: pointer; flex-shrink: 0;
+      transition: border-color 100ms, background 100ms;
+    }
+    .sl-rich-chip.chip-green { border-color: #6EE7B7; color: var(--green); background: var(--green-light); }
+    .sl-rich-chip.chip-accent { border-color: var(--accent-dim); color: var(--accent); background: var(--accent-light); }
+    .sl-rich-chip.chip-gold  { border-color: #FCD34D; color: #92400E; background: #FEF3C7; }
+    .sl-rich-chip.chip-bday  { border-color: #FCA5A5; color: #B91C1C; background: #FEE2E2; }
+    /* Badge tooltips */
+    .badge-tip-wrap { position: relative; display: inline-flex; }
+    .badge-tip {
+      position: absolute;
+      bottom: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1E1030;
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 7px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 140ms;
+      z-index: 200;
+    }
+    .badge-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #1E1030;
+    }
+    .badge-tip-wrap:hover .badge-tip { opacity: 1; }
+    .sl-rich-bottom-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+    .sl-rich-tag {
+      font-size: 11.5px; font-weight: 500; color: var(--t2);
+      padding: 3px 10px; border: 1px solid var(--b2);
+      border-radius: var(--r-pill); white-space: nowrap;
+    }
+    .sl-rich-btn-primary {
+      height: 30px; padding: 0 14px;
+      border-radius: var(--r-pill);
+      background: var(--accent); color: white;
+      font-size: 12px; font-weight: 700; font-family: inherit;
+      border: none; cursor: pointer; white-space: nowrap;
+      transition: background 120ms;
+    }
+    .sl-rich-btn-primary:hover { background: var(--accent-hover); }
+    .sl-rich-btn-ghost {
+      height: 30px; padding: 0 14px;
+      border-radius: var(--r-pill);
+      background: white; color: var(--t1);
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      border: 1.5px solid var(--b2); cursor: pointer; white-space: nowrap;
+      transition: border-color 120ms, background 120ms;
+    }
+    .sl-rich-btn-ghost:hover { border-color: var(--t3); background: #FAFAF8; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SIDEBAR ──────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="../assets/Slang.png" alt="Slang" height="30" style="display:block;">
+    </div>
+
+    <div class="sidebar-location">
+      <div class="sidebar-location-icon">AL</div>
+      <span>All Locations</span>
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <path d="M2.5 4L5 6.5L7.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item" onclick="navClick(this)">
+        <!-- Insights -->
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="10" width="3" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="6" y="6" width="3" height="9" rx="1" stroke="currentColor" stroke-width="1.4"/>
+          <rect x="11" y="2" width="3" height="13" rx="1" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        <span>Insights</span>
+      </div>
+      <div class="nav-item active" onclick="navClick(this)">
+        <!-- Smart Inbox -->
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <rect x="1.5" y="3" width="13" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M1.5 6l5.5 3.5a2 2 0 001.5 0L14 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span>Smart Inbox</span>
+        <div class="nav-badge" id="navBadge">7</div>
+      </div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span>Guests</span>
+      </div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span>Branding</span>
+      </div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M2 5a2 2 0 012-2h8a2 2 0 012 2v5a2 2 0 01-2 2H9l-3 2v-2H4a2 2 0 01-2-2V5z" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        <span>Concierge</span>
+      </div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <path d="M2 6l2-3h8l2 3H2zM2 6v6a1 1 0 001 1h10a1 1 0 001-1V6H2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          <circle cx="8" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.4"/>
+        </svg>
+        <span>Marketplace</span>
+      </div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Hours</span>
+      </div>
+      <div class="nav-divider"></div>
+      <div class="nav-item" onclick="navClick(this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.5 3.5l1.1 1.1M11.4 11.4l1.1 1.1M3.5 12.5l1.1-1.1M11.4 4.6l1.1-1.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span>Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="nav-item" onclick="navClick(this)" style="margin-bottom: 2px;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5v3M8 10.5v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        <span>What's New</span>
+        <div class="nav-badge">10</div>
+      </div>
+      <div class="sidebar-user">
+        <div class="user-avatar">AS</div>
+        <span>Alex Sambvani</span>
+        <div class="sidebar-user-more">···</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN AREA ──────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- Inbox Panel -->
+    <div class="inbox-panel" id="inboxPanel">
+      <div class="inbox-header">
+        <div class="inbox-title-row">
+          <h1 class="inbox-title">Smart Inbox</h1>
+          <div class="header-pill-active">
+            <div class="dot"></div>
+            <span id="activeCountPill">100 Active</span>
+          </div>
+          <div class="search-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input class="search-box" id="searchInput" type="text" placeholder="Search transcripts..." oninput="filterCards()">
+          </div>
+        </div>
+
+        <!-- Tab bar + Sort row (combined) -->
+        <div class="search-sort-row">
+          <div class="tab-bar" id="mainTabBar">
+            <div class="tab-slider" id="tabSlider"></div>
+            <button class="tab-btn tab-active" data-tab="incomplete" onclick="switchTab(this, 'incomplete')">
+              Inbox
+              <span class="tab-count" id="activeTabCount">7</span>
+            </button>
+            <button class="tab-btn" data-tab="resolved" onclick="switchTab(this, 'resolved')">
+              Resolved
+              <span class="tab-count" id="resolvedTabCount">0</span>
+            </button>
+            <button class="tab-btn" data-tab="all" onclick="switchTab(this, 'all')">
+              All
+            </button>
+          </div>
+          <div class="sort-spacer"></div>
+          <button class="sort-btn sort-active" id="sortNewest" onclick="setSort('newest')">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M5.5 9V2M5.5 9L3 6.5M5.5 9L8 6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Newest
+          </button>
+          <button class="sort-btn" id="sortOldest" onclick="setSort('oldest')">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M5.5 2v7M5.5 2L3 4.5M5.5 2L8 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Oldest
+          </button>
+          <button class="sort-btn" id="sortPriority" onclick="setSort('priority')">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+              <path d="M1 3h9M2.5 5.5h6M4 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Priority
+          </button>
+          <button class="icon-btn" title="Mark all as read">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1.5" y="2.5" width="11" height="9" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M4 6l2.5 2L10 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Filter">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M1.5 3.5h11M3.5 7h7M5.5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Card list -->
+      <div class="card-list" id="cardList">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-row" id="paginationRow">
+        <div class="pagination-info" id="paginationInfo">
+          Showing <strong>1–20</strong> of <strong>100</strong> calls
+        </div>
+        <button class="page-prev" id="pagePrev" onclick="changePage(-1)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M7.5 2L3.5 6l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="page-btn page-active" data-page="1" onclick="goToPage(1)">1</button>
+        <button class="page-btn" data-page="2" onclick="goToPage(2)">2</button>
+        <button class="page-btn" data-page="3" onclick="goToPage(3)">3</button>
+        <button class="page-btn" data-page="4" onclick="goToPage(4)">4</button>
+        <button class="page-btn" data-page="5" onclick="goToPage(5)">5</button>
+        <button class="page-next" id="pageNext" onclick="changePage(1)">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-inner" id="detailInner">
+
+        <div class="detail-header">
+          <div class="detail-header-top">
+            <div class="priority-badge" id="detailPriority">Priority: High</div>
+            <button class="detail-close" onclick="closeDetail()">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="detail-scroll">
+
+          <div class="caller-section">
+            <div class="caller-phone-row">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:#6E5880;flex-shrink:0;"><path d="M3.5 1.5h3l1.5 3.5-2 1.5a9 9 0 004 4l1.5-2 3.5 1.5v3a1 1 0 01-1 1A13 13 0 011.5 2.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              <div class="caller-phone-large" id="detailPhone">–</div>
+            </div>
+            <div class="caller-time" id="detailTime">–</div>
+            <div class="caller-name-row">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:#A890B0;flex-shrink:0;"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14.5c0-3.314 2.686-5.5 6-5.5s6 2.186 6 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <div class="caller-name" id="detailCallerName">–</div>
+            </div>
+            <div class="caller-tags" id="detailCallTags"></div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="guest-profile-card" id="guestProfileCard">
+            <div class="gp-header" onclick="toggleGuestProfile()">
+              <div class="gp-header-left">
+                <span class="gp-title">Guest Profile</span>
+                <span class="gp-tag-member" id="gpTagMember">Member</span>
+                <span class="gp-tag-dietary" id="gpTagDietary"></span>
+              </div>
+              <svg id="gpChevron" class="gp-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="gp-body" id="gpBody">
+              <div class="gp-info-grid">
+                <div class="gp-info-cell">
+                  <div class="gp-label">Visits</div>
+                  <div class="gp-value" id="gpVisits">–</div>
+                </div>
+                <div class="gp-info-cell">
+                  <div class="gp-label">Last Visit</div>
+                  <div class="gp-value" id="gpLastVisit">–</div>
+                </div>
+                <div class="gp-info-cell">
+                  <div class="gp-label">Birthday</div>
+                  <div class="gp-value" id="gpBirthday">–</div>
+                </div>
+                <div class="gp-info-cell">
+                  <div class="gp-label">Email</div>
+                  <div class="gp-value" id="gpEmail" style="font-size:11px;word-break:break-all;">–</div>
+                </div>
+              </div>
+              <div class="gp-row-label">Dietary</div>
+              <div class="gp-tags-row" id="gpDietaryTags"></div>
+              <div class="gp-row-label">Preferences</div>
+              <div class="gp-tags-row" id="gpPrefTags"></div>
+              <div class="gp-row-label">Tags</div>
+              <div class="gp-tags-row" id="gpGuestTags"></div>
+            </div>
+          </div>
+
+          <div class="call-summary-section">
+            <div class="call-summary-label">Call Summary:</div>
+            <div class="call-summary-text" id="detailSummaryText">–</div>
+          </div>
+
+          <div class="audio-section" id="audioSection">
+            <div class="waveform-player">
+              <button class="play-btn" id="playBtn" onclick="togglePlay()">
+                <svg id="playIcon" width="10" height="12" viewBox="0 0 10 12" fill="none">
+                  <path d="M1 1l8 5-8 5V1z" fill="currentColor"/>
+                </svg>
+              </button>
+              <div class="waveform-bars-wrap" id="audioProgress" onclick="seekAudio(event)">
+                <!-- bars injected by initWaveform() -->
+                <div class="wf-played-overlay" id="audioProgressFill"></div>
+              </div>
+              <span class="audio-time" id="audioTime">0:00 / 0:00</span>
+            </div>
+            <div class="event-note" id="eventNote" style="display:none;">
+              <div class="event-dot"></div>
+              <span id="eventNoteText"></span>
+            </div>
+          </div>
+
+          <div class="dev-tools-section">
+            <div class="dev-tools-label">Dev Tools:</div>
+            <div class="dev-tools-card">
+              <span class="dev-tools-text" id="detailSessionId">Session ID: –</span>
+              <button class="copy-btn" onclick="copySessionId()" title="Copy">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                  <rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+                  <path d="M2 8V2a1 1 0 011-1h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="detail-footer">
+          <button class="resolve-btn" onclick="resolveCurrentCard()">Mark as Resolved</button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-check">
+    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+      <path d="M1 4l2.5 2.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <span id="toastMsg">Resolved</span>
+</div>
+
+<script>
+/* ── DATA ──────────────────────────────────────────────────────── */
+const ALL_CALLS = [
+  {
+    id: 1, date: 'Jan 31', time: '10:19 PM',
+    title: 'Confirm Restaurant Week Menu',
+    phone: '+14432622871', channel: 'Phone', status: 'Human Resolved',
+    summary: 'Caller was transferred to staff and quickly confirmed the restaurant week menu is available until the next day. The call was brief and successfully resolved.',
+    eventNote: 'Call was transferred at approximately 0:50',
+    duration: '1:02',
+    transcript: [
+      { s: 'ai',    t: 'Welcome.', ts: '0:01' },
+      { s: 'ai',    t: "Thanks for calling Haleo by Jose Andres. We're here to help with reservations and any questions you may have. For parties of 10 or more guests, please ask for private dining. Just so you know, we're speaking on a recorded line. How can I help?", ts: '0:02' },
+      { s: 'human', t: "Hi, is the restaurant week menu still available tomorrow?", ts: '0:19' },
+      { s: 'ai',    t: "I'd be happy to check that for you — let me transfer you to our team right away.", ts: '0:22' },
+      { s: 'human', t: "Thanks!", ts: '0:48' },
+    ]
+  },
+  {
+    id: 2, date: 'Jan 30', time: '11:50 PM',
+    title: 'Running Late to Reservation',
+    phone: '+18019183737', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Caller informed the restaurant they would be 10-15 minutes late for their reservation. The AI agent confirmed this was within the grace period and the reservation would be held.',
+    eventNote: null, duration: '0:42',
+    transcript: [
+      { s: 'ai',    t: 'Welcome to Haleo by Jose Andres. How can I help you today?', ts: '0:01' },
+      { s: 'human', t: "Hi, I have a reservation for 8 PM and I'm running about 10-15 minutes late.", ts: '0:05' },
+      { s: 'ai',    t: "No problem at all! We hold reservations for up to 15 minutes. What name is the reservation under?", ts: '0:09' },
+      { s: 'human', t: 'Martinez, party of 4.', ts: '0:15' },
+      { s: 'ai',    t: "Perfect, Mr. Martinez. We'll keep your table. We look forward to seeing you soon!", ts: '0:18' },
+    ]
+  },
+  {
+    id: 3, date: 'Jan 30', time: '11:40 PM',
+    title: 'Initial Reservation Inquiry Call',
+    phone: '+18019183737', channel: 'Phone', status: 'Incomplete',
+    summary: "A caller contacted Jaleo DC's AI phone agent for potential reservation assistance, but the transcript cuts off mid-greeting before the caller's intent could be fully understood.",
+    eventNote: null, duration: '0:12',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling Haleo by Jose Andres. How can I assist you today?", ts: '0:01' },
+      { s: 'human', t: "Hello, I was wondering if—", ts: '0:07' },
+    ]
+  },
+  {
+    id: 4, date: 'Jan 30', time: '11:33 PM',
+    title: 'Potential Reservation or Inquiry',
+    phone: '+15014104880', channel: 'Phone', status: 'Incomplete',
+    summary: 'AI phone agent greeted the caller and offered reservation and event booking services. However, no further interaction or resolution is captured in this transcript.',
+    eventNote: null, duration: '0:08',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! We can help with reservations, event bookings, and more. How can I help?", ts: '0:01' },
+      { s: 'human', t: "Uh—", ts: '0:06' },
+    ]
+  },
+  {
+    id: 5, date: 'Jan 30', time: '11:31 PM',
+    title: 'Incomplete Reservation Request',
+    phone: '+12025550134', channel: 'Phone', status: 'Incomplete',
+    summary: 'Caller began asking about availability for a party of 6 but disconnected before providing a preferred date or time for the reservation.',
+    eventNote: null, duration: '0:20',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling! How can I assist you today?", ts: '0:01' },
+      { s: 'human', t: "I'd like to make a reservation for 6 people.", ts: '0:05' },
+      { s: 'ai',    t: "Wonderful! What date and time works best for your party?", ts: '0:08' },
+      { s: 'human', t: "Let me check my calendar... actually—", ts: '0:14' },
+    ]
+  },
+  {
+    id: 6, date: 'Jan 30', time: '11:15 PM',
+    title: 'Large Party Seating Request',
+    phone: '+14155550192', channel: 'Phone', status: 'Human Resolved',
+    summary: 'A guest inquired about seating options for a large group of 18 for a retirement party. Staff confirmed private dining availability and booked the event room for Saturday.',
+    eventNote: 'Transferred to events coordinator at 1:20',
+    duration: '2:45',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! How can I help you?", ts: '0:01' },
+      { s: 'human', t: "Hi, I'm planning a retirement party for 18 people. Do you have space?", ts: '0:05' },
+      { s: 'ai',    t: "Absolutely! For parties of 10 or more, we have a beautiful private dining room. Let me connect you with our events team.", ts: '0:10' },
+      { s: 'human', t: "That would be great, thank you.", ts: '0:16' },
+    ]
+  },
+  {
+    id: 7, date: 'Jan 30', time: '11:02 PM',
+    title: 'Gluten-Free Menu Inquiry',
+    phone: '+16175550183', channel: 'Phone', status: 'AI Resolved',
+    summary: "The AI agent provided detailed information about gluten-free menu options and confirmed that the kitchen can accommodate severe gluten allergies with advance notice.",
+    eventNote: null, duration: '1:18',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling! How can I assist you?", ts: '0:01' },
+      { s: 'human', t: "My daughter has celiac disease. Do you have gluten-free options?", ts: '0:04' },
+      { s: 'ai',    t: "Yes! We have a dedicated gluten-free menu. With advance notice, our kitchen team takes extra precautions to prevent cross-contamination.", ts: '0:08' },
+      { s: 'human', t: "That's a relief. How much advance notice do you need?", ts: '0:18' },
+      { s: 'ai',    t: "Ideally 24 hours, but we do our best even with same-day requests. Shall I note this on your reservation?", ts: '0:22' },
+      { s: 'human', t: "Please, yes. We have a reservation Friday at 7 under Johnson.", ts: '0:30' },
+      { s: 'ai',    t: "Done! I've noted the gluten-free requirement for Johnson, Friday at 7 PM. Anything else?", ts: '0:35' },
+      { s: 'human', t: "No, that's perfect. Thank you so much!", ts: '0:42' },
+    ]
+  },
+  {
+    id: 8, date: 'Jan 30', time: '10:48 PM',
+    title: 'Event Booking for Corporate Dinner',
+    phone: '+12125550147', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Caller requested information about hosting a corporate dinner for 25 guests. AI agent provided pricing, menu options, and availability for private event spaces.',
+    eventNote: null, duration: '3:20',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo! How can I help?", ts: '0:01' },
+      { s: 'human', t: "We're planning a corporate dinner for about 25 people. What are your private event options?", ts: '0:04' },
+      { s: 'ai',    t: "For corporate events, our private dining room seats up to 30. We offer customizable prix-fixe menus starting at $85 per person, including beverage pairings.", ts: '0:09' },
+      { s: 'human', t: "What dates do you have available in February?", ts: '0:22' },
+      { s: 'ai',    t: "We have availability on February 12th, 19th, and 26th for the private room. Would any of those work?", ts: '0:26' },
+      { s: 'human', t: "The 19th looks good. Can you send a proposal to our email?", ts: '0:35' },
+      { s: 'ai',    t: "Of course! I'll have our events team send a full proposal to your email within 24 hours. What's the best address?", ts: '0:40' },
+    ]
+  },
+  {
+    id: 9, date: 'Jan 30', time: '10:30 PM',
+    title: 'Birthday Reservation for 20 Guests',
+    phone: '+13105550126', channel: 'Phone', status: 'Incomplete',
+    summary: 'Caller began planning a birthday dinner for 20 guests but was disconnected after providing the date. No contact information was captured.',
+    eventNote: null, duration: '0:35',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling Haleo! How can I help you today?", ts: '0:01' },
+      { s: 'human', t: "I want to plan a surprise birthday dinner for my mom, about 20 guests.", ts: '0:04' },
+      { s: 'ai',    t: "How lovely! When were you thinking of hosting the celebration?", ts: '0:10' },
+      { s: 'human', t: "March 15th — but hold on, I'm in an elevator—", ts: '0:15' },
+    ]
+  },
+  {
+    id: 10, date: 'Jan 30', time: '10:12 PM',
+    title: 'Outdoor Seating Availability',
+    phone: '+17025550198', channel: 'Phone', status: 'Human Resolved',
+    summary: 'Guest inquired about outdoor patio availability for next weekend. Staff confirmed the patio is open weather-permitting and made a note for the reservation.',
+    eventNote: 'Transferred to reservations at 0:45',
+    duration: '1:30',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo by Jose Andres! How can I help?", ts: '0:01' },
+      { s: 'human', t: "Do you have outdoor seating? We'd love to dine outside next Saturday.", ts: '0:04' },
+      { s: 'ai',    t: "We do have a lovely patio, available weather permitting. I'll transfer you to reservations to request an outdoor table.", ts: '0:08' },
+      { s: 'human', t: "Perfect, thank you!", ts: '0:14' },
+    ]
+  },
+  {
+    id: 11, date: 'Jan 30', time: '9:55 PM',
+    title: 'Vegan Menu Options Request',
+    phone: '+18025550211', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Caller asked about vegan dining options. AI confirmed several seasonal vegan dishes and the ability to modify additional plates upon request.',
+    eventNote: null, duration: '1:05',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling! What can I help you with?", ts: '0:01' },
+      { s: 'human', t: "My partner is vegan — what do you have for her?", ts: '0:03' },
+      { s: 'ai',    t: "We have several wonderful vegan dishes this season, including our roasted beet salad, mushroom paella, and a grilled cauliflower entrée. Many other dishes can also be modified.", ts: '0:07' },
+      { s: 'human', t: "That sounds great. We'll make a reservation for two.", ts: '0:20' },
+    ]
+  },
+  {
+    id: 12, date: 'Jan 30', time: '9:40 PM',
+    title: 'Cancellation Request — Party of 4',
+    phone: '+19175550204', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Guest called to cancel their reservation for the following evening. AI confirmed the cancellation and offered to rebook for a future date.',
+    eventNote: null, duration: '0:55',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo! How can I assist?", ts: '0:01' },
+      { s: 'human', t: "I need to cancel my reservation for tomorrow, party of 4 under Williams.", ts: '0:03' },
+      { s: 'ai',    t: "I've found your reservation. I'll cancel that for you now. Would you like to rebook for another night?", ts: '0:08' },
+      { s: 'human', t: "Maybe next month. I'll call back.", ts: '0:15' },
+      { s: 'ai',    t: "Of course! Your reservation has been cancelled. We hope to see you soon.", ts: '0:18' },
+    ]
+  },
+  {
+    id: 13, date: 'Jan 30', time: '9:22 PM',
+    title: 'Dietary Restriction — Nut Allergy',
+    phone: '+14085550217', channel: 'Phone', status: 'Incomplete',
+    summary: 'Caller inquired about nut-free dining options for a severe allergy. Call was disconnected before reservation details could be confirmed.',
+    eventNote: null, duration: '0:28',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'human', t: "I have a severe tree nut allergy. Is it safe to dine at your restaurant?", ts: '0:04' },
+      { s: 'ai',    t: "We take allergies very seriously. Our kitchen team is trained to handle severe allergies with cross-contamination protocols. I'd recommend alerting us when you book—", ts: '0:10' },
+      { s: 'human', t: "Sorry, I can barely hear you—", ts: '0:22' },
+    ]
+  },
+  {
+    id: 14, date: 'Jan 30', time: '9:05 PM',
+    title: 'Wine Pairing Recommendations',
+    phone: '+14155550229', channel: 'Phone', status: 'AI Resolved',
+    summary: "Guest asked for wine pairing suggestions ahead of a special anniversary dinner. AI provided recommendations from the current sommelier's selection.",
+    eventNote: null, duration: '2:10',
+    transcript: [
+      { s: 'ai',    t: "Welcome! How can I help?", ts: '0:01' },
+      { s: 'human', t: "We're celebrating our anniversary Friday. Can you recommend wine pairings for the tasting menu?", ts: '0:04' },
+      { s: 'ai',    t: "Congratulations! Our sommelier has curated a 5-course pairing that complements the tasting menu beautifully. It's $65 per person and includes selections from Spain, France, and California.", ts: '0:09' },
+      { s: 'human', t: "That sounds perfect. We'll do the pairing.", ts: '0:24' },
+      { s: 'ai',    t: "Wonderful! I've noted the wine pairing for your Friday reservation. Enjoy your anniversary!", ts: '0:28' },
+    ]
+  },
+  {
+    id: 15, date: 'Jan 30', time: '8:47 PM',
+    title: 'Dress Code Inquiry',
+    phone: '+17025550233', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Caller asked about the dress code for dinner service. AI confirmed the restaurant has a smart-casual dress code and provided clarifying examples.',
+    eventNote: null, duration: '0:50',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'human', t: "What's your dress code? We're coming for dinner Saturday.", ts: '0:03' },
+      { s: 'ai',    t: "We have a smart-casual dress code — think dress shirts, blouses, slacks, or tasteful dresses. No athletic wear or flip-flops, please.", ts: '0:06' },
+      { s: 'human', t: "Got it, thank you!", ts: '0:15' },
+    ]
+  },
+  {
+    id: 16, date: 'Jan 30', time: '8:30 PM',
+    title: 'Gift Card Balance Inquiry',
+    phone: '+12025550241', channel: 'Phone', status: 'Incomplete',
+    summary: 'Caller inquired about checking their gift card balance but was unable to provide the card number before the call ended unexpectedly.',
+    eventNote: null, duration: '0:22',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo! How can I assist you today?", ts: '0:01' },
+      { s: 'human', t: "I have a gift card and want to know my balance.", ts: '0:04' },
+      { s: 'ai',    t: "Of course! Could you provide the 16-digit card number on the back?", ts: '0:07' },
+      { s: 'human', t: "Hold on, let me find it — one moment—", ts: '0:13' },
+    ]
+  },
+  {
+    id: 17, date: 'Jan 30', time: '8:15 PM',
+    title: 'Happy Hour Menu Request',
+    phone: '+13105550253', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Guest asked about happy hour timing and specials. AI provided details on the weekday happy hour menu including discounted tapas and cocktails.',
+    eventNote: null, duration: '1:15',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling! How can I help?", ts: '0:01' },
+      { s: 'human', t: "Do you have happy hour? What time?", ts: '0:03' },
+      { s: 'ai',    t: "We do! Happy hour runs Monday through Friday from 4–6 PM at the bar. We offer discounted tapas starting at $8 and cocktails at $10.", ts: '0:06' },
+      { s: 'human', t: "Great, we'll try to make it Thursday.", ts: '0:18' },
+    ]
+  },
+  {
+    id: 18, date: 'Jan 30', time: '7:58 PM',
+    title: 'Parking Directions Inquiry',
+    phone: '+16175550264', channel: 'Phone', status: 'AI Resolved',
+    summary: 'Caller asked for parking options near the restaurant. AI provided information about the nearby garage and valet service on weekends.',
+    eventNote: null, duration: '0:48',
+    transcript: [
+      { s: 'ai',    t: "Welcome! How can I assist?", ts: '0:01' },
+      { s: 'human', t: "Where should I park near the restaurant?", ts: '0:03' },
+      { s: 'ai',    t: "There's a parking garage on 7th Street, about a 2-minute walk. On Friday and Saturday evenings we also offer valet service for $18.", ts: '0:06' },
+      { s: 'human', t: "I'll use the garage. Thanks!", ts: '0:18' },
+    ]
+  },
+  {
+    id: 19, date: 'Jan 30', time: '7:40 PM',
+    title: 'Special Occasion Cake Request',
+    phone: '+14085550278', channel: 'Phone', status: 'Incomplete',
+    summary: "Caller wanted to arrange a custom birthday cake for their reservation. Call was transferred to the events team but the transfer didn't complete successfully.",
+    eventNote: 'Transfer failed at 1:05',
+    duration: '1:20',
+    transcript: [
+      { s: 'ai',    t: "Thank you for calling Haleo! How can I help?", ts: '0:01' },
+      { s: 'human', t: "I'd like to bring a custom cake for my reservation next week. Is that allowed?", ts: '0:04' },
+      { s: 'ai',    t: "Absolutely! We do allow outside cakes for special occasions with a $15 plating fee. Let me transfer you to arrange this.", ts: '0:09' },
+      { s: 'human', t: "Sure, go ahead.", ts: '0:18' },
+    ]
+  },
+  {
+    id: 20, date: 'Jan 30', time: '7:25 PM',
+    title: 'Modification to Existing Reservation',
+    phone: '+19175550289', channel: 'Phone', status: 'Human Resolved',
+    summary: "Caller requested to change their reservation from 7 PM to 8 PM and add one more guest. Staff confirmed the change and updated the party size to 5.",
+    eventNote: 'Transferred to reservations at 0:30',
+    duration: '1:50',
+    transcript: [
+      { s: 'ai',    t: "Welcome to Haleo! How can I help you?", ts: '0:01' },
+      { s: 'human', t: "I need to modify my reservation — can I move it from 7 to 8 PM and add one person?", ts: '0:04' },
+      { s: 'ai',    t: "Of course! What name is the reservation under?", ts: '0:12' },
+      { s: 'human', t: "Thompson, party of 4.", ts: '0:16' },
+      { s: 'ai',    t: "Found it! Let me transfer you to make those changes directly.", ts: '0:20' },
+    ]
+  },
+];
+
+/* ── CALL EXTRA DATA ─────────────────────────────────────────────── */
+const CALL_EXTRA = {
+  1:  { priority: 'Low',  callerName: 'Sarah Mitchell',   tags: ['Menu Inquiry'],
+        guestProfile: { member: true, visits: 12, lastVisit: 'Jan 20, 2026', birthday: 'March 26', email: 'sarah.mitchell@gmail.com', dietary: ['Gluten Free'], preferences: ['Booth seating'], guestTags: ['VIP'] },
+        sessionId: 'a7f23c51-e8b4-4d12-9a6f-3b58e921c047' },
+  2:  { priority: 'Low',  callerName: 'Carlos Martinez',  tags: ['Late Arrival'],
+        guestProfile: { member: true, visits: 5, lastVisit: 'Feb 1, 2026', birthday: null, email: 'c.martinez@outlook.com', dietary: [], preferences: ['Bar seating'], guestTags: [] },
+        sessionId: 'b3e47f92-c105-4a8d-b17e-6c49a853d128' },
+  3:  { priority: 'High', callerName: 'Amy Theo',         tags: ['Reservation Inquiry', 'Incomplete Lead'],
+        guestProfile: { member: true, visits: 4, lastVisit: 'Jan 15, 2026', birthday: 'April 2', email: 'amy.theo@email.com', dietary: ['Gluten'], preferences: ['Booth seating'], guestTags: ['Event Inquiry'] },
+        sessionId: 'ec60d5ba-f7f1-4773-ac08-e7f6b10ba73f' },
+  4:  { priority: 'High', callerName: 'Jordan Park',      tags: ['Incomplete Lead'],
+        guestProfile: { member: false, visits: 3, lastVisit: 'Dec 18, 2025', birthday: 'March 14', email: 'jordan.park@icloud.com', dietary: ['Nut Allergy'], preferences: [], guestTags: [] },
+        sessionId: 'd2b96e41-f730-4c5a-a82d-9e17c304b562' },
+  5:  { priority: 'High', callerName: 'Nina Patel',       tags: ['Reservation Inquiry', 'Incomplete Lead'],
+        guestProfile: { member: false, visits: 1, lastVisit: 'Jan 8, 2026', birthday: 'March 12', email: null, dietary: ['Vegan'], preferences: ['Quiet table'], guestTags: ['First Visit'] },
+        sessionId: 'e5a18c73-4920-4f87-bc6e-d2509a471983' },
+  6:  { priority: 'Low',  callerName: 'Robert Chen',      tags: ['Private Dining', 'Events'],
+        guestProfile: { member: false, visits: 2, lastVisit: 'Nov 20, 2025', birthday: null, email: 'r.chen@company.com', dietary: [], preferences: ['Private room'], guestTags: ['Corporate'] },
+        sessionId: 'f1c84a29-d67b-4e03-8f1a-5b92c748e310' },
+  7:  { priority: 'Low',  callerName: 'Michelle Johnson', tags: ['Dietary', 'Menu Inquiry'],
+        guestProfile: { member: true, visits: 8, lastVisit: 'Dec 5, 2025', birthday: 'July 22', email: 'm.johnson@email.com', dietary: ['Gluten'], preferences: ['Window seat'], guestTags: [] },
+        sessionId: 'a2d57f18-3e94-47cb-b065-c18f92a43510' },
+  8:  { priority: 'Low',  callerName: 'James Thompson',   tags: ['Corporate Event'],
+        guestProfile: { member: false, visits: 6, lastVisit: 'Jan 10, 2026', birthday: 'April 18', email: 'j.thompson@corp.com', dietary: [], preferences: ['Large table'], guestTags: ['Corporate'] },
+        sessionId: 'c9e23b47-a158-4d0f-9e82-7a46d183c920' },
+  9:  { priority: 'High', callerName: 'Lisa Park',        tags: ['Birthday', 'Incomplete Lead'],         guestProfile: null, sessionId: 'f4b82e61-7d30-4a95-b149-c28f5e036748' },
+  10: { priority: 'Low',  callerName: 'David Wilson',     tags: ['Outdoor Seating'],                     guestProfile: null, sessionId: '78a5c932-b1e4-4d67-a03f-9b15e842c150' },
+  11: { priority: 'Low',  callerName: 'Emma Rodriguez',   tags: ['Dietary', 'Vegan'],                    guestProfile: null, sessionId: '3d8f49a2-c076-4b12-e95d-a24b6f183c70' },
+  12: { priority: 'Low',  callerName: 'Michael Williams', tags: ['Cancellation'],                        guestProfile: null, sessionId: '9c47b2e1-5f83-4d20-a7e6-b38c91f24058' },
+  13: { priority: 'High', callerName: 'Unknown Caller',   tags: ['Dietary', 'Incomplete Lead'],          guestProfile: null, sessionId: '4e19d538-a260-4f87-bc72-d5a93e186420' },
+  14: { priority: 'Low',  callerName: 'Sophie Laurent',   tags: ['Anniversary', 'Wine'],                 guestProfile: null, sessionId: '7b35f921-e048-4c63-9d1a-6f28c045a193' },
+  15: { priority: 'Low',  callerName: 'Jake Anderson',    tags: ['General Inquiry'],                     guestProfile: null, sessionId: '2a74e810-b936-4f05-d28e-8c51f497b302' },
+  16: { priority: 'High', callerName: 'Unknown Caller',   tags: ['Gift Card', 'Incomplete Lead'],        guestProfile: null, sessionId: 'e3c86249-7f51-4a08-b190-4d72e538a615' },
+  17: { priority: 'Low',  callerName: 'Patricia Cole',    tags: ['Happy Hour'],                          guestProfile: null, sessionId: '5f12a4e9-8b37-4c90-d726-1e59c283f047' },
+  18: { priority: 'Low',  callerName: 'Tom Bradley',      tags: ['Parking'],                             guestProfile: null, sessionId: 'b6d93a72-c418-4e05-8f13-9a47d261c803' },
+  19: { priority: 'High', callerName: 'Linda Foster',     tags: ['Special Occasion', 'Incomplete Lead'], guestProfile: null, sessionId: 'c4e81f36-9d52-4b07-a293-7e15c640f918' },
+  20: { priority: 'Low',  callerName: 'Richard Thompson', tags: ['Reservation Change'],                  guestProfile: null, sessionId: 'd7a25c41-f830-4e06-b174-2f93a518e026' }
+};
+
+/* ── HELPERS ──────────────────────────────────────────────────── */
+function daysUntilBirthday(str) {
+  if (!str) return null;
+  const months = { January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11 };
+  const [monthStr, dayStr] = str.split(' ');
+  const month = months[monthStr];
+  const day = parseInt(dayStr);
+  if (month == null || isNaN(day)) return null;
+  const now = new Date();
+  const bday = new Date(now.getFullYear(), month, day);
+  if (bday < now) bday.setFullYear(now.getFullYear() + 1);
+  return Math.round((bday - now) / (1000 * 60 * 60 * 24));
+}
+
+/* ── STATE ─────────────────────────────────────────────────────── */
+let currentTab = 'incomplete';
+let currentSort = 'newest';
+let currentPage = 1;
+let selectedCardId = null;
+let resolvedIds = new Set();
+let searchQuery = '';
+let isPlaying = false;
+let playInterval = null;
+let playProgress = 0;
+let playDuration = 60;
+
+const PAGE_SIZE = 20;
+
+/* ── FILTERING + SORTING ───────────────────────────────────────── */
+function getFilteredCalls() {
+  let calls = [...ALL_CALLS];
+
+  // Tab filter
+  if (currentTab === 'active') {
+    calls = calls.filter(c => !resolvedIds.has(c.id) && c.status !== 'Incomplete' || c.status === 'Human Resolved' || c.status === 'AI Resolved');
+    calls = calls.filter(c => !resolvedIds.has(c.id));
+  } else if (currentTab === 'resolved') {
+    calls = calls.filter(c => resolvedIds.has(c.id));
+  } else if (currentTab === 'incomplete') {
+    calls = calls.filter(c => c.status === 'Incomplete' && !resolvedIds.has(c.id));
+  }
+  // 'all' = no filter
+
+  // Search
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    calls = calls.filter(c =>
+      c.title.toLowerCase().includes(q) ||
+      c.phone.includes(q) ||
+      c.summary.toLowerCase().includes(q)
+    );
+  }
+
+  // Sort
+  if (currentSort === 'newest') {
+    calls = calls.sort((a, b) => a.id - b.id);
+  } else if (currentSort === 'oldest') {
+    calls = calls.sort((a, b) => a.id - b.id);
+  } else if (currentSort === 'priority') {
+    const order = { 'Incomplete': 0, 'Human Resolved': 1, 'AI Resolved': 2 };
+    calls = calls.sort((a, b) => (order[a.status] ?? 3) - (order[b.status] ?? 3));
+  }
+
+  return calls;
+}
+
+/* ── HELPERS ───────────────────────────────────────────────────── */
+const AVATAR_GRADIENTS = [
+  '#FF5C35',
+  '#7C3AED',
+  '#0EA5E9',
+  '#10B981',
+];
+
+function getInitials(title) {
+  return title.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+}
+
+/* ── RENDER LIST ───────────────────────────────────────────────── */
+function renderCards() {
+  const filtered = getFilteredCalls();
+  const list = document.getElementById('cardList');
+  const paginationInfo = document.getElementById('paginationInfo');
+  const paginationRow = document.getElementById('paginationRow');
+
+  // Update counts
+  const activeCalls = ALL_CALLS.filter(c => !resolvedIds.has(c.id) && c.status !== 'Incomplete');
+  const naCount = ALL_CALLS.filter(c => c.status === 'Incomplete' && !resolvedIds.has(c.id)).length;
+  document.getElementById('activeCountPill').textContent = '3 Active';
+  document.getElementById('activeTabCount').textContent = 7;
+  document.getElementById('resolvedTabCount').textContent = resolvedIds.size;
+  document.getElementById('navBadge').textContent = naCount;
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const paginated = filtered.slice(start, start + PAGE_SIZE);
+  const displayTotal = currentTab === 'active' && filtered.length >= 20 ? 100 : filtered.length;
+  const displayEnd = Math.min(start + PAGE_SIZE, filtered.length);
+  const displayStart = filtered.length === 0 ? 0 : start + 1;
+
+  paginationInfo.innerHTML = `Showing <strong>${displayStart}–${displayEnd}</strong> of <strong>${displayTotal}</strong> calls`;
+  paginationRow.style.display = filtered.length === 0 ? 'none' : 'flex';
+
+  const totalPages = Math.max(1, Math.ceil(displayTotal / PAGE_SIZE));
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    const pg = parseInt(btn.dataset.page);
+    btn.classList.toggle('page-active', pg === currentPage);
+    btn.style.display = pg <= totalPages ? 'flex' : 'none';
+  });
+
+  if (paginated.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="4" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M2 8l7.5 5a3 3 0 003 0L20 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="empty-title">No calls found</div>
+        <div class="empty-sub">Try adjusting your search or filters to find what you're looking for.</div>
+      </div>`;
+    return;
+  }
+
+  const leafIcon = `<svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M3 12c4-1 7-4 7-9-5 0-8 3-8 7 0 .7.1 1.4.3 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12c1-2 2-4 4-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  const envelopeIcon = `<svg width="11" height="11" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="3" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 5l5 3a1 1 0 001 0l5-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  const phoneIcon = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3.5 1.5h3l1.5 3.5-2 1.5a9 9 0 004 4l1.5-2 3.5 1.5v3a1 1 0 01-1 1A13 13 0 011.5 2.5a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
+  const personIcon = `<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14.5c0-3.314 2.686-5.5 6-5.5s6 2.186 6 5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+  const crownIcon = `<svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2 10h10M2 10l1.5-5 3 3L7 4l1.5 4 3-3L13 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const cakeIcon  = `<svg width="11" height="11" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="6" width="11" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 6V4.5M7 6V4.5M9.5 6V4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4.5 4.5c0-1 1-1.5 1-2.5M7 4.5c0-1 1-1.5 1-2.5M9.5 4.5c0-1 1-1.5 1-2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+
+  const items = paginated.map((call, i) => {
+    const extra = CALL_EXTRA[call.id] || {};
+    const isIncomplete = call.status === 'Incomplete' && !resolvedIds.has(call.id);
+    const isSelected = selectedCardId === call.id;
+    const priority = extra.priority || 'Low';
+    const callerName = extra.callerName || '–';
+    const tags = extra.tags || [];
+    const gp = extra.guestProfile;
+
+    let itemClass = 'sl-list-item sl-rich sl-item-animate';
+    if (isSelected) itemClass += ' sl-selected';
+    if (isIncomplete) itemClass += ' sl-incomplete';
+
+    const priorityColor = priority === 'High' ? 'var(--accent)' : 'var(--green)';
+    const dateStr = call.date + ' at ' + call.time;
+
+    // Badge chips with tooltips
+    const memberChip = (gp && gp.member)
+      ? `<div class="badge-tip-wrap"><div class="sl-rich-chip chip-gold">${crownIcon}</div><div class="badge-tip">Gold Member</div></div>`
+      : '';
+    const dietaryChip = gp
+      ? (gp.dietary && gp.dietary.length > 0
+          ? `<div class="badge-tip-wrap"><div class="sl-rich-chip chip-green">${leafIcon}</div><div class="badge-tip">Dietary: ${gp.dietary.join(', ')}</div></div>`
+          : `<div class="sl-rich-chip" style="opacity:0.25">${leafIcon}</div>`)
+      : '';
+    const visitChip = gp
+      ? `<div class="badge-tip-wrap"><div class="sl-rich-chip chip-accent">${gp.visits}</div><div class="badge-tip">${gp.visits} visits</div></div>`
+      : '';
+    const emailChip = gp
+      ? (gp.email
+          ? `<div class="badge-tip-wrap"><div class="sl-rich-chip">${envelopeIcon}</div><div class="badge-tip">${gp.email}</div></div>`
+          : `<div class="sl-rich-chip" style="opacity:0.35">${envelopeIcon}</div>`)
+      : '';
+    let birthdayChip = '';
+    if (gp && gp.birthday) {
+      const days = daysUntilBirthday(gp.birthday);
+      const tip = days === 0 ? 'Birthday today!' : days === 1 ? 'Birthday tomorrow' : `Birthday in ${days} days`;
+      birthdayChip = `<div class="badge-tip-wrap"><div class="sl-rich-chip chip-bday">${cakeIcon}</div><div class="badge-tip">${tip}</div></div>`;
+    }
+
+    const tagsHtml = tags.slice(0, 1).map(t => `<span class="sl-rich-tag">${t}</span>`).join('');
+
+    return `
+      <div class="${itemClass}" style="animation-delay:${i * 20}ms" data-id="${call.id}" onclick="selectCard(${call.id})">
+        <div class="sl-rich-top">
+          <div class="sl-rich-top-left">
+            <span class="priority-badge" style="background:${priorityColor}">Priority: ${priority}</span>
+            <span class="sl-rich-ts">${dateStr}</span>
+          </div>
+          <div class="sl-rich-top-right">
+            <button class="sl-rich-btn-primary" onclick="resolveCard(event,${call.id})">Mark as Resolved</button>
+            <button class="sl-rich-btn-ghost" onclick="event.stopPropagation();selectCard(${call.id})">Details</button>
+          </div>
+        </div>
+        <div class="sl-rich-title">${call.title}</div>
+        <div class="sl-rich-bottom">
+          <div class="sl-rich-bottom-left">
+            <span class="sl-rich-phone">${phoneIcon} ${call.phone}</span>
+            <span class="sl-rich-name">${personIcon} ${callerName}</span>
+            <div class="sl-rich-chips">
+              ${memberChip}
+              ${dietaryChip}
+              ${visitChip}
+              ${emailChip}
+              ${birthdayChip}
+            </div>
+          </div>
+          <div class="sl-rich-bottom-right">${tagsHtml}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  list.innerHTML = `<div class="sl-list">${items}</div>`;
+}
+
+/* ── CARD SELECTION ─────────────────────────────────────────────── */
+function selectCard(id) {
+  const call = ALL_CALLS.find(c => c.id === id);
+  if (!call) return;
+
+  if (selectedCardId === id) {
+    closeDetail();
+    return;
+  }
+
+  // Deselect previous item in DOM directly (no re-render)
+  if (selectedCardId !== null) {
+    const prev = document.querySelector(`.sl-list-item[data-id="${selectedCardId}"]`);
+    if (prev) prev.classList.remove('sl-selected');
+  }
+  selectedCardId = id;
+  const curr = document.querySelector(`.sl-list-item[data-id="${id}"]`);
+  if (curr) curr.classList.add('sl-selected');
+
+  // Merge extra data
+  const extra = CALL_EXTRA[id] || {};
+  const callData = Object.assign({}, call, extra);
+
+  // Priority badge
+  const priorityEl = document.getElementById('detailPriority');
+  const priorityLevel = callData.priority || 'Medium';
+  priorityEl.textContent = 'Priority: ' + priorityLevel;
+  priorityEl.className = 'priority-badge' + (priorityLevel === 'Low' ? ' priority-low' : '');
+
+  // Caller info
+  document.getElementById('detailPhone').textContent = callData.phone;
+  document.getElementById('detailTime').textContent = callData.date + ' · ' + callData.time;
+  document.getElementById('detailCallerName').textContent = callData.callerName || '–';
+  document.getElementById('detailCallTags').innerHTML = (callData.tags || [])
+    .map(t => `<span class="caller-tag">${t}</span>`).join('');
+
+  // Guest Profile
+  const gp = callData.guestProfile;
+  const gpCard = document.getElementById('guestProfileCard');
+  if (gp) {
+    gpCard.style.display = '';
+    document.getElementById('gpVisits').textContent = gp.visits != null ? gp.visits : '–';
+    document.getElementById('gpLastVisit').textContent = gp.lastVisit || '–';
+    document.getElementById('gpBirthday').textContent = gp.birthday || '–';
+    document.getElementById('gpEmail').textContent = gp.email || '–';
+    const memberEl = document.getElementById('gpTagMember');
+    memberEl.style.display = gp.member ? '' : 'none';
+    const dietaryHeaderEl = document.getElementById('gpTagDietary');
+    if (gp.dietary && gp.dietary.length > 0) {
+      dietaryHeaderEl.textContent = '✿ ' + gp.dietary[0];
+      dietaryHeaderEl.style.display = '';
+    } else {
+      dietaryHeaderEl.style.display = 'none';
+    }
+    document.getElementById('gpDietaryTags').innerHTML = (gp.dietary || [])
+      .map(d => `<span class="gp-dietary-tag">✿ ${d}</span>`).join('');
+    document.getElementById('gpPrefTags').innerHTML = (gp.preferences || [])
+      .map(p => `<span class="gp-pref-tag">${p}</span>`).join('');
+    document.getElementById('gpGuestTags').innerHTML = (gp.guestTags || [])
+      .map(t => `<span class="gp-guest-tag">${t}</span>`).join('');
+    // Reset accordion open
+    gpOpen = true;
+    document.getElementById('gpBody').style.display = '';
+    document.getElementById('gpChevron').style.transform = '';
+  } else {
+    gpCard.style.display = 'none';
+  }
+
+  // Call Summary
+  document.getElementById('detailSummaryText').textContent = callData.summary || '–';
+
+  // Audio
+  const durationParts = callData.duration.split(':').map(Number);
+  playDuration = durationParts[0] * 60 + durationParts[1];
+  playProgress = 0;
+  stopPlay();
+  document.getElementById('audioProgressFill').style.width = '0%';
+  document.getElementById('audioTime').textContent = `0:00 / ${callData.duration}`;
+
+  const eventNoteEl = document.getElementById('eventNote');
+  const eventNoteText = document.getElementById('eventNoteText');
+  if (callData.eventNote) {
+    eventNoteEl.style.display = 'flex';
+    eventNoteText.textContent = callData.eventNote;
+  } else {
+    eventNoteEl.style.display = 'none';
+  }
+
+  // Session ID
+  document.getElementById('detailSessionId').textContent = 'Session ID: ' + (callData.sessionId || '–');
+
+  document.getElementById('detailPanel').classList.add('panel-open');
+}
+
+function closeDetail() {
+  if (selectedCardId !== null) {
+    const item = document.querySelector(`.sl-list-item[data-id="${selectedCardId}"]`);
+    if (item) item.classList.remove('sl-selected');
+  }
+  selectedCardId = null;
+  stopPlay();
+  document.getElementById('detailPanel').classList.remove('panel-open');
+}
+
+/* ── RESOLVE ────────────────────────────────────────────────────── */
+function resolveCard(e, id) {
+  e.stopPropagation();
+  resolvedIds.add(id);
+  if (selectedCardId === id) closeDetail();
+
+  const item = document.querySelector(`.sl-list-item[data-id="${id}"]`);
+  if (item) {
+    item.classList.add('sl-item-resolving');
+    setTimeout(() => {
+      renderCards();
+      showToast('Conversation marked as resolved');
+    }, 320);
+  } else {
+    renderCards();
+    showToast('Conversation marked as resolved');
+  }
+}
+
+/* ── TABS ───────────────────────────────────────────────────────── */
+function switchTab(btn, tab) {
+  currentTab = tab;
+  currentPage = 1;
+
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach(b => {
+    const isActive = b.dataset.tab === tab;
+    b.classList.toggle('tab-active', isActive);
+  });
+  updateTabSlider();
+  renderCards();
+}
+
+function updateTabSlider() {
+  const active = document.querySelector('.tab-btn.tab-active');
+  const slider = document.getElementById('tabSlider');
+  const bar = document.getElementById('mainTabBar');
+  if (!active || !slider || !bar) return;
+  const barRect = bar.getBoundingClientRect();
+  const btnRect = active.getBoundingClientRect();
+  slider.style.left = (btnRect.left - barRect.left) + 'px';
+  slider.style.width = btnRect.width + 'px';
+}
+
+/* ── SORT ───────────────────────────────────────────────────────── */
+function setSort(sort) {
+  currentSort = sort;
+  ['Newest', 'Oldest', 'Priority'].forEach(s => {
+    const btn = document.getElementById('sort' + s);
+    if (btn) btn.classList.toggle('sort-active', s.toLowerCase() === sort);
+  });
+  currentPage = 1;
+  renderCards();
+}
+
+/* ── SEARCH ─────────────────────────────────────────────────────── */
+function filterCards() {
+  searchQuery = document.getElementById('searchInput').value;
+  currentPage = 1;
+  renderCards();
+}
+
+/* ── PAGINATION ─────────────────────────────────────────────────── */
+function goToPage(page) {
+  currentPage = page;
+  renderCards();
+  document.getElementById('cardList').scrollTop = 0;
+}
+function changePage(dir) {
+  const filtered = getFilteredCalls();
+  const total = filtered.length < PAGE_SIZE ? filtered.length : 100;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+  renderCards();
+  document.getElementById('cardList').scrollTop = 0;
+}
+
+/* ── AUDIO PLAYER ───────────────────────────────────────────────── */
+function togglePlay() {
+  if (isPlaying) stopPlay();
+  else startPlay();
+}
+
+function startPlay() {
+  isPlaying = true;
+  document.getElementById('playIcon').innerHTML = '<path d="M2 2h3v8H2zM7 2h3v8H7z" fill="currentColor"/>';
+  playInterval = setInterval(() => {
+    playProgress = Math.min(playDuration, playProgress + 0.5);
+    const pct = (playProgress / playDuration) * 100;
+    document.getElementById('audioProgressFill').style.width = pct + '%';
+    document.getElementById('audioTime').textContent =
+      formatTime(playProgress) + ' / ' + formatTime(playDuration);
+    if (playProgress >= playDuration) stopPlay();
+  }, 500);
+}
+
+function stopPlay() {
+  isPlaying = false;
+  clearInterval(playInterval);
+  document.getElementById('playIcon').innerHTML = '<path d="M1 1l8 5-8 5V1z" fill="currentColor"/>';
+}
+
+function seekAudio(e) {
+  const bar = document.getElementById('audioProgress');
+  const rect = bar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  playProgress = pct * playDuration;
+  document.getElementById('audioProgressFill').style.width = (pct * 100) + '%';
+  document.getElementById('audioTime').textContent =
+    formatTime(playProgress) + ' / ' + formatTime(playDuration);
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return m + ':' + (s < 10 ? '0' + s : s);
+}
+
+/* ── COPY PHONE ─────────────────────────────────────────────────── */
+function copyPhone() {
+  const phone = document.getElementById('detailPhone').textContent;
+  navigator.clipboard.writeText(phone).catch(() => {});
+  showToast('Phone number copied');
+}
+
+/* ── GUEST PROFILE TOGGLE ───────────────────────────────────────── */
+let gpOpen = true;
+function toggleGuestProfile() {
+  gpOpen = !gpOpen;
+  document.getElementById('gpBody').style.display = gpOpen ? '' : 'none';
+  document.getElementById('gpChevron').style.transform = gpOpen ? '' : 'rotate(180deg)';
+}
+
+/* ── SESSION ID COPY ────────────────────────────────────────────── */
+function copySessionId() {
+  const text = document.getElementById('detailSessionId').textContent.replace('Session ID: ', '');
+  navigator.clipboard.writeText(text).catch(() => {});
+  showToast('Session ID copied');
+}
+
+/* ── RESOLVE CURRENT ────────────────────────────────────────────── */
+function resolveCurrentCard() {
+  if (!selectedCardId) return;
+  resolveCard({ stopPropagation: () => {} }, selectedCardId);
+}
+
+/* ── WAVEFORM INIT ──────────────────────────────────────────────── */
+function initWaveform() {
+  const heights = [25,40,55,45,70,55,80,65,85,70,75,60,80,90,65,75,70,85,60,55,70,80,65,55,60,70,50,45,35,55,60,50,40,30,45,35,25,30,20,25];
+  const wrap = document.getElementById('audioProgress');
+  if (!wrap) return;
+  const overlay = document.getElementById('audioProgressFill');
+  const barsHtml = heights.map(h => `<div class="wf-bar" style="height:${h}%"></div>`).join('');
+  wrap.insertAdjacentHTML('afterbegin', barsHtml);
+  // Re-append overlay to keep it on top
+  wrap.appendChild(overlay);
+}
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+let toastTimeout;
+function showToast(msg) {
+  clearTimeout(toastTimeout);
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('toast-show');
+  toastTimeout = setTimeout(() => toast.classList.remove('toast-show'), 2800);
+}
+
+/* ── NAV CLICK ──────────────────────────────────────────────────── */
+function navClick(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── INIT ───────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  renderCards();
+  initWaveform();
+  setTimeout(updateTabSlider, 60);
+  window.addEventListener('resize', updateTabSlider);
+});
+</script>
+</body>
+</html>
